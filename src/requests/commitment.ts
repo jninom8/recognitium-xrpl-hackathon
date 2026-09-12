@@ -1,25 +1,9 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import { isValidClassicAddress } from 'xrpl';
 import { CONTRACT_VERSION, TRACK1, type Agreement } from '../shared/contract.js';
 
-/** Canonical format v1: sorted UTF-16 keys, JSON strings, finite safe integers only.
- * No undefined, floats, sparse arrays, custom prototypes, or implicit conversion.
- * Monetary and wide integer values are strings. UTF-8 bytes are hashed verbatim. */
-export function canonical(value: unknown): string {
-  if (value === null || typeof value === 'boolean' || typeof value === 'string') return JSON.stringify(value);
-  if (typeof value === 'number' && Number.isSafeInteger(value) && !Object.is(value, -0)) return String(value);
-  if (Array.isArray(value)) {
-    if (Object.keys(value).length !== value.length) throw new Error('Sparse or extended array');
-    return '[' + value.map(canonical).join(',') + ']';
-  }
-  if (typeof value === 'object' && value !== null && Object.getPrototypeOf(value) === Object.prototype) {
-    const record = value as Record<string, unknown>;
-    return '{' + Object.keys(record).sort().map(key => `${JSON.stringify(key)}:${canonical(record[key])}`).join(',') + '}';
-  }
-  throw new Error('Unsupported canonical value');
-}
-export function sha256(bytes: string | Uint8Array): string { return createHash('sha256').update(bytes).digest('hex'); }
-export function digest(value: unknown): string { return sha256(canonical(value)); }
+export { canonical, sha256, digest } from '../shared/canonical.js';
+import { canonical, sha256 } from '../shared/canonical.js';
 export function documentCommitment(document: Uint8Array, salt = randomBytes(32).toString('hex')) {
   if (!/^[a-f0-9]{64}$/.test(salt)) throw new Error('Invalid document salt');
   return { salt, hash: sha256(Buffer.concat([Buffer.from('recognitium.document.v1\0'), Buffer.from(salt, 'hex'), document])) };

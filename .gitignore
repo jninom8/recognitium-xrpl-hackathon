@@ -16,6 +16,9 @@ wallets/
 secrets/
 # Build/runtime outputs
 node_modules/
+.vercel/
+public/
+/hosted/
 dist/
 .next/
 coverage/

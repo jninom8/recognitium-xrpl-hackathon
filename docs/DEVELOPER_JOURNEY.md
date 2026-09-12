@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **21:49 Paris time (UTC+2)**. About eight minutes to read.
+Evidence through **22:28 Paris time (UTC+2)**. About eight minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -18,8 +18,8 @@ Evidence through **21:49 Paris time (UTC+2)**. About eight minutes to read.
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Plain-language task entrance, request form and tracking; separate completed example and team inbox; technical workspace at `/operator` |
-| Tests | 32 passing local tests, including process crashes with simulated external systems, two-client state checks, durable intake and example separation |
-| Developer capture | Team **Recognitium**; 380 events accepted at the last recorded check |
+| Tests | 34 passing local tests, including process crashes with simulated external systems, two-client state checks, durable intake and example separation |
+| Developer capture | Team **Recognitium**; 412 events accepted at the last recorded check |
 | Last connection checkpoint | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
 | Still to finish | Reviewed request to fresh loan, independent reproduction, fresh joint rehearsal and participant-written final report |
 
@@ -318,3 +318,13 @@ can see what changed without reading private hook data.
 
 *Compiled with AI assistance from recorded project evidence. This shared
 working journal is not the official participant-written final report.*
+
+## September 12, 22:28 Paris: shared Vercel demo
+
+- Founder explicitly authorized continuing past 22:00 and deployment. Reviewed the 19-page lending introduction and all 27 workshop pages, alongside the previously reviewed 10-page challenge (56 event pages total). Native Vanilla evidence remains the foundation; hosting adds shared request review.
+- Created the separate recognitium-xrpl-hackathon Vercel project and private Blob store in cdg1 on the existing Hobby account. Public URL: https://recognitium-xrpl-hackathon.vercel.app/ . Native wallets, service credentials, private state and hook logs were excluded. Hosted role codes are separate and ignored.
+- npm test: 34 passed, 0 failed (4,472 ms). Hosted tests explicitly simulate CAS conflicts and a write accepted before its response is lost. Actual local HTTP tests check role/origin gates and two-client review. No new ledger write or receipt charge.
+- First deployed API returned HTTP 500, ERR_REQUIRE_ESM from @xrplf/isomorphic requiring @noble/hashes. Shared intake unnecessarily imported the ledger SDK through a digest utility. Extracted the identical canonical digest into a dependency-free shared module; native tests still pass. Second deployment returned state HTTP 200 and unauthenticated intake HTTP 401.
+- At 20:28:28 UTC, real deployed Blob-backed HTTP checks passed: requester create, reviewer list and start-review, requester list, concurrent duplicate retry, wrong-role 401, foreign-origin 403 and native setup 403. Synthetic request request-7583f90f-c95f-4dd7-97f0-96dc0a0a4b8b remains UNDER_REVIEW, revision 2, exactly once. This is author-operated verification, not teammate reproduction.
+- Chrome extension verified the public landing and request form. Fresh native agreement creation from intake is still pending; hosted service has no signing endpoint. See [hosted testing](HOSTED_TESTING.md).
+- Hook 2.4.0: registered; flush accepted 27 actual events with HTTP 200 at 20:27:52 UTC, 412 cumulative, zero remaining. No generated participant report was submitted.

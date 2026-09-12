@@ -1,0 +1,15 @@
+**
+!api
+!api/**
+!src
+!src/**
+!web
+!web/**
+!evidence
+!evidence/synthetic-supplier-001.json
+!scripts
+!scripts/build-hosted.mjs
+!package.json
+!package-lock.json
+!tsconfig.json
+!vercel.json

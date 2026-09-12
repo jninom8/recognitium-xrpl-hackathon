@@ -1,5 +1,7 @@
 # Customer interface and working request flow
 
+**Hosted demo:** https://recognitium-xrpl-hackathon.vercel.app/ · [Two-person access and testing](HOSTED_TESTING.md). Shared request review is live; native signing remains local.
+
 September 12, 2026. The founder identified that the earlier browser page exposed
 operator information without providing a usable customer journey. The root page
 now starts with customer tasks. The technical workspace is at /operator.

@@ -1,5 +1,7 @@
 # Test together from two PCs
 
+**Hosted demo:** https://recognitium-xrpl-hackathon.vercel.app/ · [Two-person access and testing](HOSTED_TESTING.md). Shared request review is live; native signing remains local.
+
 The customer interface runs in the application at **port 3000**.
 The technical browser workspace is at **/operator**; the console is a terminal
 command. See [the customer flow](CUSTOMER_FLOW.md) for request intake.

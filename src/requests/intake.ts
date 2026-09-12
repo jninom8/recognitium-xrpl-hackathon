@@ -1,5 +1,5 @@
-import { digest } from "./commitment.js";
-import { Store } from "./store.js";
+import { digest } from "../shared/canonical.js";
+import type { Store } from "./store.js";
 import type {
   FinancingInput,
   FinancingRequest,
@@ -50,7 +50,7 @@ export function financingInput(input: Record<string, unknown>): FinancingInput {
 
 /** Calls run under the server's existing process lock. No ledger or receipt dependency. */
 export class IntakeService {
-  constructor(readonly store: Store<FinancingRequest>) {}
+  constructor(readonly store: Pick<Store<FinancingRequest>, "read" | "write" | "all">) {}
   async list(): Promise<FinancingRequest[]> {
     return (await this.store.all()).sort((a, b) =>
       b.createdAt.localeCompare(a.createdAt),

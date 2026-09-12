@@ -143,6 +143,7 @@ function render() {
   $("source-note").textContent = recorded
     ? "Example · A completed loan using test money. This is not your loan."
     : "Demo · test money. Use made-up business details only.";
+  if (!recorded && state.hosting?.sharedIntake) $("source-note").textContent = "Shared demo · Requests sync between participants. Test money only.";
   if (r?.mode === "fixture")
     $("source-note").textContent =
       "Simulated fixture workspace · No live ledger result is claimed";
@@ -874,8 +875,10 @@ document.addEventListener("click", (e) => {
   if (b.dataset.decision) void applyReview(b.dataset.decision);
   if (b.hasAttribute("data-approve")) void applyReview();
 });
+let nextPollAt = 0;
 setInterval(async () => {
-  if (document.hidden || pollBusy) return;
+  if (document.hidden || pollBusy || Date.now() < nextPollAt) return;
+  nextPollAt = Date.now() + (state?.hosting?.sharedIntake ? 10000 : 3000);
   pollBusy = true;
   try {
     await refresh();

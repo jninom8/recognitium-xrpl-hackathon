@@ -1,5 +1,7 @@
 # Recognitium: XRPL lending hackathon
 
+**Hosted demo:** https://recognitium-xrpl-hackathon.vercel.app/ · [Two-person access and testing](docs/HOSTED_TESTING.md). Shared request review is live; native signing remains local.
+
 A small application connecting a private request and agreement to an actual XRPL
 loan, repayment and checkable receipt. AI can help discover and prepare a request;
 people approve the terms; XRPL moves test funds; Recognitium records commitments.
