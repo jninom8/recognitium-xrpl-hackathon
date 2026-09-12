@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **19:57 Paris time (UTC+2)**. About eight minutes to read.
+Evidence through **21:28 Paris time (UTC+2)**. About eight minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -19,7 +19,7 @@ Evidence through **19:57 Paris time (UTC+2)**. About eight minutes to read.
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Borrower request form and tracking, lender position, protected broker inbox at `/`; technical workspace at `/operator` |
 | Tests | 31 passing local tests, including process crashes with simulated external systems, two-client state checks and durable request intake |
-| Developer capture | Team **Recognitium**; 347 events accepted at the last recorded check |
+| Developer capture | Team **Recognitium**; 366 events accepted at the last recorded check |
 | Last connection checkpoint | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
 | Still to finish | Reviewed request to fresh loan, independent reproduction, fresh joint rehearsal and participant-written final report |
 
@@ -186,6 +186,14 @@ This is an application finding, not an XRPL protocol defect.
 
 ## 3. Check the result
 
+**21:28 challenge alignment check:** all ten PDF pages were reread from the
+founder's ZIP. The recorded native cycle covers page 3's six Track 1 gates;
+the off-ledger agreement/receipt layer is consistent with page 5's Vanilla
+description. Fresh online verification again passed both signatures, receipt
+authority records and XRPL validation. This does not complete the remaining
+fresh customer-request-to-loan bridge or participant-written submission.
+[Exact review and command →](../DEVEX_LOG.md#alignment-001-complete-challenge-pdf-review-and-fresh-native-evidence-check)
+
 **Customer interface checkpoint:** the root page now leads with customer tasks.
 Authenticated intake tests cover duplicate requests, immutable details, broker
 revision checks, two HTTP clients and a real server restart. They use isolated
@@ -244,8 +252,8 @@ independent live reproduction remains a useful next check; CI did not move funds
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **19:53:28**,
-the last recorded delivery returned **HTTP 200**, with **347 accepted events**
+is installed locally in this project, with eight trusted hooks. At **21:28:42**,
+the last recorded delivery returned **HTTP 200**, with **366 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 

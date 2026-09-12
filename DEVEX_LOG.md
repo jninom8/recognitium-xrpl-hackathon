@@ -4,6 +4,28 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## ALIGNMENT-001: complete challenge PDF review and fresh native evidence check
+
+- September 12, 2026, 19:28 UTC. Read all ten pages of XRPL Lending Protocol
+  Hackathon Challenge.pdf directly from the founder's Downloads ZIP. The ignored
+  reference copy matched byte-for-byte; SHA-256:
+  43633187e64f8c68817e3bb88de0bc7ab226217a779c239b73bb989e68fe8f76.
+- Page 3 lists six Track 1 gates: vault, lender deposit, accepted broker loan,
+  borrower drawdown/repayment, capital plus yield withdrawal, native refusal.
+  Existing recorded transactions cover all six. LoanSet itself funds the borrower;
+  no separate LoanDraw is claimed. Page 5 distinguishes Vanilla from adding
+  another ledger primitive. The Recognitium receipt integration is off-ledger.
+- Command: npm run verify -- evidence/synthetic-supplier-001.json --online
+  --mentor-confirmed-open-ended. Exit 0: contentHash consistent, signatures
+  both-valid, receiptChainHash consistent, receiptAuthority
+  online-authority-record-verified, xrplValidation validated-success.
+- This was read-only verification, not a new cycle. Fresh request-to-loan flow,
+  independent reproduction, live rehearsal and participant-authored submission
+  materials remain distinct unfinished gates. Page 8 weights feedback 40%,
+  technical execution 30%, use case 20%, presentation 10%.
+- Hook flush at 19:28:42.046 UTC: HTTP 200, seven observed events accepted,
+  366 cumulative and zero buffered. No generated participant report submitted.
+
 ## CUSTOMER-001: founder feedback turns the operator page into a customer flow
 
 - September 12, 2026, 17:17–17:57 UTC implementation/checkpoints. The founder
