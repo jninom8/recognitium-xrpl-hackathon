@@ -6,6 +6,10 @@ This records the original proposal. Subsequent implementation now connects the
 white interface at port 3000 to shared state and health. See the current
 [contract](FRONTEND_CONTRACT.md) and [two-PC guide](TEAM_TESTING.md). Existing
 native evidence remains unchanged; the concept at port 3100 stays simulated.
+The founder subsequently identified the operator focus as a usability gap.
+The root page now has a [customer flow](CUSTOMER_FLOW.md), with the technical
+workspace preserved at /operator. That implementation supersedes the earlier
+screen organization below.
 
 **Direction: a white, calm fintech workspace that makes one loan easy to explain
 and independently check.** Build the frontend now, alongside a bounded recovery

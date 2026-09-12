@@ -1,6 +1,8 @@
 # Test together from two PCs
 
-The white interface now runs in the actual application at **port 3000**.
+The customer interface runs in the application at **port 3000**.
+The technical browser workspace is at **/operator**; the console is a terminal
+command. See [the customer flow](CUSTOMER_FLOW.md) for request intake.
 Port 3100 remains the separate simulated design concept. The console and app
 consume the same `/api/state` snapshot; health checks never sign or mint receipts.
 
@@ -20,7 +22,8 @@ Requires Node 24+. From an existing clean checkout, use `git pull --ff-only`
 first. Preserve any local changes and coordinate branches before updating.
 
 Both participants open http://127.0.0.1:3000/?mode=recorded on their own PC.
-Choose Request, Lender position and Evidence. Compare:
+Choose Borrower and Lender demo views, then Activity & records. The full
+verification workspace remains at /operator?mode=recorded. Compare:
 
 - Same commit: `git rev-parse HEAD`.
 - Request `synthetic-supplier-001`, version 1, borrower funding 100 test XRP.
@@ -83,6 +86,7 @@ encrypts the forwarded connection; see [OpenSSH's local forwarding reference](ht
 Do not disable host-key checks, relax CORS or bind the wallet app to all interfaces.
 
 Before attempting actions, compare the backend **instance ID** in System status.
+Open /operator to see this technical panel.
 It must match on both PCs. A revision can advance between refreshes; after state
 settles, both should display the same revision and request/transaction hashes.
 The console on either PC can consume that same backend:
@@ -91,7 +95,10 @@ The console on either PC can consume that same backend:
 npm run health -- --watch
 ```
 
-The operator configures three distinct local capabilities using `.env.example`.
+The operator runs `npm run demo:access`, then restarts the backend. This creates
+an ignored `.env` with three distinct random role capabilities without printing
+them. An existing `.env` is never overwritten; fill missing roles locally using
+`.env.example` in that case.
 Give each reviewer only their assigned demo role's capability through a private
 channel. Keep the operator capability on the backend operator's PC. These are
 prototype access controls, not wallet ownership or production authentication.
@@ -109,6 +116,11 @@ invite or raw logs. Each participant sets up their own mandatory development
 hook with their own consent; see [HOOK_SETUP](HOOK_SETUP.md).
 
 ## What to test as a pair
+
+For the customer flow, start with [the request walkthrough](CUSTOMER_FLOW.md).
+The borrower submits an intake and the broker reviews that same record. It
+works without ledger access or creation of a loan or metered receipt. Intake
+review is separate from the exact loan approval described below.
 
 1. Open the same request on both PCs. Check version, amount, network, expiry,
    agreement hash and transaction digest.

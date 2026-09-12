@@ -29,7 +29,10 @@ npm run verify -- evidence/synthetic-supplier-001.json --online --mentor-confirm
 
 Use the [two-PC testing guide](docs/TEAM_TESTING.md) to review the same evidence
 with a teammate and understand the private connection needed for shared actions.
-The white interface is integrated into the application at port 3000. The earlier
+The customer interface is at port 3000; the operator workspace is at /operator.
+Borrowers can submit and track synthetic requests, brokers can review them,
+and lenders can read their recorded position. See the
+[customer flow and its current limits](docs/CUSTOMER_FLOW.md). The earlier
 simulated design concept remains available with `npm run design:preview` at
 http://127.0.0.1:3100, separate from the application.
 

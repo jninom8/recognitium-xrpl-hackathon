@@ -38,6 +38,16 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Pending, not represented as completed
 
+The founder's customer-UX correction is implemented: / now provides borrower,
+lender and broker task views, while /operator retains technical controls.
+Borrower intake submission and broker review are durable authenticated actions;
+local demo role codes were generated into ignored .env and loaded by the server.
+Both role inbox reads returned HTTP 200. The repeatable setup command is
+npm run demo:access; it leaves existing configuration untouched.
+The [customer flow](CUSTOMER_FLOW.md) documents their limits. Connecting reviewed
+intake to a fresh isolated native agreement is still pending. No new loan or
+receipt was created during this milestone.
+
 The white frontend is now integrated into the actual application at port 3000.
 Its request, lender position, evidence and system-status views consume the same
 typed snapshot as `npm run health`. Live local records and published real evidence
@@ -71,6 +81,17 @@ See [the network comparisons](NETWORK_FINDING.md).
 4. Optional MCP discovery and pilot discussion after the native acceptance gates.
 
 ## Fresh implementation evidence, September 12
+
+- Customer interface/intake: 31 tests passed, zero failed; final local run at
+  17:53 UTC took 5,649.7976 ms.
+  Two HTTP clients share immutable intake and broker review across a real server
+  restart; no wallet or loan was created. An initial restart regression returned
+  409 after acknowledged success. The server now releases its writer lock before
+  HTTP 200, with a regression assertion. Chrome checked exact six-decimal
+  requests, validation, access gating and mobile borrower/lender views at
+  390x844 with no horizontal page overflow. Native/evidence tests still pass.
+  Hook at 17:53:28.640 UTC: HTTP 200, 347 cumulative, zero buffered.
+  See CUSTOMER-001 in DEVEX_LOG.
 
 - Shared UI/console integration: 27 local tests passed, zero failed, 3,818.7502 ms.
   New coverage includes safe public projections, stale snapshots, exact review

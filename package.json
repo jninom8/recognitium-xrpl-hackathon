@@ -16,7 +16,8 @@
     "export": "node dist/scripts/export-bundle.js",
     "hook:status": "node scripts/hook-status.mjs",
     "design:preview": "node scripts/preview-design.mjs",
-    "health": "node scripts/console-health.mjs"
+    "health": "node scripts/console-health.mjs",
+    "demo:access": "node scripts/demo-access.mjs"
   },
   "dependencies": {
     "ripple-binary-codec": "2.11.0",

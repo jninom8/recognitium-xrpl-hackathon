@@ -4,6 +4,56 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## CUSTOMER-001: founder feedback turns the operator page into a customer flow
+
+- September 12, 2026, 17:17–17:57 UTC implementation/checkpoints. The founder
+  pointed out that the browser page exposed admin/evidence information without
+  the requested customer interface. The earlier diagram incorrectly suggested
+  a separate finished customer experience existed. The terminal console was
+  never the page the founder had been viewing.
+- Root / now offers borrower requests, plain-language loan tracking, lender
+  position and broker inbox. Native/evidence controls moved to /operator.
+  Customer state preserves funding despite a missing receipt and does not
+  count a refused deposit as confirmed capital.
+- Added authenticated synthetic intake using exact drops, requested days and
+  purpose enums, with no private-document or personal-data fields. Borrower
+  creates; broker reviews. Client UUID plus immutable digest deduplicates
+  retries; revision checks protect review. Records persist in ignored data/intake.
+  These actions have no ledger/receipt dependencies and do not constitute
+  underwriting, loan approval, funding or a receipt.
+- The initial test run passed 30/31: immediate restart returned 409 after an
+  earlier HTTP 200. Code inspection found success sent before writer lock
+  release. Moved response after cleanup; regression now asserts acknowledged
+  writes have no remaining writer lock. Initial corrected run: 31 passed, zero
+  failed, 4,499.2842 ms. This was an application lifecycle defect, not an XRPL defect.
+  Final review corrected activity wording for refused deposits/withdrawals and
+  the request button after opening demo access. npm test passed 31/31 again at
+  17:53 UTC, 5,649.7976 ms. JavaScript syntax checks and TypeScript build passed.
+- Chrome checks: borrower dashboard, lender redemption, agreement costs,
+  request wizard, 250.000001-XRP / 60-day requested-window review and access
+  gate. A 0.5-XRP input produced the minimum-amount message. Mobile at 390x844
+  measured page width 375px and request-dialog width 341px. Browser automation
+  stopped before access-code entry; no real submission, approval or loan.
+- Isolated HTTP tests used synthetic role values and real local persistence:
+  unauthorized/wrong-role/cross-origin actions refused; simultaneous identical
+  intake calls reconciled to one record; review survived a real server restart;
+  retry preserved its version. This is not a teammate reproduction or completion
+  of the remaining funding/persistence/receipt-loss failure matrix.
+- Hook flush at 17:19:31.984 UTC: HTTP 200, 317 cumulative, zero buffered.
+  At 17:43:40.909 UTC, 14 more real events were accepted: 331 cumulative,
+  zero buffered. At 17:53:28.640 UTC, HTTP 200 accepted 16 more: 347 cumulative,
+  zero buffered. No fabricated feedback or generated participant report sent.
+- Handover check found no .env or configured role codes on this PC. Added
+  npm run demo:access: creates separate random codes in ignored .env, never
+  prints them, never copies a wallet/service key, and never overwrites an
+  existing file. Running it twice preserved the first file's SHA-256 hash.
+  Restarted the idle local server with the existing mentor trial and read-only
+  health flags. Private read-only checks returned HTTP 200 for borrower and
+  broker, both seeing the same backend and an empty inbox. No intake was created.
+- Next: reviewed intake to fresh native agreement/run, exact approvals, durable
+  MCP issuance handoff and a two-person rehearsal. Browser wallets and customer
+  deposit/repayment controls remain pending.
+
 ## SYNC-001: shared UI/console state, two-client checks and wallet clarification
 
 - September 12, 2026, evening integration. Connected the original white interface

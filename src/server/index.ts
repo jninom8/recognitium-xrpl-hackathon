@@ -1,16 +1,20 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { timingSafeEqual } from 'node:crypto';
+import { join } from 'node:path';
 import { type Role } from '../shared/contract.js';
 import { NativeAdapter } from '../xrpl/adapter.js';
 import { Cycle } from '../xrpl/cycle.js';
-import { processLock } from '../requests/store.js';
+import { processLock, Store } from '../requests/store.js';
+import { IntakeService } from '../requests/intake.js';
+import type { FinancingRequest } from '../shared/intake.js';
 import { Dashboard, readPublishedBundle, repositoryBundlePath } from './dashboard.js';
 import { HealthMonitor } from './health.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const adapter = new NativeAdapter(process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1'); adapter.client.on('error', () => {});
 const cycle = new Cycle(adapter, process.env.RECOGNITIUM_DATA_DIR ?? 'data', process.env.RECOGNITIUM_WALLET_DIR ?? 'wallets');
+const intake = new IntakeService(new Store<FinancingRequest>(join(cycle.dataDirectory, 'intake')));
 const health = new HealthMonitor(adapter, cycle.receipts, process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1');
 const dashboard = new Dashboard({ records: async () => ({ cycle: await cycle.cycles.read('native') ?? null, requests: await cycle.requests.all() }),
   health: () => health.snapshot(), connected: () => adapter.client.isConnected(), published: readPublishedBundle });
@@ -41,16 +45,22 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
-    if (req.method === 'GET' && path === '/') {
+    if (req.method === 'GET' && (path === '/' || path === '/operator')) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
-      return res.end(await readFile('web/index.html'));
+      return res.end(await readFile(path === '/operator' ? 'web/operator.html' : 'web/index.html'));
     }
-    if (req.method === 'GET' && (path === '/app.js' || path === '/state-client.mjs' || path === '/style.css')) {
+    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css'].includes(path)) {
       res.writeHead(200, { 'Content-Type': path.endsWith('.css') ? 'text/css' : 'text/javascript', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(await readFile('web' + path));
     }
     if (req.method === 'GET' && path === '/api/state') {
       return respond(res,200,await dashboard.snapshot(url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live'));
+    }
+    if (req.method === 'GET' && path === '/api/intake') {
+      const role = url.searchParams.get('role');
+      if (role !== 'borrower' && role !== 'broker') return respond(res,401,{ error: 'Choose a demo role' });
+      authorize(req, role);
+      return respond(res,200,{ instanceId: dashboard.instanceId, observedAt: new Date().toISOString(), requests: await intake.list() });
     }
     if (req.method === 'GET' && path === '/api/evidence/published') {
       res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Disposition': 'attachment; filename="synthetic-supplier-001.json"', 'Cache-Control': 'no-store' });
@@ -62,12 +72,15 @@ const server = createServer(async (req, res) => {
     }
     if (req.method === 'POST') {
       const approval = /^\/api\/requests\/([a-zA-Z0-9_-]+)\/approve\/(broker|borrower)$/.exec(path);
-      authorize(req, approval ? approval[2] as Role : 'operator');
+      const intakeReview = /^\/api\/intake\/([a-zA-Z0-9_-]+)\/review$/.exec(path);
+      authorize(req, path === '/api/intake' ? 'borrower' : intakeReview ? 'broker' : approval ? approval[2] as Role : 'operator');
       const input = await body(req);
       const release = await processLock(cycle.dataDirectory);
+      let result: unknown;
       try {
-        let result: unknown;
-        if (approval) {
+        if (path === '/api/intake') result = await intake.create(input);
+        else if (intakeReview) result = await intake.review(intakeReview[1]!, input);
+        else if (approval) {
           if (typeof input.agreementHash !== 'string' || typeof input.transactionDigest !== 'string') throw new Error('Exact hashes required');
           result = await cycle.service.approve(approval[1]!,approval[2] as Role,input.agreementHash,input.transactionDigest);
         } else {
@@ -100,8 +113,10 @@ const server = createServer(async (req, res) => {
             }
           }
         }
-        return respond(res,200,result);
       } finally { await release(); }
+      // A successful response means both the durable write and writer cleanup
+      // finished. An immediate restart must not strand an acknowledged lock.
+      return respond(res,200,result);
     }
     return respond(res,404,{ error: 'Not found' });
   } catch (error) {

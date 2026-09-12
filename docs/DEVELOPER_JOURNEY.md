@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **18:58 Paris time (UTC+2)**. About seven minutes to read.
+Evidence through **19:57 Paris time (UTC+2)**. About eight minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -17,10 +17,11 @@ Evidence through **18:58 Paris time (UTC+2)**. About seven minutes to read.
 | Realised interest | **20 drops before network fees**, not net profit |
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
-| Tests | 27 passing local tests, including process crashes with simulated external systems and two-client state checks |
-| Developer capture | Team **Recognitium**; 293 events accepted at the last recorded check |
-| Current connection | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
-| Still to finish | Independent reproduction, fresh joint rehearsal and participant-written final report |
+| Customer interface | Borrower request form and tracking, lender position, protected broker inbox at `/`; technical workspace at `/operator` |
+| Tests | 31 passing local tests, including process crashes with simulated external systems, two-client state checks and durable request intake |
+| Developer capture | Team **Recognitium**; 347 events accepted at the last recorded check |
+| Last connection checkpoint | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
+| Still to finish | Reviewed request to fresh loan, independent reproduction, fresh joint rehearsal and participant-written final report |
 
 The business request and document are explicitly **synthetic**. The ledger
 transactions and receipt calls are real observations. All XRP is test XRP.
@@ -57,6 +58,7 @@ timestamps. They are not estimates of hours spent coding.
 | 17:11:24 | Used a separate verifier to look up all seven cap transactions and historical vault states | Cap evidence verified; original vault unchanged; empty experimental vault balance zero |
 | By 18:05 | Researched and previewed the founder's clean white fintech direction in Chrome | Original concept labelled simulated; no new ledger evidence asserted |
 | By 18:58 | Integrated the three views with shared state/health and tested two local clients plus browser reconnection | 27 tests passed; recorded funding survived an idle backend stop/restart; teammate reproduction still pending |
+| 19:17–19:44 | Founder identified that the browser showed operator information, not a usable customer journey; added a customer home, request wizard and broker inbox | Persisted synthetic requests and reviews work; fresh loan creation from those requests remains a separate step; 31 tests passed |
 
 ## 2. What we learned
 
@@ -157,9 +159,43 @@ fees were accounted separately. The two competing deposits landed in consecutive
 ledgers, so a same-ledger race remains untested.
 [Recorded cap evidence →](../evidence/native-cap-001.json)
 
+### User experience: evidence needs a customer task around it
+
+The earlier browser page was the operator interface. Our diagram incorrectly
+suggested that a separate customer experience already existed. The founder's
+feedback made the missing work concrete: a borrower needs to request financing,
+review terms and track progress; a lender needs to understand their position;
+a broker needs an inbox. Technical state and health belong behind those tasks.
+
+The root page now provides those views, while `/operator` preserves the native
+controls and detailed evidence. New synthetic requests persist in a protected
+intake store. Broker review changes their status, but **does not approve or fund
+a loan**. A reviewed request still needs a fresh agreement and both exact
+approvals. [Working flow and remaining boundary →](CUSTOMER_FLOW.md)
+
+The handover check also found missing local role codes. A repeatable setup
+command now creates them in ignored .env without printing them or overwriting
+existing configuration. Both protected inbox reads returned HTTP 200 after the
+local restart; the inbox stayed empty because no real intake was submitted.
+
+A new restart test also exposed a local application defect: an HTTP success
+response could be sent before releasing the writer lock. Stopping the server
+immediately after the response could strand that lock. The response now follows
+cleanup; the regression checks that an acknowledged write has released its lock.
+This is an application finding, not an XRPL protocol defect.
+
 ## 3. Check the result
 
-**Shared interface checkpoint:** the actual app at port 3000 now shows request,
+**Customer interface checkpoint:** the root page now leads with customer tasks.
+Authenticated intake tests cover duplicate requests, immutable details, broker
+revision checks, two HTTP clients and a real server restart. They use isolated
+test-only role values and create no wallet, loan or receipt. All **31 tests**
+passed. Chrome checks covered desktop and mobile borrower/lender views, exact
+six-decimal amount review, validation and the access gate. Browser automation
+stopped before entering a role code; these checks are not a second participant's
+reproduction. [Commands and results →](../DEVEX_LOG.md#customer-001-founder-feedback-turns-the-operator-page-into-a-customer-flow)
+
+**Earlier synchronization checkpoint:** the technical page at `/operator` shows request,
 lender position and evidence from the same state as the console. Source labels
 separate private live records from read-only published real evidence. Backend
 instance IDs and revisions let two reviewers check that they see the same run.
@@ -208,8 +244,8 @@ independent live reproduction remains a useful next check; CI did not move funds
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **18:58:39**,
-the last recorded delivery returned **HTTP 200**, with **293 accepted events**
+is installed locally in this project, with eight trusted hooks. At **19:53:28**,
+the last recorded delivery returned **HTTP 200**, with **347 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 
@@ -223,9 +259,11 @@ stay out of GitHub. Each teammate's own machine needs its own consent and setup.
 
 The founder selected a clean white fintech direction inspired by OpenFX. The
 [design brief](FRONTEND_DESIGN.md) led to an original simulated concept at port
-3100 and then the integrated application at port 3000. The actual interface
-uses shared state, exact request reviews, operator actions, receipt-ID recovery
-and a service-status drawer. It preserves money facts during connectivity loss.
+3100 and then the integrated application at port 3000. Following the founder's
+feedback, the [customer interface](CUSTOMER_FLOW.md) now occupies the root page;
+the technical workspace remains at `/operator`. Both read the same lending
+state. Private request intake adds borrower submission and broker review without
+changing the signed native agreement contract. Money facts survive connectivity loss.
 Fresh-clone users can immediately explore the published real cycle without keys.
 The [two-PC guide](TEAM_TESTING.md) explains independent checks and the private
 connection needed for two browsers to observe one backend's live approvals.
@@ -235,19 +273,21 @@ is a separate compatibility test for network 4001 and two-party native LoanSet
 signing. [Custody and wallet choices](WALLETS.md).
 
 The next shared task has a [fresh-clone reproduction guide and failure matrix](REPRODUCTION_AND_RECOVERY.md).
-It distinguishes the original 21-test baseline, six new state/UI/health/client
-tests and what the four bounded extensions still must prove. A teammate's
-independent outcome remains pending.
+It distinguishes the original 21-test baseline, six state/UI/health/client
+tests and what the four bounded extensions still must prove. Four customer
+intake/view tests now bring the suite to 31. A teammate's independent outcome
+remains pending.
 
-**Recommended next gate:** independently reproduce the evidence, complete
-fresh-run isolation and the durable external MCP issuance handoff, then rehearse
-the whole story together. The old loan's approval has expired; deleting its
-history is not a valid reset. The [frontend contract](FRONTEND_CONTRACT.md)
-separates the implemented synchronization from these remaining requirements.
+**Recommended next gate:** try the borrower-to-broker request flow together,
+then connect a reviewed request to a fresh isolated native agreement and the
+durable external MCP issuance handoff. Independently reproduce the existing
+evidence alongside that work. The old loan's approval has expired; deleting
+its history is not a valid reset. The [frontend contract](FRONTEND_CONTRACT.md)
+separates implemented behavior from these remaining requirements.
 
 | Work | Starting point | Current state |
 |---|---|---|
-| Frontend and demo | [Shared API contract](FRONTEND_CONTRACT.md), `web/` | Synchronized white UI/console implemented; fresh joint demonstration pending |
+| Frontend and demo | [Customer flow](CUSTOMER_FLOW.md), [shared API contract](FRONTEND_CONTRACT.md), `web/` | Customer intake and broker review implemented; reviewed request to fresh loan and joint demonstration pending |
 | Backend and receipts | [Current status](STATUS.md), `src/` | Native cycle verified; direct receipt issuance access needs diagnosis |
 | Targeted experiments | [External review and test matrix](EXTERNAL_REVIEW.md) | Recovery and native cap tests passed; selected cover/impairment tests follow the integrated rehearsal |
 | Mentor discussion | Problems and fixes above, linked evidence | Technical observations collected; unresolved causes stay labelled |

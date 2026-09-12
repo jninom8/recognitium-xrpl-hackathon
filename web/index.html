@@ -1,21 +1,235 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Recognitium | Native lending</title><link rel="stylesheet" href="/style.css"><script type="module" src="/app.js"></script></head>
-<body>
-<div class="concept-strip" id="mode-banner">LIVE LOCAL WORKSPACE · Event network · Test funds · Synthetic documents</div>
-<header class="topbar"><a href="/" class="brand" aria-label="Recognitium home"><span class="brand-mark" aria-hidden="true">r</span>recognitium<span class="brand-dot">.</span></a><span class="workspace-label">Lending workspace</span><button id="health-toggle" class="health-button" aria-expanded="false" aria-controls="health-panel">System status</button></header>
-<main>
-  <div class="page-heading"><div><p class="eyebrow">RECOGNITIUM / XRPL HACKATHON</p><h1>Agree. Fund. Verify.</h1><p class="intro">The approved version, the funds and the evidence. One shared history.</p></div><label class="mode-choice">Workspace<select id="mode"><option value="live">This backend's live records</option><option value="recorded">Published real evidence · read-only</option></select></label></div>
-  <section id="health-panel" class="panel" hidden aria-labelledby="health-heading"><div class="panel-heading"><h2 id="health-heading">Service observations</h2><button id="check-health" class="secondary">Check services</button></div><p class="small-print">Read-only checks. Connectivity does not establish a transaction's validity or receipt authenticity.</p><div id="health-details"></div><p id="sync-id" class="small-print"></p><p class="small-print">Console: <code>npm run health -- --watch</code>. Compare instance ID, revision and request hash when sharing this backend.</p></section>
-  <nav class="view-nav" aria-label="Workspace view"><button data-view="request" aria-pressed="true">Request</button><button data-view="position" aria-pressed="false">Lender position</button><button data-view="evidence" aria-pressed="false">Evidence</button></nav>
-  <div class="sync-bar"><span id="sync-status" role="status" aria-live="polite">Loading shared state…</span><button id="refresh" class="text-button">Refresh now</button></div>
-  <p id="message" class="change-notice" role="status" hidden></p><div id="request-picker"></div>
-  <section class="outcome" aria-label="Request outcome"><div><span class="eyebrow">MONEY</span><h2 id="money-title">Reading recorded state…</h2><p id="money-description"></p></div><div class="outcome-evidence"><span class="eyebrow">EXECUTION EVIDENCE</span><span id="receipt-status" class="badge neutral">Unchecked</span><p id="receipt-description"></p></div></section>
-  <section id="request-view" class="view"><div class="workspace-grid"><section class="panel" id="agreement-panel" aria-label="Agreement"></section><section class="panel" id="execution-panel" aria-label="Execution history"></section></div><details class="operator-tools"><summary>Operator controls · test funds only</summary><p>These actions use this backend's test wallets. Human agreement approval remains separate. Receipt issuance may consume one tick; recovery does not mint a replacement.</p><div id="operator-actions" class="action-grid"></div></details></section>
-  <section id="position-view" class="view panel" hidden aria-label="Lender position"><div id="position"></div></section>
-  <section id="evidence-view" class="view panel" hidden aria-label="Evidence checks"><div id="proof"></div><p><a id="published-download" href="/api/evidence/published">Download the published synthetic evidence bundle</a></p></section>
-  <div class="proof-principle"><span aria-hidden="true">↳</span><p><strong>The agreement says what was approved. The ledger shows what moved.</strong><br>Recognitium links the commitment to its execution. Each remains independently checkable.</p></div>
-  <footer><span id="disclosure"></span><span>Backend-managed test wallets</span></footer>
-</main>
-<dialog id="action-dialog" aria-labelledby="action-title"><form id="action-form"><h2 id="action-title">Review action</h2><p id="action-context"></p><div id="action-review"></div><p id="review-changed" class="change-notice" hidden>The request changed, action closed or backend restarted. Close this review and inspect the current version.</p><fieldset id="recovery-fields" hidden><legend>Existing receipt</legend><label>Receipt stage<select id="receipt-stage"><option value="agreement">Agreement</option><option value="execution">Execution</option></select></label><label>Receipt ID<input id="receipt-id" autocomplete="off" placeholder="DG-…"></label><p id="recovery-hash" class="hash"></p></fieldset><label class="capability-label">Your role's local approval capability<input id="capability" type="password" autocomplete="off" spellcheck="false" required minlength="24"></label><p class="small-print">Kept only for this request. This is prototype role access, not a wallet seed or production identity verification.</p><div class="dialog-actions"><button type="button" id="cancel-action" class="secondary">Cancel</button><button id="confirm-action" class="primary" type="submit">Confirm exact action</button></div></form></dialog>
-</body></html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Recognitium | Your financing</title>
+    <link rel="stylesheet" href="/customer.css" />
+    <script type="module" src="/customer.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Recognitium home"
+        ><span class="brand-icon" aria-hidden="true">r</span>recognitium<span
+          >.</span
+        ></a
+      >
+      <div class="space-label">YOUR WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button data-page="overview" aria-current="page">
+          <span aria-hidden="true">◫</span>Overview</button
+        ><button data-page="requests">
+          <span aria-hidden="true">▤</span
+          ><span id="requests-label">My requests</span></button
+        ><button data-page="activity">
+          <span aria-hidden="true">↗</span>Activity & records
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="test-tag">Test environment</span>
+        <p>Agree. Fund. Verify.</p>
+        <a id="operator-link" href="/operator?mode=recorded"
+          >Operations & system status ↗</a
+        >
+      </div>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <span class="workspace-name">Business financing</span>
+        <div class="profile-controls">
+          <label
+            >Demo view<select id="profile">
+              <option value="borrower">Borrower</option>
+              <option value="lender">Lender</option>
+              <option value="broker">Broker</option>
+            </select></label
+          ><button id="access-button" class="account-button">
+            Demo access
+          </button>
+        </div>
+      </header>
+      <main>
+        <div class="source-bar">
+          <p id="source-note">Loading your workspace…</p>
+          <label class="sr-only" for="source">Data source</label
+          ><select id="source">
+            <option value="recorded">Completed demo</option>
+            <option value="live">Live workspace</option>
+          </select>
+        </div>
+        <p id="notice" class="notice" role="status" hidden></p>
+        <div class="page-heading">
+          <div>
+            <p id="page-eyebrow" class="eyebrow">BORROWER WORKSPACE</p>
+            <h1 id="page-title">Your financing.</h1>
+            <p id="page-subtitle" class="subtitle">
+              Request funding, review the terms and follow your loan.
+            </p>
+          </div>
+          <button id="new-request" class="primary">
+            Request financing <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <section id="overview-page" aria-label="Overview">
+          <div id="overview-content"></div>
+        </section>
+        <section id="requests-page" aria-label="Financing requests" hidden>
+          <div id="requests-content"></div>
+        </section>
+        <section id="activity-page" aria-label="Activity and records" hidden>
+          <div id="activity-content"></div>
+        </section>
+        <footer class="footer">
+          <span>Test XRP · Synthetic business requests</span
+          ><span id="sync-note" role="status">Connecting…</span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="request-dialog" aria-labelledby="request-title">
+      <form id="request-form">
+        <div class="dialog-top">
+          <span class="eyebrow" id="request-step"
+            >NEW FINANCING REQUEST / 1 OF 2</span
+          ><button
+            type="button"
+            class="icon-button"
+            id="request-close"
+            aria-label="Close financing request"
+          >
+            ×
+          </button>
+        </div>
+        <h2 id="request-title">What does your business need?</h2>
+        <p id="request-intro" class="subtitle">
+          Tell the broker what you are looking for. You will review any loan
+          terms separately.
+        </p>
+        <div id="request-fields">
+          <label for="amount">Amount to request</label>
+          <div class="amount-input">
+            <input
+              id="amount"
+              name="amount"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="100"
+              required
+            /><span>test XRP</span>
+          </div>
+          <p class="hint">
+            Between 1 and 10,000 test XRP. Up to six decimal places.
+          </p>
+          <fieldset class="purpose-options">
+            <legend>What will the funding support?</legend>
+            <label
+              ><input
+                type="radio"
+                name="purpose"
+                value="inventory"
+                checked
+              /><span
+                ><strong>Purchase inventory</strong
+                ><small>Materials or stock for your next order</small></span
+              ></label
+            ><label
+              ><input type="radio" name="purpose" value="receivables" /><span
+                ><strong>Bridge a customer payment</strong
+                ><small
+                  >Keep working while an invoice is outstanding</small
+                ></span
+              ></label
+            ><label
+              ><input
+                type="radio"
+                name="purpose"
+                value="working-capital"
+              /><span
+                ><strong>Working capital</strong
+                ><small>Support day-to-day business expenses</small></span
+              ></label
+            >
+          </fieldset>
+          <label for="term">Requested repayment window</label
+          ><select id="term">
+            <option value="7">7 days</option>
+            <option value="30" selected>30 days</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+          </select>
+          <p class="hint">
+            This is a preference for review, not an agreed repayment schedule.
+          </p>
+        </div>
+        <div id="request-summary" hidden></div>
+        <p id="request-error" class="notice error" role="alert" hidden></p>
+        <div class="dialog-footer">
+          <button id="request-back" type="button" class="secondary" hidden>
+            Edit details</button
+          ><span id="request-disclosure" class="hint"
+            >Synthetic request · No funds move at this step</span
+          ><button id="request-next" type="submit" class="primary">
+            Review request →
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="access-dialog" aria-labelledby="access-title">
+      <form id="access-form">
+        <div class="dialog-top">
+          <span class="eyebrow">LOCAL DEMO ACCESS</span
+          ><button
+            type="button"
+            id="access-close"
+            class="icon-button"
+            aria-label="Close demo access"
+          >
+            ×
+          </button>
+        </div>
+        <h2 id="access-title">Open your demo workspace</h2>
+        <p id="access-description" class="subtitle"></p>
+        <label for="access-code">Demo access code</label
+        ><input
+          id="access-code"
+          type="password"
+          minlength="24"
+          required
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <p class="hint">
+          Use the role code configured by the demo operator. This is prototype
+          access, not a wallet connection. The code is kept in this tab's memory
+          only.
+        </p>
+        <p id="access-error" class="notice error" role="alert" hidden></p>
+        <div class="dialog-footer">
+          <button id="access-submit" class="primary">Open workspace</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="review-dialog" aria-labelledby="review-title">
+      <div class="dialog-top">
+        <span class="eyebrow" id="review-eyebrow">REVIEW</span
+        ><button
+          type="button"
+          id="review-close"
+          class="icon-button"
+          aria-label="Close review"
+        >
+          ×
+        </button>
+      </div>
+      <h2 id="review-title">Review details</h2>
+      <div id="review-content"></div>
+      <p id="review-warning" class="notice error" role="alert" hidden></p>
+      <label id="approval-consent" class="check-label" hidden
+        ><input type="checkbox" id="approval-check" />I approve these exact
+        terms and this transaction for my demo role.</label
+      >
+      <div id="review-actions" class="dialog-footer"></div>
+    </dialog>
+  </body>
+</html>

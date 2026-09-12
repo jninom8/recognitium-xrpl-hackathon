@@ -11,7 +11,8 @@ test('local API shows disconnected state and refuses unauthenticated or wrong-ro
     const base=`http://127.0.0.1:${port}`;
     const state=await (await fetch(base+'/api/state')).json();
     assert.equal(state.contractVersion,'recognitium.lending.v1'); assert.equal(state.connected,false);
-    const home=await fetch(base); assert.equal(home.status,200); assert.match(await home.text(),/Agree\. Fund\. Verify\./);
+    const home=await fetch(base); assert.equal(home.status,200); assert.match(await home.text(),/Request financing/);
+    const operatorPage=await fetch(base+'/operator');assert.equal(operatorPage.status,200);assert.match(await operatorPage.text(),/Operator controls/);
     for(const [path,token] of [['/api/setup',''],['/api/setup',broker],['/api/requests/x/approve/borrower',broker]]) {
       const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:'{}'});
       assert.equal(response.status,401);

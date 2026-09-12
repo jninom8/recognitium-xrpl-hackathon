@@ -1,5 +1,13 @@
 # Frontend integration contract
 
+Current customer entry: /, implemented in web/customer.js. The original
+operator/evidence interface is now /operator, using web/app.js. Both read
+the public snapshot; the terminal health script reads it as well. Customer
+intake uses a separate authenticated contract in src/shared/intake.ts.
+See [CUSTOMER_FLOW](CUSTOMER_FLOW.md) for routes, role permissions and limits.
+Intake review is not loan approval and does not automatically prepare or fund
+a new loan. Existing exact agreement approvals retain their original API/gates.
+
 Import types from `src/shared/contract.ts`. This file is browser-safe and has no
 wallet or service dependency. Coordinate changes to its version before changing
 field names. The white `web/` interface now consumes the shared snapshot for its
