@@ -3,7 +3,23 @@
 Status: user approved activation after plan review on September 12. Consent
 identity created, invite verified, project hooks registered and all eight trusted
 through the supported Codex CLI review. Four Codex project skills installed.
-Actual fresh-session capture and accepted delivery are still to be verified.
+Actual fresh-session capture and accepted delivery are verified. On September 12,
+the lifecycle flush accepted 4 events at 11:15:55.330 UTC. During implementation,
+the installed hook's own flush API accepted 14 further real events with HTTP 200
+at 11:30:36.930 UTC: 18 cumulative, zero buffered at that check. Subsequent
+capture includes tool results and an xrpl package install. No event was invented.
+
+Latest verified flush, `2026-09-12T13:18:08.611Z`: 62 further events accepted,
+HTTP 200, zero remaining, 106 cumulative sent. Capture continues during work;
+these numbers are timestamped observations, not a claim that the buffer is always empty.
+
+Use `npm run hook:status` for privacy-filtered counters. To flush existing
+captured events with the installed hook's own API, use
+`node scripts/hook-status.mjs --flush`. This emits only counts and HTTP status.
+Its immediate flush result has its own timestamp; the upstream status field
+`last_flush_at` records lifecycle-hook flushes and can therefore be older.
+Registration/trust are unchanged. Invite, identity, buffers and sent records
+remain ignored, as do any automatic analyses. The manual report is still human-written.
 
 Source: https://github.com/RippleDevRel/xrpl-devex-hook
 
@@ -63,8 +79,8 @@ Official Codex documentation confirms that project hooks are subject to a trust
 review and that changed hooks require renewed review:
 https://developers.openai.com/codex/hooks
 
-The current CLI exposes hook support; runtime capture in the new session has
-not yet been exercised. If the host's tool-event names do not match the hook's
+The current CLI's runtime capture and accepted delivery have been exercised.
+If the host's tool-event names do not match the hook's
 filters, record that observation and resolve it with the mentor rather than
 claiming the hook works because setup returned successfully.
 

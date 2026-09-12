@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recognitium | Native lending</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main><header><p class="eyebrow">RECOGNITIUM · XRPL HACKATHON</p><h1>Agree. Fund. Verify.</h1><p>One shared agreement. Native XRPL lending. Separate proof of what happened.</p><p id="network" class="notice">Loading local state…</p></header>
+<nav aria-label="Role views"><button data-tab="lender">Lender</button><button data-tab="request">Request & approval</button><button data-tab="evidence">Evidence</button><button id="refresh">Refresh</button></nav>
+<section id="lender"><h2>Lender position</h2><p>Deposited capital, available liquidity and realised yield stay separate.</p><div id="position" class="card">No validated deposit yet.</div></section>
+<section id="request" hidden><h2>Review the exact request</h2><p>The broker and borrower each approve the same agreement hash and prepared transaction. A role label does not authorize signing.</p><div id="requests"></div></section>
+<section id="evidence" hidden><h2>Three independent checks</h2><div class="grid"><article class="card"><h3>Content</h3><p>Does this document match the agreed commitment?</p></article><article class="card"><h3>Receipt authority</h3><p>Does the official authority record contain this receipt?</p></article><article class="card"><h3>XRPL validation</h3><p>Did the exact signed transaction validate and move test funds?</p></article></div><pre id="proof">No execution evidence yet.</pre></section>
+<footer id="disclosure"></footer></main></body></html>
