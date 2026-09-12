@@ -41,6 +41,10 @@
 
 ## HOOK-004: continued runtime delivery
 
+- At 13:30:26 UTC, a further 24 existing captured events were accepted with
+  HTTP 200: 130 cumulative, zero buffered. This includes ongoing live-cycle,
+  recovery, verification and implementation activity selected by hook filters.
+
 - Identity audit: display name Recognitium, normalized team `recognitium`,
   consent recorded 11:05:54 UTC, earliest retained event 11:11:29 UTC. All
   106 sent records agree with this team. No identity/invite values exported.
