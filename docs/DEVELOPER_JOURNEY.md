@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **16:05 Paris time (UTC+2)**. About five minutes to read.
+Evidence through **17:13 Paris time (UTC+2)**. About six minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -17,8 +17,9 @@ Evidence through **16:05 Paris time (UTC+2)**. About five minutes to read.
 | Realised interest | **20 drops before network fees**, not net profit |
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
-| Tests | 18 passing local tests; original implementation CI passed |
-| Developer capture | Team **Recognitium**; 167 events accepted at the last recorded check |
+| Tests | 21 passing local tests, including two real process crashes with simulated external systems |
+| Developer capture | Team **Recognitium**; 219 events accepted at the last recorded check |
+| Current connection | New Wi-Fi works: HTTP, WebSocket and SDK each connected in under one second |
 | Still to finish | Frontend/demo integration and participant-written final report |
 
 The business request and document are explicitly **synthetic**. The ledger
@@ -48,6 +49,12 @@ timestamps. They are not estimates of hours spent coding.
 | After the cycle | Verified saved signatures, receipts and transactions through fresh lookups; published reviewed code | Evidence was reproducible independently of the application UI |
 | 15:36–15:40 | Refreshed the brief and compared mentor-recommended beta.1 with stable | Both SDKs verified the recorded cycle; stable already included the signing fix |
 | By 16:05 | Added targeted simulated failure tests, observed two failures and fixed the application | Receipt outages no longer hide validated funding; stale receipt actions cannot rewind progress |
+| 16:20 | Repeated the probe after returning to venue Wi-Fi | The same connection failures returned; ordinary HTTPS still worked |
+| By 16:31 | Reviewed six external proposals and tested actual child-process crashes with simulated external systems | Recovery tests passed; several external claims needed correction; a deposit-formula documentation discrepancy was reproduced |
+| 17:01:57 | Repeated the same probe after another Wi-Fi change | Event HTTP 573 ms, WebSocket 553 ms, SDK 766 ms; ledger 68408 |
+| By 17:06 | Reverified the earlier cycle and corrected optional CTID handling | Loan and metadata matched; fresh responses omitted an optional RPC locator. All online evidence checks then passed |
+| 17:07:31–17:08:01 | Ran the selected cap experiment in a separate 10-test-XRP vault | One competing deposit succeeded, the other and two cap violations were refused; full principal withdrawn |
+| 17:11:24 | Independently looked up all seven cap transactions and historical vault states | Cap evidence verified; original vault unchanged; empty experimental vault balance zero |
 
 ## 2. What we learned
 
@@ -56,6 +63,10 @@ timestamps. They are not estimates of hours spent coding.
 On venue Wi-Fi, RPC timed out and the SDK reported a reset. TCP connected, but
 TLS stalled. The same computer, endpoint and SDK succeeded on the hotspot:
 HTTP **960 ms**, WebSocket **986 ms**, SDK **1,582 ms**.
+
+Returning to venue Wi-Fi at 16:20 reproduced the failure. Another Wi-Fi change
+at 17:01 restored all three connections in under one second, still on network
+4001. The hook continued delivering captured events while ledger access failed.
 
 This strongly implicates the venue network path. Congestion, filtering and
 other intermediary behavior were **not individually isolated**. The separate
@@ -125,6 +136,25 @@ on stable 5.2.0.
 
 [Package differences, timestamps and comparison commands →](SDK_UPDATE.md)
 
+### External review: hypotheses became controlled tests
+
+The six supplied proposals prompted useful tests of caps, cover and impairment.
+They also contained unsupported claims, including missing borrower consent and
+an asserted impairment exploit. We checked these against primary sources and
+our real signatures before changing the application.
+
+One actual discrepancy emerged: the current vault documentation and pinned
+standard recalculate the deposit debit differently when paper loss is nonzero.
+The earlier cycle had zero paper loss, so it does not settle that question.
+[Comparison, sources and selected experiments →](EXTERNAL_REVIEW.md)
+
+The first selected native experiment is now complete: a 10-XRP cap held under
+competing deposits, a one-drop excess and an attempted cap reduction. Each
+refusal was validated `tecLIMIT_EXCEEDED`. Full principal was returned; network
+fees were accounted separately. The two competing deposits landed in consecutive
+ledgers, so a same-ledger race remains untested.
+[Recorded cap evidence →](../evidence/native-cap-001.json)
+
 ## 3. Check the result
 
 **Latest hardening:** a simulated authority outage exposed an unnecessary
@@ -133,6 +163,13 @@ a backwards state transition. Both were reproduced before correction. Four
 regression checks now pass, including the rule that a new submission still needs
 receipt verification and unresolved execution issuance cannot be silently reset.
 [Exact before/after observations →](../DEVEX_LOG.md#recovery-001-targeted-simulated-failures-exposed-two-application-issues)
+
+Two additional tests terminated a real child process at uncertain funding
+checkpoints, then recovered in a new process with one submission. Their external
+ledger and receipts are explicitly simulated. Later, a fresh live check exposed
+an overly strict comparison of optional `ctid` data. The verifier now checks that
+locator when present while comparing all other transaction fields and metadata.
+The unchanged original evidence bundle passed fresh online verification again.
 
 The [synthetic evidence bundle](../evidence/synthetic-supplier-001.json) contains
 the actual transaction hashes, ledger metadata and receipts. The funded LoanSet
@@ -155,8 +192,8 @@ offline consistency from fresh authority and ledger verification.
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **16:05:52**,
-the last recorded delivery returned **HTTP 200**, with **167 accepted events**
+is installed locally in this project, with eight trusted hooks. At **17:13:57**,
+the last recorded delivery returned **HTTP 200**, with **219 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 
@@ -172,6 +209,7 @@ stay out of GitHub. Each teammate's own machine needs its own consent and setup.
 |---|---|---|
 | Frontend and demo | [Shared API contract](FRONTEND_CONTRACT.md), `web/` | Starter UI/API implemented; polished shared demonstration pending |
 | Backend and receipts | [Current status](STATUS.md), `src/` | Native cycle verified; direct receipt issuance access needs diagnosis |
+| Targeted experiments | [External review and test matrix](EXTERNAL_REVIEW.md) | Recovery and native cap tests passed; isolated cover/impairment tests selected next |
 | Mentor discussion | Problems and fixes above, linked evidence | Technical observations collected; unresolved causes stay labelled |
 | Final developer report | [Participant writing template](../DEVELOPER_FEEDBACK.md) | **Participants must write the final account themselves** |
 | Pitch and submission | [Pitch draft](../PITCH.md) | Confirm duration; no event submission made |

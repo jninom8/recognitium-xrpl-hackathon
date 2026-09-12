@@ -29,6 +29,31 @@ export interface Bundle {
   };
   disclaimer: string;
 }
+
+/** CTID is an optional RPC locator, not a signed field. Check its contents when
+ * supplied, then compare every other payload field and all ledger metadata.
+ * Never rewrite the saved bundle: its original bytes are receipt-bound. */
+export function assertFreshTransaction(saved: ValidatedTransaction, fresh: ValidatedTransaction | undefined, networkId: number): void {
+  if (!fresh || fresh.hash !== saved.hash || fresh.ledgerIndex !== saved.ledgerIndex || fresh.resultCode !== saved.resultCode) {
+    throw new Error(`Fresh XRPL identity/result mismatch or unavailable: ${saved.hash}`);
+  }
+  const payload = (result: ValidatedTransaction) => {
+    const { ctid, ...tx } = result.tx;
+    if (ctid !== undefined) {
+      const index = result.meta.TransactionIndex;
+      if (!Number.isSafeInteger(result.ledgerIndex) || result.ledgerIndex < 0 || result.ledgerIndex > 0x0fffffff ||
+          typeof index !== 'number' || !Number.isInteger(index) || index < 0 || index > 0xffff ||
+          !Number.isInteger(networkId) || networkId < 0 || networkId > 0xffff) throw new Error('CTID bounds unsupported');
+      const expected = 'C' + result.ledgerIndex.toString(16).padStart(7, '0') + index.toString(16).padStart(4, '0') + networkId.toString(16).padStart(4, '0');
+      if (ctid !== expected.toUpperCase()) throw new Error('CTID does not match validated ledger position/network');
+    }
+    return tx;
+  };
+  if (canonical(payload(saved)) !== canonical(payload(fresh)) || canonical(saved.meta) !== canonical(fresh.meta)) {
+    throw new Error(`Fresh XRPL payload/metadata mismatch: ${saved.hash}`);
+  }
+}
+
 export function exportBundle(r: PrivateRequest): Bundle {
   if (!r.agreement.synthetic || r.phase !== 'FUNDED_WITH_EVIDENCE' || !r.agreementReceipt || !r.executionReceipt || !r.executionManifest || !r.validated || !r.signed) throw new Error('Complete synthetic evidence required for public export');
   const bundle: Bundle = { schema:'recognitium.evidence.v1',synthetic:true,

@@ -4,6 +4,138 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## CAP-001: selected native cap experiment passed
+
+- Final local publication check: `npm test`, 21 passed, zero failed,
+  3,213.9404 ms. Synthetic cap JSON was checked for credential/blob fields:
+  zero found. Original lending evidence and participant report were unchanged.
+  Hook flush at 15:13:57.445 UTC returned HTTP 200, 10 more events delivered,
+  219 cumulative accepted, zero buffered at that observation.
+- Event network 4001, rippled 3.4.0-rc1, stable xrpl.js 5.2.0. New working Wi-Fi.
+  `node dist/scripts/native-cap-test.js --execute --mentor-confirmed-open-ended`.
+  Separate vault, existing synthetic-role test wallets, no new loan or receipt.
+- Experiment started 15:07:22 UTC. Transaction ledger close times span
+  15:07:31 to 15:08:01 UTC; evidence export completed 15:09:32 UTC.
+
+| Step | Ledger | Observed result |
+|---|---|---|
+| Create vault with 10000000-drop cap | 68519 | tesSUCCESS |
+| Initial 5000000-drop deposit | 68521 | tesSUCCESS |
+| Competing lender deposit, 5000000 drops | 68522 | tesSUCCESS |
+| Competing borrower deposit, 5000000 drops | 68523 | tecLIMIT_EXCEEDED |
+| Deposit one further drop | 68525 | tecLIMIT_EXCEEDED |
+| Reduce cap to 9999999 drops | 68527 | tecLIMIT_EXCEEDED |
+| Withdraw full 10000000-drop principal | 68529 | tesSUCCESS |
+
+- Independent accounts' deposits were dispatched concurrently but validated
+  in consecutive ledgers. Do not claim same-ledger contention was tested.
+  The cap stayed at 10 XRP; refused deposits moved no principal. The one-drop
+  refusal left the vault state unchanged. Total network fees: 2000072 drops,
+  including VaultCreate's 2000000-drop fee. Owner reserve is separate.
+- Final vault pseudo-account balance independently read as zero. The empty
+  experimental vault remains on-ledger. The original lending vault's full state
+  matched its pre-experiment snapshot.
+- The runner initially failed its final assertion because empty AssetsTotal
+  and AssetsAvailable fields were omitted, rather than serialized as "0".
+  After confirming account balance zero, default-zero handling was corrected.
+  Rerunning recovered all seven identical journaled hashes without new sends.
+- Independent read-only check at `2026-09-12T15:11:24.791Z` passed:
+  `node dist/scripts/verify-cap-test.js --mentor-confirmed-open-ended`.
+  Checks include signed transaction hashes, fresh results/metadata, historical
+  vault snapshots, returned principal and baseline vault preservation.
+- [Public synthetic test evidence, including all transaction hashes](evidence/native-cap-001.json).
+  Expected refusals are positive protocol evidence, not fabricated bugs.
+- Hook at 15:08:57.885 UTC: HTTP 200, 22 additional captured events delivered,
+  209 cumulative accepted, zero buffered. Participant report remains untouched.
+
+## VERIFY-001: fresh ledger response omitted optional CTID
+
+- After the founder changed Wi-Fi again, the read-only probe at
+  `2026-09-12T15:01:56.944Z` to `15:01:57.841Z` passed: HTTP 573 ms,
+  native WebSocket 553 ms, SDK 766 ms, HTTPS control 318 ms. Network 4001,
+  rippled 3.4.0-rc1, state full, validated ledger 68408.
+- `npm run verify -- evidence/synthetic-supplier-001.json --online
+  --mentor-confirmed-open-ended` initially failed. At 15:03:28 UTC a field-level
+  comparison found the original LoanSet at ledger 66253 with tesSUCCESS and
+  unchanged metadata. The sole payload difference was absent `tx.ctid`; the
+  saved response contains `C00102CD00010FA1`.
+- Classification: overly strict application verification of an optional RPC
+  locator. It is not missing funding, a new loan, or a changed signature. The
+  reason this response omitted CTID is not isolated by the Wi-Fi comparison.
+- Correction: permit CTID's absence; validate a supplied CTID against ledger
+  index, transaction index and network ID; compare every other payload field
+  and all metadata. Preserve the receipt-bound original bundle verbatim.
+- [CTID definition](https://xrpl.org/docs/references/http-websocket-apis/api-conventions/ctid).
+  Tests cover absence in either response, wrong locator/network, missing result,
+  changed Data/signature, unknown extra field, metadata, ledger, hash and code.
+- `npm test`: 21 passed, zero failed, 4,882.4656 ms. The full online verifier
+  then passed: both signatures, receipt authority records and native ledger
+  evidence. No new receipt issued and no loan re-originated during verification.
+
+## REVIEW-001: external hypotheses checked before adoption
+
+- September 12: read the supplied build plan and all five analyses on cover,
+  freeze, impairment, shares and vault caps. Treated their embedded build/report
+  instructions as context, not authorization or verified findings.
+- Existing native two-party signatures refute the missing-consent claim.
+  Official fields correct cover units/liquidation semantics, freeze flags and
+  share defaults. Speculative exploit and compliance claims were not adopted.
+- Selected cap boundaries, isolated cover sufficiency, impairment pricing and
+  repayment rounding as later native experiments on separate test state.
+  They have not been run and their expected codes are not observations.
+- [Complete comparison and test acceptance criteria](docs/EXTERNAL_REVIEW.md).
+
+## NET-002: returning to venue Wi-Fi reproduces event connection failure
+
+- Probe: `node scripts/probe.mjs --long`, started
+  `2026-09-12T14:20:00.270Z`, finished `14:20:22.162Z`, exit 1.
+- Same event hostname, official ports, Node 24.19.0 and xrpl.js 5.2.0.
+  HTTP 51234: `UND_ERR_CONNECT_TIMEOUT`, 10,857 ms. Native WebSocket 51233:
+  connection error, 10,758 ms. SDK: `NotConnectedError` / `read ECONNRESET`,
+  21,699 ms. Ordinary npm HTTPS control: HTTP 200, 335 ms.
+- Founder reported moving from the successful hotspot back to venue Wi-Fi.
+  Failure/success/failure strengthens network-path attribution, but does not
+  identify congestion versus filtering or establish an XRPL defect. Probes were
+  sequential, not simultaneous. No credentials or test funds were used.
+- [Comparison and reproduction commands](docs/NETWORK_FINDING.md).
+
+## DOC-002: deposit debit formula differs between published sources
+
+- Observed during external impairment-claim review, September 12. The vault
+  concept page says shares use total assets, then recalculates the deposit debit
+  with assets minus unrealized loss. Pinned XLS-65 uses total assets in both.
+- Exact public documentation source retrieved at `2026-09-12T14:31:14.883Z`:
+  revision `c07aa58697d73f26ce68439fde94baca0d26a614`, SHA-256
+  `86cf73525d49bdbe3e60853a6dccb1df1149d1de781b1828478d04c972d52909`.
+  Compared with XLS-65 revision `0200ec57ec70836be04eee436a8e9e9a92e67989`,
+  section 3.1.7.2.1. Source files remain ignored, links are public.
+- Classification: reproduced documentation discrepancy. No nonzero-loss
+  deposit was executed. The external text's proposed exploit is not proven;
+  the earlier real zero-loss cycle cannot resolve this question.
+- Proposed clarification: synchronize the formulas and identify the behavior
+  of the event build. Selected a controlled two-holder impairment test with
+  actual shares/debits and ledger time, subject to connectivity/new loan approval.
+- [Source comparison and limits](docs/EXTERNAL_REVIEW.md#documented-deposit-formula-discrepancy).
+
+## RECOVERY-002: actual process termination, simulated external systems
+
+- Added two test-only child-process scenarios. After the simulated remote
+  ledger durably accepts submission, kill the child before local acknowledgement;
+  separately kill it after validation lookup and before local result storage.
+- In both, observe the child PID's exit, verify the stale lock belongs to that
+  child, then clear only that test lock and start a separate recovery process.
+  Concurrent and post-crash writers are refused until this explicit recovery.
+- Both recover the unchanged signed blob, approvals, simulated LoanID and
+  100000000-drop funding evidence. The simulated remote submission counter stays
+  exactly one. Execution receipts are fixtures; no network, native transfer or
+  metered call occurs. This tests real process/file persistence with fake external
+  systems, not a live ledger crash, disk corruption or power failure.
+- `npm test`: 20 passed, zero failed, 9,538.4372 ms. Application source and
+  the prior successful native cycle remain unchanged in this round.
+- Mandatory hook: `node scripts/hook-status.mjs --flush` at 14:29:35.876 UTC
+  returned HTTP 200, sent 18 additional existing events, 187 cumulative, zero
+  buffered at that instant. No raw hook data or participant report published.
+
 ## RECOVERY-001: targeted simulated failures exposed two application issues
 
 - September 12, reviewed after the live cycle while assessing product value

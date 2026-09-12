@@ -38,6 +38,11 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Pending, not represented as completed
 
+The event probe failed again on venue Wi-Fi at 14:20 UTC, then succeeded after
+another Wi-Fi change at 15:01:57 UTC: HTTP 573 ms, WebSocket 553 ms and SDK 766 ms,
+network 4001, ledger 68408. Native experiment access is restored at this check.
+See [the network comparisons](NETWORK_FINDING.md).
+
 1. Teammate frontend integration and an interactive demonstration of the local
    approval/evidence screens. The adapter, shared contract and live evidence exist.
 2. Direct Recognitium HTTP issuance access returned 403. Authorized MCP issuance
@@ -47,6 +52,25 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 4. Optional MCP discovery and pilot discussion after the native acceptance gates.
 
 ## Fresh implementation evidence, September 12
+
+- Isolated native cap experiment passed after the Wi-Fi change. At cap 10 test
+  XRP, one competing deposit succeeded and one returned `tecLIMIT_EXCEEDED` in
+  consecutive ledgers. A one-drop excess and cap reduction below current assets
+  were also refused. All 10 XRP of principal returned; 2.000072 XRP network fees
+  are separate. Seven transactions and historical state snapshots independently
+  verified online at 15:11:24 UTC. Original vault unchanged; experimental vault
+  remains empty. [Evidence](../evidence/native-cap-001.json).
+  Reproduce read-only: `node dist/scripts/verify-cap-test.js --mentor-confirmed-open-ended`.
+  Hook at 15:13:57 UTC: HTTP 200, 219 cumulative accepted events, zero buffered.
+
+- Read and evaluated six external proposal texts. Kept the working track and
+  selected isolated cap, cover and impairment experiments. Found a reproducible
+  deposit-formula discrepancy between current docs and pinned XLS-65; no exploit
+  or nonzero-loss ledger behavior has been demonstrated. [Review](EXTERNAL_REVIEW.md).
+- Two actual child-process termination/restart tests passed with explicitly
+  simulated ledger and receipt systems, preserving one submission and unchanged
+  signatures/approvals. Stale writer locks remain fail-closed. No new funds moved.
+  Hook delivery at 14:29:35 UTC reached 187 accepted events, zero buffered.
 
 - Mentor beta.1 update evaluated. Both stable and beta.1 reproduced the real
   signed cycle offline; no new transfer or dependency migration. Stable already
@@ -59,13 +83,19 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 - Shared browser-safe contract: `src/shared/contract.ts`. Native transaction
   builders and adapter, durable operation journal, request approval/receipt
   state machine, CLI cycle, local role views and authenticated mutation API
-  implemented. These are implementation milestones, not passed live gates.
-- Latest complete run: 18 tests passed, zero failed, 5,742.5857 ms. Both actual SDK signatures cover Data and the full
+  implemented. The native results and passed acceptance gates are listed below.
+- Latest complete run: 21 tests passed, zero failed, 3,213.9404 ms. Both actual SDK signatures cover Data and the full
   transaction; changed terms/documents reject; missing human approvals or
   agreement receipt block; simulated uncertain submission/restart/receipt outage
   recovers without signing or funding another loan. Additional tests cover API
   roles/origin, nanosecond precision, authority mismatches, stored signature
   integrity, exact repeat blobs, expired unknown history and writer locking.
+- Fresh live verification initially rejected a response missing optional
+  `tx.ctid`; loan hash, ledger 66253, result and metadata matched. The comparison
+  now validates CTID's ledger position/network if present and permits its absence,
+  retaining every other field/metadata check and the original receipt-bound
+  bundle bytes. A new regression rejects changed locators and substantive fields.
+  The complete original cycle passed online verification again after correction.
 - Targeted simulated regressions exposed and fixed two application issues:
   authority availability blocked recovery of already-validated funding, and
   replaying an agreement-receipt action rewound signed/funded phase. Four new

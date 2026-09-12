@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
-import { canonical } from '../src/requests/commitment.js';
-import { verifyOffline, type Bundle } from '../src/recognitium/evidence.js';
+import { verifyOffline, assertFreshTransaction, type Bundle } from '../src/recognitium/evidence.js';
+import type { Agreement } from '../src/shared/contract.js';
 import { RecognitiumClient } from '../src/recognitium/client.js';
 import { NativeAdapter } from '../src/xrpl/adapter.js';
 const path = process.argv[2]; if (!path) throw new Error('Provide bundle path; add --online for fresh checks');
@@ -13,13 +13,15 @@ if (process.argv.includes('--online')) {
   checks.receiptAuthority = 'online-authority-record-verified';
   const adapter = new NativeAdapter(process.argv.includes('--mentor-confirmed-open-ended')); adapter.client.on('error',()=>{});
   try {
-    await adapter.connect();
+    const network = await adapter.connect();
+    const agreement = JSON.parse(bundle.agreementBytes) as Agreement;
+    if (network.networkId !== agreement.network.networkId) throw new Error('Fresh XRPL network differs from agreement');
     const fresh = await adapter.lookup(bundle.transaction.hash);
-    if (!fresh || fresh.resultCode !== 'tesSUCCESS' || fresh.ledgerIndex !== bundle.transaction.ledgerIndex || canonical(fresh.tx) !== canonical(bundle.transaction.tx) || canonical(fresh.meta) !== canonical(bundle.transaction.meta)) throw new Error('Fresh XRPL evidence mismatch or unavailable');
+    assertFreshTransaction(bundle.transaction, fresh, network.networkId);
     checks.xrplValidation = 'validated-success';
     for(const saved of Object.values(bundle.nativeCycle?.transactions ?? {})) {
       const actual=await adapter.lookup(saved.hash);
-      if(!actual || actual.resultCode !== saved.resultCode || actual.ledgerIndex !== saved.ledgerIndex || canonical(actual.tx) !== canonical(saved.tx) || canonical(actual.meta) !== canonical(saved.meta)) throw new Error('Native cycle fresh XRPL evidence mismatch');
+      assertFreshTransaction(saved, actual, network.networkId);
     }
   } finally { if(adapter.client.isConnected()) await adapter.disconnect(); }
 }
