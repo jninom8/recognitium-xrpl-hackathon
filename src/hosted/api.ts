@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { HostedIntake } from './intake.js';
 import { BlobIntakeDatabase } from './blob.js';
-import { authorizeHosted, checkHostedOrigin } from './security.js';
+import { checkHostedOrigin } from './security.js';
 
 const instanceId = 'hosted-' + createHash('sha256').update(process.env.VERCEL_URL ?? 'local-hosted-test').digest('hex').slice(0,24);
 const reply = (res: ServerResponse, status: number, value: unknown) => {
@@ -20,7 +20,7 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     if (req.method === 'GET' && path === '/api/state') {
       const mode = url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live';
       const state = JSON.parse(await readFile(join(process.cwd(), 'hosted', mode + '.json'), 'utf8'));
-      return reply(res, 200, { ...state, instanceId, observedAt: new Date().toISOString(), hosting: { sharedIntake: true, nativeActions: false } });
+      return reply(res, 200, { ...state, instanceId, observedAt: new Date().toISOString(), hosting: { sharedIntake: true, nativeActions: false, openDemo: true } });
     }
     if (req.method === 'GET' && path === '/api/evidence/published') {
       return reply(res, 200, JSON.parse(await readFile(join(process.cwd(), 'hosted', 'bundle.json'), 'utf8')));
@@ -31,7 +31,7 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     if (!isList && !isWrite) return reply(res, 403, { error: 'This hosted service supports request review and the completed example. Native wallet actions run only on the local operator backend.' });
     const role = isList ? url.searchParams.get('role') : review ? 'broker' : 'borrower';
     if (role !== 'broker' && role !== 'borrower') throw new Error('Unauthorized role');
-    authorizeHosted(role, req.headers.authorization?.replace(/^Bearer /, '') ?? '', { borrower: process.env.HOSTED_BORROWER_TOKEN, broker: process.env.HOSTED_BROKER_TOKEN });
+    // Founder-authorized public synthetic demo; these roles are views, not identities.
     if (isList) return reply(res, 200, { instanceId, observedAt: new Date().toISOString(), requests: await intake.list() });
     if (req.headers['content-type'] !== 'application/json') throw new Error('application/json required');
     let input: unknown;

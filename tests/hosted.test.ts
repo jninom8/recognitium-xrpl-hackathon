@@ -36,7 +36,7 @@ test('hosted CAS reconciles concurrent requests and a committed write with a los
   await assert.rejects(b.mutate(r.clientRequestId,{...review,decision:'finish-review'}),/changed/);
   assert.equal(db.records[0]!.status,'UNDER_REVIEW');
 });
-test('hosted HTTP roles share intake; wrong roles, origins and native actions are refused', async () => {
+test('public hosted intake needs no code; invalid views, origins and native actions are refused', async () => {
   const borrower = 'fixture-requester-'.padEnd(40,'R'), broker = 'fixture-reviewer-'.padEnd(40,'B');
   process.env.HOSTED_BORROWER_TOKEN = borrower; process.env.HOSTED_BROKER_TOKEN = broker;
   const db = new Database(), server = createServer(createHostedHandler(new HostedIntake(db)));
@@ -44,18 +44,18 @@ test('hosted HTTP roles share intake; wrong roles, origins and native actions ar
   const base = 'http://127.0.0.1:'+(server.address() as {port:number}).port;
   const call = (path:string, token?:string, input?:unknown, origin?:string) => fetch(base+path, {method:input?'POST':'GET', headers:{...(token?{Authorization:'Bearer '+token}:{}),...(input?{'Content-Type':'application/json'}:{}),...(origin?{Origin:origin}:{})},...(input?{body:JSON.stringify(input)}:{})});
   try {
-    assert.equal((await call('/api/intake?role=broker')).status,401);
-    assert.equal((await call('/api/intake',broker,example())).status,401);
+    assert.equal((await call('/api/intake?role=broker')).status,200);
+    assert.equal((await call('/api/intake?role=invalid')).status,401);
     assert.equal((await call('/api/intake',borrower,example(),'https://untrusted.invalid')).status,403);
     assert.equal((await call('/api/setup',borrower,{})).status,403);
     assert.equal((await call('/api/requests/example/sign',broker,{})).status,403);
     const malformed = await fetch(base+'/api/intake',{method:'POST',headers:{Authorization:'Bearer '+borrower,'Content-Type':'application/json'},body:'{'});
     assert.equal(malformed.status,400);
-    const created = await call('/api/intake',borrower,example()); assert.equal(created.status,200);
+    const created = await call('/api/intake',undefined,example()); assert.equal(created.status,200);
     const r = await created.json();
-    const inbox = await (await call('/api/intake?role=broker',broker)).json();
+    const inbox = await (await call('/api/intake?role=broker')).json();
     assert.equal(inbox.requests.length,1);
-    assert.equal((await call('/api/intake/'+r.clientRequestId+'/review',broker,{expectedRevision:1,requestDigest:r.requestDigest,decision:'start-review'})).status,200);
+    assert.equal((await call('/api/intake/'+r.clientRequestId+'/review',undefined,{expectedRevision:1,requestDigest:r.requestDigest,decision:'start-review'})).status,200);
     const next = await (await call('/api/intake?role=borrower',borrower)).json();
     assert.equal(next.requests[0].status,'UNDER_REVIEW'); assert.equal(next.instanceId,inbox.instanceId);
     assert.equal('transaction' in next.requests[0],false);

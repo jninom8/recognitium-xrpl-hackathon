@@ -154,7 +154,7 @@ function render() {
   $("access-button").textContent = hasAccess()
     ? "Lock workspace"
     : role() === "broker" ? "Open review inbox" : "Open my requests";
-  $("access-button").hidden = lender || recorded;
+  $("access-button").hidden = lender || recorded || state.hosting?.openDemo;
   $("requests-label").textContent =
     role() === "broker" ? "Review inbox" : "My requests";
   document.querySelector("[data-page=requests]").hidden = lender;
@@ -235,7 +235,7 @@ function render() {
 function borrowerStart() {
   const requests = privateRequests();
   if (hasAccess() && requests.length) return requestList(false);
-  return `<section class='card next-step-card'><p class='eyebrow'>HOW IT WORKS</p><h2>You stay in control.</h2><ol class='simple-steps'><li><span>1</span><div><h3>Tell us what you need</h3><p>Choose an amount, what it is for and when you would like to pay it back.</p></div></li><li><span>2</span><div><h3>Follow the review</h3><p>Your teammate checks the request. See the same progress on both computers.</p></div></li><li><span>3</span><div><h3>Understand what comes next</h3><p>Review is not loan approval. A future offer must show every cost before both sides agree.</p></div></li></ol><p class='plain-note'>Available now: request and review together. New offers and funding are not connected to this website yet. Explore the completed example to follow a real test loan.</p></section><p class='help-line'>Already sent a request? <button class='text-button' data-access>Open my requests →</button></p>`;
+  return `<section class='card next-step-card'><p class='eyebrow'>HOW IT WORKS</p><h2>You stay in control.</h2><ol class='simple-steps'><li><span>1</span><div><h3>Tell us what you need</h3><p>Choose an amount, what it is for and when you would like to pay it back.</p></div></li><li><span>2</span><div><h3>Follow the review</h3><p>Switch to the review area to check the request. The same progress appears in both views.</p></div></li><li><span>3</span><div><h3>Understand what comes next</h3><p>Review is not loan approval. A future offer must show every cost before both sides agree.</p></div></li></ol><p class='plain-note'>Available now: request and review together. New offers and funding are not connected to this website yet. Explore the completed example to follow a real test loan.</p></section><p class='help-line'>Already sent a request? <button class='text-button' data-access>Open my requests →</button></p>`;
 }
 function loanCard(r, c, outcome) {
   return `<section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>BUSINESS FUNDING</p><h2>${outcome.repaid ? "Loan repaid" : outcome.funded ? "Money received" : "Your loan agreement"}</h2></div>${badge(outcome.label, outcome.tone)}</div><div class='big-amount'>${esc(drops(outcome.funded ? r.funding.borrowerFundingDrops : r.agreement.terms.principalDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Interest rate per year", r.agreement.terms.interestRate / 1000 + "%")}${fact("Repayment", outcome.repaid ? "Complete" : outcome.funded ? "In progress" : "Not started")}${fact("Agreement", "Version " + r.agreement.documentVersion)}</dl><div class='card-bottom'><p class='hint'>${esc(outcome.description)}</p><button class='text-button' data-loan>View agreement →</button></div></section>`;
@@ -422,6 +422,10 @@ async function refresh() {
       state.revision !== next.revision ||
       state.mode !== next.mode;
     state = next;
+    if (next.hosting?.openDemo && role() !== "lender" && access?.role !== role()) {
+      inboxSequence++;
+      access = {role: role(), token: ""};
+    }
     available = true;
     if (changed) render();
     else
@@ -441,7 +445,7 @@ async function loadIntake() {
   const session = access, ticket = ++inboxSequence;
   try {
     const response = await fetch("/api/intake?role=" + session.role, {
-      headers: { Authorization: "Bearer " + session.token },
+      headers: session.token ? { Authorization: "Bearer " + session.token } : {},
       signal: AbortSignal.timeout(10000),
     });
     if (!response.ok) throw Error();
@@ -470,7 +474,9 @@ async function loadIntake() {
     render();
   }
 }
-function openAccess() {
+async function openAccess() {
+  if (!state) await refresh();
+  if (state?.hosting?.openDemo) { await loadIntake(); if (draft && $("request-dialog").open) showDraftReview(); else setPage("requests"); return; }
   if (role() === "lender") return;
   $("access-description").textContent =
     role() === "broker"
@@ -631,7 +637,7 @@ $("request-form").addEventListener("submit", async (e) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + access.token,
+        ...(access.token ? {Authorization: "Bearer " + access.token} : {}),
       },
       body: JSON.stringify(pending),
       signal: AbortSignal.timeout(15000),
@@ -820,7 +826,7 @@ async function applyReview(decision) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + access.token,
+        ...(access.token ? {Authorization: "Bearer " + access.token} : {}),
       },
       body: JSON.stringify(input),
       signal: AbortSignal.timeout(15000),
