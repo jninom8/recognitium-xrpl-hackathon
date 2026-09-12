@@ -29,7 +29,7 @@ export class Cycle {
   readonly journal: Journal;
   readonly receipts = new RecognitiumClient();
   readonly service: LendingService;
-  constructor(readonly adapter: NativeAdapter, readonly dataDirectory = 'data', readonly walletDirectory = 'wallets') {
+  constructor(readonly adapter: NativeAdapter, readonly dataDirectory = 'data', readonly walletDirectory = 'wallets', readonly onProgress?: () => Promise<void>) {
     this.wallets = new Store<SavedWallet>(walletDirectory);
     this.cycles = new Store<CycleRecord>(join(dataDirectory, 'cycles'));
     this.requests = new Store<PrivateRequest>(join(dataDirectory, 'requests'));
@@ -97,6 +97,7 @@ export class Cycle {
     const result = await this.execute(name, tx, wallet);
     record.steps[name] = { hash: result.hash, ledgerIndex: result.ledgerIndex, resultCode: result.resultCode };
     await this.cycles.write('native', record);
+    await this.onProgress?.();
     if (result.resultCode !== 'tesSUCCESS') throw new Error(`${name}: validated ${result.resultCode}`);
     return result;
   }

@@ -26,3 +26,9 @@ export function drops(value) {
   const fraction = (absolute % 1000000n).toString().padStart(6, '0').replace(/0+$/, '');
   return `${n < 0n ? '-' : ''}${absolute / 1000000n}${fraction ? '.' + fraction : ''}`;
 }
+
+export function cycleFor(state, requestId) {
+ if (!requestId) return state?.cycle;
+ if (state?.cyclesByRequest) return state.cyclesByRequest[requestId] ?? null;
+ return state?.cycle?.requestId === requestId ? state.cycle : null;
+}

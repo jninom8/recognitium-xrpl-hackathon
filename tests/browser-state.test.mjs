@@ -19,3 +19,11 @@ test('approval review locks exact hashes, role action and backend identity; tiny
   assert.equal(sameReview(review,{...state,requests:[{...r,actions:[{id:'approve/broker',allowed:false}]}]}),false);
   assert.equal(drops('200000020'),'200.00002');assert.equal(drops('20'),'0.00002');assert.equal(drops(undefined),'Not observed');
 });
+
+test('selected loan never inherits another run cycle',async()=>{
+ const {cycleFor}=await import('../web/state-client.mjs');
+ const a={requestId:'A',yield:{realisedYieldDrops:'20'}},b={requestId:'B',steps:{}};
+ const state={cycle:a,cyclesByRequest:{A:a,B:b}};
+ assert.equal(cycleFor(state,'B'),b);assert.equal(cycleFor(state,'missing'),null);
+ assert.equal(cycleFor({cycle:a},'B'),null);assert.equal(cycleFor({cycle:a},'A'),a);
+});

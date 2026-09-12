@@ -22,7 +22,12 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
       const mode = url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live';
       const state = JSON.parse(await readFile(join(process.cwd(), 'hosted', mode + '.json'), 'utf8'));
       const progress = mode === 'live' ? await readPublicRuns() : undefined;
-      if (progress?.runs.length) { state.requests = progress.runs.map(r=>r.request); state.cyclesByRequest = Object.fromEntries(progress.runs.map(r=>[r.request.agreement.requestId,r.cycle])); state.cycle = progress.runs[0]!.cycle; state.revision = progress.revision; }
+      if (progress?.runs.length) {
+        state.requests = progress.runs.flatMap(r=>r.request?[r.request]:[]);
+        state.cyclesByRequest = Object.fromEntries(progress.runs.map(r=>[r.requestId,r.cycle]));
+        state.bridgeByRequest = Object.fromEntries(progress.runs.map(({request,cycle,updatedAt,...p})=>[p.requestId,p]));
+        state.cycle = progress.runs[0]!.cycle; state.revision = progress.revision;
+      }
       return reply(res, 200, { ...state, instanceId, observedAt: new Date().toISOString(), hosting: { sharedIntake: true, nativeActions: false, openDemo: true } });
     }
     if (req.method === 'GET' && path === '/api/evidence/published') {

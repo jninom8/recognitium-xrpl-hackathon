@@ -1,4 +1,4 @@
-import { SnapshotCursor, sameReview, drops } from "/state-client.mjs";
+import { SnapshotCursor, sameReview, drops, cycleFor } from "/state-client.mjs";
 import {
   currentInboxResponse,
   purposes,
@@ -132,10 +132,19 @@ function privateRequests() {
     ? (intake?.requests ?? [])
     : [];
 }
+function syncLabel(snapshot) {
+ const publication = snapshot.bridgeByRequest?.[selected()?.agreement.requestId]?.publishedAt;
+ return 'Page refreshed ' + new Date(snapshot.observedAt).toLocaleTimeString() + (snapshot.hosting ? publication ? ' · Native progress published ' + fullTime(publication) : ' · No fresh native progress' : ' · See verification check times');
+}
+function rowStatus(request) {
+ const loan=state.requests.find(r=>r.agreement.requestId===request.clientRequestId);
+ if(loan)return loanOutcome(loan,cycleFor(state,request.clientRequestId)).label;
+ return state.bridgeByRequest?.[request.clientRequestId] ? 'Preparing vault and offer' : intakeStates[request.status].label;
+}
 function render() {
   if (!state || state.mode !== $("source").value) return;
   const r = selected(),
-    c = r && state.cyclesByRequest ? state.cyclesByRequest[r.agreement.requestId] : $("source").value === "recorded" || r ? state.cycle : undefined,
+    c = cycleFor(state, r?.agreement.requestId),
     outcome = loanOutcome(r, c),
     borrower = role() === "borrower",
     lender = role() === "lender";
@@ -207,7 +216,7 @@ function render() {
             : "Review the business request before preparing any loan terms.";
   $("new-request").hidden = !borrower || page === "activity" || recorded;
   $("sync-note").textContent = available
-    ? "Updated " + new Date(state.observedAt).toLocaleTimeString()
+    ? syncLabel(state)
     : "Connection paused · Last recorded facts retained";
   if (lender) renderLender(r, c);
   else if (borrower && !recorded && !r) {
@@ -343,7 +352,7 @@ function requestList(compact) {
     .slice(0, compact ? 4 : 100)
     .map(
       (r) =>
-        `<div class='request-row'><div><h3>${esc(purposes[r.purpose])}</h3><p>Request ${esc(shortId(r.clientRequestId))} · ${date(r.createdAt)}</p></div><div><strong>${esc(drops(r.requestedDrops))} test XRP</strong><p>${r.requestedDays} days requested</p></div><div>${badge(state.requests.some(loan=>loan.agreement.requestId===r.clientRequestId) ? 'Loan agreement available' : intakeStates[r.status].label, intakeStates[r.status].tone)}</div><button class='secondary' data-intake='${esc(r.clientRequestId)}'>${role() === "broker" ? "Review request" : "View request"}</button></div>`,
+        `<div class='request-row'><div><h3>${esc(purposes[r.purpose])}</h3><p>Request ${esc(shortId(r.clientRequestId))} · ${date(r.createdAt)}</p></div><div><strong>${esc(drops(r.requestedDrops))} test XRP</strong><p>${r.requestedDays} days requested</p></div><div>${badge(rowStatus(r), intakeStates[r.status].tone)}</div><button class='secondary' data-intake='${esc(r.clientRequestId)}'>${role() === "broker" ? "Review request" : "View request"}</button></div>`,
     )
     .join(
       "",
@@ -356,6 +365,7 @@ function activity(r, c) {
       "A request under review is not a funded loan. Your agreement and payments will appear once they exist.",
     );
   const events = [];
+  if(c?.refusal)events.push({title:'Withdrawal refused: funds were lent out',description:'The ledger enforced available liquidity. The refused withdrawal did not fund or repay a loan.',...c.refusal});
   if (role() === "lender" && c?.steps.deposit)
     events.push({
       title:
@@ -414,7 +424,7 @@ function activity(r, c) {
   events.sort(
     (a, b) => (a.ledgerIndex ?? Infinity) - (b.ledgerIndex ?? Infinity),
   );
-  return `<section class='card'><p class='eyebrow'>FINANCING ACTIVITY</p>${events.map((e) => `<div class='activity-row'><span class='feature-icon' aria-hidden='true'>${e.resultCode === "tesSUCCESS" ? "✓" : "↗"}</span><div class='activity-main'><h3>${esc(e.title)}</h3><p>${esc(e.description)}</p><details><summary>Transaction details</summary><p class='hash'>${esc(e.hash)}</p><p>${esc(e.resultCode ?? "Awaiting validation")} · Ledger ${esc(e.ledgerIndex ?? "not yet recorded")}</p></details></div>${badge(e.resultCode === "tesSUCCESS" ? "Confirmed" : e.resultCode ? "Declined" : "Pending", e.resultCode === "tesSUCCESS" ? "green" : "amber")}</div>`).join("")}</section><div class='section-heading'><h2>Your records</h2></div><div class='record-links'><section class='card'><h3>Loan agreement</h3><p class='hint'>Version ${r.agreement.documentVersion}. Review the terms associated with this loan.</p><button class='text-button' data-loan>View agreement →</button></section><section class='card'><h3>Funding receipt</h3><p class='hint'>${r.executionReceipt ? "A receipt is recorded for the funding execution. Authority checks and ledger checks remain separate." : "The funding receipt is pending. Established funding remains recorded."}</p><a class='text-button' href='/operator?mode=${state.mode}'>Inspect verification records ↗</a></section></div><p class='hint'>${state.mode === "recorded" ? "These are saved real test-network records, checked offline. A page refresh does not repeat every ledger and authority lookup." : "This view uses stored results. Service availability does not establish the outcome of an individual transaction."}</p>`;
+  return `<section class='card'><p class='eyebrow'>FINANCING ACTIVITY</p>${events.map((e) => `<div class='activity-row'><span class='feature-icon' aria-hidden='true'>${e.resultCode === "tesSUCCESS" ? "✓" : "↗"}</span><div class='activity-main'><h3>${esc(e.title)}</h3><p>${esc(e.description)}</p><details><summary>Transaction details</summary><p class='hash'>${esc(e.hash)}</p><p>${esc(e.resultCode ?? "Awaiting validation")} · Ledger ${esc(e.ledgerIndex ?? "not yet recorded")}</p></details></div>${badge(e.resultCode === "tesSUCCESS" ? "Confirmed" : e.resultCode ? "Declined" : "Pending", e.resultCode === "tesSUCCESS" ? "green" : "amber")}</div>`).join("")}</section><div class='section-heading'><h2>Your records</h2></div><div class='record-links'><section class='card'><h3>Loan agreement</h3><p class='hint'>Version ${r.agreement.documentVersion}. Review the terms associated with this loan.</p><button class='text-button' data-loan>View agreement →</button></section><section class='card'><h3>Funding receipt</h3><p class='hint'>${r.executionReceipt ? "A receipt is recorded for the funding execution. Authority checks and ledger checks remain separate." : r.funding.status === "funded" ? "Money received. The funding receipt is still pending." : "No funding receipt is expected until money has been received."}</p><a class='text-button' href='/operator?mode=${state.mode}'>Inspect verification records ↗</a></section></div><p class='hint'>${state.mode === "recorded" ? "These are saved real test-network records, checked offline. A page refresh does not repeat every ledger and authority lookup." : "This view uses stored results. Service availability does not establish the outcome of an individual transaction."}</p>`;
 }
 async function refresh() {
   const ticket = cursor.begin($("source").value);
@@ -440,7 +450,7 @@ async function refresh() {
     if (changed) render();
     else
       $("sync-note").textContent =
-        "Updated " + new Date(next.observedAt).toLocaleTimeString();
+        syncLabel(next);
   } catch {
     if (ticket !== cursor.sequence) return;
     available = false;
@@ -719,6 +729,8 @@ function openIntake(id) {
   if (role() === "broker")
     $("review-content").innerHTML +=
       `<p class='hint'>Marking intake reviewed does not approve credit or create loan terms. Native preparation and its exact approvals are separate.</p>`;
+  const progress=state.bridgeByRequest?.[id];const native=cycleFor(state,id);
+  if(progress) $('review-content').innerHTML += '<h3>Native preparation</h3><p class="hint">Published '+esc(fullTime(progress.publishedAt))+' · '+esc(progress.stage)+'</p><dl class="costs">'+fact(native?.steps.deposit?.resultCode==='tesSUCCESS'?'Lender deposit confirmed':'Planned lender deposit',native?amount(native.depositDrops):'Not confirmed')+fact(native?.steps.cover?.resultCode==='tesSUCCESS'?'Broker cover confirmed':'Planned broker cover',native?amount(native.coverDrops):'Not confirmed')+'</dl><ol class="journey">'+['vault','deposit','broker','cover'].map(name=>'<li><div><h3>'+esc(name)+'</h3><p>'+esc(native?.steps[name]?.resultCode??'Awaiting confirmation')+'</p></div></li>').join('')+'</ol>';
   const linked = state.requests.find(r=>r.agreement.requestId===id);
   if(linked) $('review-actions').innerHTML += `<button class='primary' data-linked-loan='${esc(id)}'>View loan agreement →</button>`;
   $("review-warning").hidden = true;
@@ -763,6 +775,9 @@ function openLoan() {
       .join(
         "",
       )}${fact("Network transaction fee", amount(r.preparedTransaction.Fee))}${fact("Approval expires", fullTime(a.expiresAt))}${fact("Transaction expires", "After ledger " + r.preparedTransaction.LastLedgerSequence)}${fact("Network", "Event network " + a.network.networkId)}${fact("Transaction sequence", r.preparedTransaction.Sequence)}${fact("Loan flags", t.flags)}</dl><details><summary>Accounts and exact agreement identifiers</summary><p class='hash'>Borrower: ${esc(a.accounts.borrower)}<br>Broker: ${esc(a.accounts.broker)}<br>Lender: ${esc(a.accounts.lender)}<br>Agreement: ${esc(r.agreementHash)}<br>Transaction digest: ${esc(r.transactionDigest)}<br>Document commitment: ${esc(a.documentCommitment)}<br>Vault: ${esc(a.vaultId)}<br>Loan broker: ${esc(a.loanBrokerId)}</p></details><p class='hint'>${state.mode === "recorded" ? "This completed agreement is read-only. Both transaction signatures were checked in the published evidence." : "The backend holds the demo signing keys. Your approval is an application permission for these exact terms; selecting a role alone does not approve."}</p>`;
+  const intakeRequest=privateRequests().find(x=>x.clientRequestId===a.requestId);
+  const approvals=['broker','borrower'].map(role=>fact(role==='broker'?'Reviewer approval':'Borrower approval',r.approvals.some(x=>x.role===role)?'Exact terms approved':'Awaiting exact approval')).join('');
+  $('review-content').innerHTML += '<h3>Request, offer and decisions</h3><dl class="costs">'+(intakeRequest?fact('Originally requested',intakeRequest.requestedDays+' days')+fact('Offered repayment interval',t.paymentInterval+' seconds'):'')+approvals+'</dl>'+(intakeRequest&&t.paymentInterval!==intakeRequest.requestedDays*86400?'<p class="notice">Demo counter-offer: the repayment period differs from the original request. Approval applies to this offered period.</p>':'')+(state.hosting?'<p class="hint">The local operator records your explicit approval and executes the native loan. Viewing this agreement does not approve or sign it.</p>':'');
   const canApprove = state.mode === "live" && action?.allowed;
   $("approval-consent").hidden = !canApprove;
   $("approval-check").checked = false;

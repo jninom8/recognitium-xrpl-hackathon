@@ -102,6 +102,9 @@ export interface AppState {
   connected: boolean;
   requests: DashboardRequest[];
   cycle: CycleView | null;
+  cyclesByRequest?: Record<string, CycleView | null>;
+  bridgeByRequest?: Record<string, BridgeProgress>;
+  hosting?: {sharedIntake:boolean; nativeActions:boolean; openDemo:boolean};
   health: DashboardHealth;
   actions: ActionView[];
   verification: { scope: 'local-records' | 'published-bundle-offline'; checkedAt: string };
@@ -139,4 +142,8 @@ export interface DashboardRequest extends RequestView {
   actions: ActionView[];
   receiptRecovery: { agreementHash: string; executionHash?: string; pendingStage?: 'agreement' | 'execution' };
   funding: { status: 'unfunded' | 'unknown' | 'funded' | 'refused'; borrowerFundingDrops?: string };
+}
+
+export interface BridgeProgress {
+ requestId:string;stage:string;requestedDrops:string;requestedDays:number;offeredIntervalSeconds:number;publishedAt:string;intakeDigest:string;intakeRevision:number;
 }

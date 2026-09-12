@@ -1,4 +1,4 @@
-import { SnapshotCursor, sameReview, drops } from '/state-client.mjs';
+import { SnapshotCursor, sameReview, drops, cycleFor } from '/state-client.mjs';
 const $ = id => document.getElementById(id);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const json = value => `<pre>${escape(JSON.stringify(value, null, 2))}</pre>`;
@@ -17,15 +17,17 @@ function render() {
   const openDetails = new Set([...document.querySelectorAll('details[open]')].map(d=>d.querySelector('summary')?.textContent));
   const r = selected(); selectedId = r?.agreement.requestId;
   const recorded = state.mode === 'recorded';
-  $('mode-banner').textContent = recorded ? 'PUBLISHED REAL EVIDENCE · Read-only · Synthetic document · Offline consistency checked' : 'LIVE LOCAL WORKSPACE · Event network · Test funds · Synthetic documents';
+  $('check-health').hidden = Boolean(state.hosting);
+  const bridge = state.bridgeByRequest?.[r?.agreement.requestId];
+  $('mode-banner').textContent = recorded ? 'PUBLISHED REAL EVIDENCE · Read-only · Synthetic document · Offline consistency checked' : (state.hosting ? 'SHARED DEMO · Native actions use the local operator bridge' : 'LIVE LOCAL WORKSPACE · Event network · Test funds · Synthetic documents');
   if (!recorded && r?.mode === 'fixture') $('mode-banner').textContent = 'SIMULATED FIXTURE RECORD · No live ledger result is claimed';
-  $('sync-status').textContent = available ? `Updated ${new Date(state.observedAt).toLocaleTimeString()} · Revision ${state.revision} · Refreshes every 3 seconds` : 'Backend unavailable. Last displayed facts are retained; actions paused.';
+  $('sync-status').textContent = available ? `Page refreshed ${new Date(state.observedAt).toLocaleTimeString()} · ${state.hosting ? (bridge ? "Bridge published " + time(bridge.publishedAt) : "No native progress published") : "See service check times below"}` : 'Backend unavailable. Last displayed facts are retained; actions paused.';
   $('sync-id').textContent = `Backend ${state.instanceId} · Revision ${state.revision} · ${state.mode}`;
   $('disclosure').textContent = state.disclosure;
   $('health-toggle').textContent = `System status · Ledger ${state.health.ledger.status}`;
   $('health-details').innerHTML = Object.entries(state.health).map(([name, h]) => `<div class="evidence-row"><div><h3>${escape({ledger:'Event ledger',receipts:'Receipt service',hook:'Developer capture'}[name])}</h3><p>${escape(h.message)}</p><p class="small-print">Checked ${escape(time(h.checkedAt))}${name === 'ledger' && h.ledgerIndex ? ` · Ledger ${h.ledgerIndex} · ${h.latencyMs} ms` : ''}${name === 'hook' && h.accepted !== undefined ? ` · ${h.accepted} accepted / ${h.buffered} buffered` : ''}</p></div>${badge(h.status, h.status === 'ready' ? 'green' : h.status === 'blocked' || h.status === 'unavailable' ? 'amber' : 'neutral')}</div>`).join('');
   $('request-picker').innerHTML = state.requests.length > 1 ? `<label>Request<select id="selected-request">${state.requests.map(q => `<option value="${escape(q.agreement.requestId)}" ${q.agreement.requestId === selectedId ? 'selected' : ''}>${escape(q.agreement.requestId)}</option>`).join('')}</select></label>` : '';
-  const c = state.cycle;
+  const c = cycleFor(state, r?.agreement.requestId);
   const repaid = c?.steps.repay?.resultCode === 'tesSUCCESS' || c?.steps['repay-late']?.resultCode === 'tesSUCCESS';
   const redeemed = c?.steps.withdraw?.resultCode === 'tesSUCCESS';
   const money = !r ? 'No request prepared.' : r.funding.status === 'funded' ? redeemed ? 'Lender redemption recorded.' : repaid ? 'Repayment recorded.' : 'Funding confirmed.' : r.phase === 'EXPIRED_UNRESOLVED' ? 'Expired. Outcome still unknown.' : r.funding.status === 'unknown' ? 'Funding outcome not yet validated.' : r.funding.status === 'refused' ? 'Native refusal recorded.' : 'Ready for exact review.';

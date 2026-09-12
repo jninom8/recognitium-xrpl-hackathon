@@ -12,12 +12,14 @@ const allowed=['prepare','view','receipt-intent','approve','recover','sign','sub
 if(!action || !allowed.includes(action))throw Error('Unsupported bridge action');
 const root=join('data','runs',id), plans=new Store<ReturnType<typeof bridgePlan>>(root);
 const release=await processLock(root), adapter=new NativeAdapter(true);adapter.client.on('error',()=>{});
-const cycle=new Cycle(adapter,root,join('wallets','runs',id));
+const cycle=new Cycle(adapter,root,join('wallets','runs',id),publish);
 async function current(){const r=await fetch('https://recognitium-xrpl-hackathon.vercel.app/api/intake?role=broker',{signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Hosted intake unavailable');const body=await r.json() as {requests:FinancingRequest[]};const found=body.requests.find(r=>r.clientRequestId===id);if(!found)throw Error('Unknown hosted request');return found;}
 async function publish() {
- const r=await cycle.requests.read(id!);const plan=await plans.read('plan');if(!r||!plan)return;
- const view=requestView(r,true);view.actions=view.actions.map(a=>({...a,allowed:false,reason:'Exact human approval and native execution run on the local operator bridge.'}));
- await publishRun({request:view,cycle:cycleView(await cycle.cycles.read('native')??null),intakeDigest:plan.request.requestDigest,intakeRevision:plan.request.revision,updatedAt:new Date().toISOString()});
+ const r=await cycle.requests.read(id!);const plan=await plans.read('plan');if(!plan)return;
+ const view=r?requestView(r,true):null;if(view)view.actions=view.actions.map(a=>({...a,allowed:false,reason:'Exact human approval and native execution run on the local operator bridge.'}));
+ const native=cycleView(await cycle.cycles.read('native')??null);if(native)native.requestId=id!;
+ const stage=native?.yield?'WITHDRAWN':native?.steps.repay?.resultCode==='tesSUCCESS'||native?.steps['repay-late']?.resultCode==='tesSUCCESS'?'REPAID':r?.phase??'PREPARING_VAULT';
+ await publishRun({requestId:id!,request:view,cycle:native,stage,requestedDrops:plan.request.requestedDrops,requestedDays:plan.request.requestedDays,offeredIntervalSeconds:plan.paymentInterval,publishedAt:new Date().toISOString(),intakeDigest:plan.request.requestDigest,intakeRevision:plan.request.revision,updatedAt:new Date().toISOString()});
 }
 try {
  let plan=await plans.read('plan');
@@ -25,7 +27,7 @@ try {
   const intake=await current(), interval=Number(args[0]);
   if(plan){assertSamePlan(plan,intake);if(plan.paymentInterval!==interval)throw Error('Existing offer interval is immutable');}
   else {plan=bridgePlan(intake,interval);await plans.write('plan',plan);}
-  await adapter.connect();await cycle.setup({depositDrops:plan.depositDrops,coverDrops:plan.coverDrops});
+  await publish();await adapter.connect();await cycle.setup({depositDrops:plan.depositDrops,coverDrops:plan.coverDrops});
   await cycle.prepareRequest(plan.request,plan.paymentInterval);
  } else {
   if(!plan)throw Error('Prepare this reviewed request first');

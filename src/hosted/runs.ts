@@ -1,6 +1,6 @@
 import { get, put } from '@vercel/blob';
-import type { DashboardRequest, CycleView } from '../shared/contract.js';
-export interface PublicRun {request:DashboardRequest;cycle:CycleView|null;intakeDigest:string;intakeRevision:number;updatedAt:string}
+import type { DashboardRequest, CycleView, BridgeProgress } from '../shared/contract.js';
+export interface PublicRun extends BridgeProgress {request:DashboardRequest|null;cycle:CycleView|null;updatedAt:string}
 const path='recognitium/native-progress-v1.json';
 async function read() {
  const r=await get(path,{access:'private',useCache:false,headers:{'Accept-Encoding':'identity'},abortSignal:AbortSignal.timeout(8000)});
@@ -13,7 +13,7 @@ async function read() {
 export async function readPublicRuns(){return read();}
 export async function publishRun(run:PublicRun) {
  for(let attempt=0;attempt<3;attempt++) {
-  const prior=await read();const runs=prior.runs.filter(r=>r.request.agreement.requestId!==run.request.agreement.requestId);
+  const prior=await read();const runs=prior.runs.filter(r=>r.requestId!==run.requestId);
   if(runs.length>=20)throw Error('Native demo run limit reached');
   runs.unshift(run);
   try {await put(path,JSON.stringify({schema:'recognitium.native-progress.v1',revision:Math.max(Date.now(),prior.revision+1),runs}),{access:'private',addRandomSuffix:false,contentType:'application/json',...(prior.etag?{ifMatch:prior.etag}:{allowOverwrite:false}),abortSignal:AbortSignal.timeout(8000)});return;}
