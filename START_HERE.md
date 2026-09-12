@@ -18,7 +18,11 @@ documents outside the hook-enabled workspace.
 6. [Hook setup](docs/HOOK_SETUP.md): install consent and capture verification.
 7. [PLAN.md](PLAN.md) and [DEVEX_LOG.md](DEVEX_LOG.md): event plan and observations.
 
-## Prompt for the new session, after plan approval
+## Prompt for the new session
+
+The founder approved activation, implementation and GitHub publication on
+September 12. Project hooks have now been registered and trusted through the
+supported Codex hook review. Verify actual capture/delivery as the build begins.
 
 > Work only in this Recognitium hackathon repository. Read AGENTS.md and
 > START_HERE.md in full, then follow the linked build handoff. The plan is
@@ -29,8 +33,9 @@ documents outside the hook-enabled workspace.
 > Recognitium agreement/execution receipts and evidence export, then the optional
 > MCP-assisted request discovery. Keep the human approval boundary. Pin versions,
 > save validated evidence, and update STATUS and DEVEX_LOG at each milestone.
-> Do not publish, push, use real money or modify the company repository. Do not
-> generate the participants' final developer report.
+> Commit and push reviewed hackathon work to the configured team repository.
+> Use no real money and do not modify the company repository. Do not generate
+> the participants' final developer report.
 
 That paragraph is a reusable future prompt, not authorization created by this
 document. Obtain any missing hook consent/invite from the actual user context.

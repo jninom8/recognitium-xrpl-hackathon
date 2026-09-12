@@ -4,8 +4,8 @@ A small application connecting a private request and agreement to an actual XRPL
 loan, repayment and checkable receipt. AI can help discover and prepare a request;
 people approve the terms; XRPL moves test funds; Recognitium records commitments.
 
-**Status: planning and handoff repository. No XRPL application is implemented yet.**
-The founder requested plan review before hook activation and the build.
+**Status: build authorized; implementation starting.** The native XRPL lending
+cycle has not yet been validated. See the live milestone record in docs/STATUS.
 
 Start with [START_HERE.md](START_HERE.md). The next agent's implementation contract
 is [BUILD_HANDOFF.md](docs/BUILD_HANDOFF.md). The readable overall plan remains
@@ -15,7 +15,8 @@ is [BUILD_HANDOFF.md](docs/BUILD_HANDOFF.md). The readable overall plan remains
 
 This is a separate local Git repository on the Desktop. It contains the work
 specific to the September 12-13 XRPL hackathon. It has no relationship to the
-company repository's git history and no remote is configured.
+company repository's git history. Team repository:
+https://github.com/jninom8/recognitium-xrpl-hackathon
 
 | Need | File |
 |---|---|
@@ -39,4 +40,5 @@ copy and the downloaded hook are under `.local/`, also excluded from git.
 
 The eventual event submission needs a public-safe application repository,
 reproducible setup, validated transaction links, slides and a participant-authored
-developer report. This repository has not been published or submitted.
+developer report. GitHub publication is authorized; event submission has not
+been made. Teammates can clone the public repository and use feature branches.

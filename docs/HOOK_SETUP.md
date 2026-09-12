@@ -1,7 +1,9 @@
 # Project-local DevEx hook plan
 
-Status: downloaded and inspected; capture is OFF. The founder asked to see the
-plan before activation. No consent identity or project hook registration exists.
+Status: user approved activation after plan review on September 12. Consent
+identity created, invite verified, project hooks registered and all eight trusted
+through the supported Codex CLI review. Four Codex project skills installed.
+Actual fresh-session capture and accepted delivery are still to be verified.
 
 Source: https://github.com/RippleDevRel/xrpl-devex-hook
 
