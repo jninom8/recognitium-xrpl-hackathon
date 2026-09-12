@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-09-12T23:23:06.187Z",
+  "source": "evidence/synthetic-supplier-001.json",
+  "sourceSha256": "107fbd6134c66091c2677cb31a0082b67628e63fe4375016eb41f7ad13679b57",
+  "sourceUnchanged": true,
+  "method": "Author-operated checks using the repository verifier. Mutations are labelled simulations. This is not independent implementation or reproduction.",
+  "signingOrIssuance": false,
+  "ledgerWrites": false,
+  "applicationHttpCalls": false,
+  "authorityReads": 2,
+  "observations": [
+    {
+      "case": "Recorded original, offline",
+      "expected": "Content and signatures consistent; authority and ledger need online checks",
+      "actual": {
+        "contentHash": "consistent",
+        "signatures": "both-valid",
+        "receiptChainHash": "consistent",
+        "receiptAuthority": "requires-online-lookup",
+        "xrplValidation": "requires-online-lookup"
+      }
+    },
+    {
+      "case": "SIMULATED changed document",
+      "expected": "Reject",
+      "actual": "Changed document"
+    },
+    {
+      "case": "SIMULATED changed signed commitment",
+      "expected": "Reject",
+      "actual": "Signed transaction differs from approval"
+    },
+    {
+      "case": "SIMULATED inflated realised yield",
+      "expected": "Reject",
+      "actual": "Realised yield does not reconcile"
+    },
+    {
+      "case": "SIMULATED erased refusal history",
+      "expected": "Reject",
+      "actual": "Late retry requires original validated refusal"
+    },
+    {
+      "case": "SIMULATED self-consistent altered receipt, offline",
+      "expected": "Hash consistency alone is insufficient; require authority lookup",
+      "actual": "requires-online-lookup"
+    },
+    {
+      "case": "Same altered local receipt, compared to real authority record",
+      "expected": "Reject",
+      "actual": "Authority record differs: new_tip"
+    }
+  ]
+}
