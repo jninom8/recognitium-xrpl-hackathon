@@ -50,7 +50,7 @@ the event server runs. Pin the SDK and record server_info/amendments first.
 | WSS | `wss://lending-hackathon.dev.ripplex.io:51233` | `wss://s.devnet.rippletest.net:51233/` |
 | HTTP | `https://lending-hackathon.dev.ripplex.io:51234/` | `https://s.devnet.rippletest.net:51234/` |
 | Faucet | `https://lending-hackathon-faucet.dev.ripplex.io/accounts` | `https://faucet.devnet.rippletest.net/accounts` |
-| SDK per event brief | Stable xrpl.js; 5.2.0 was registry stable when checked | `xrpl.js@5.2.0-beta.0` explicitly prescribed |
+| SDK guidance | Exact stable `xrpl@5.2.0`, live cycle verified | Mentor update relayed: `xrpl@5.2.0-beta.1`; public brief refresh still returned beta.0 |
 | Explorer | `https://custom.xrpl.org/lending-hackathon.dev.ripplex.io:51233/` | `https://devnet.xrpl.org/` |
 
 The generic workshop Payment example uses Testnet. It is not the Lending V1
@@ -71,6 +71,8 @@ V1's accounting. The public Devnet wall clock cannot be accelerated locally.
 - [Co-signing tutorial](https://xrpl.org/docs/tutorials/defi/lending/use-the-lending-protocol/create-a-loan)
 - [VaultWithdraw reference](https://xrpl.org/docs/references/protocol/transactions/types/vaultwithdraw)
 
-Track 1 connectivity timed out in the initial probes. That observation has not
-been promoted to a confirmed protocol defect. See DEVEX_LOG and ask a mentor
-for a working event connection before spending substantial time on the adapter.
+Track 1 connectivity initially timed out on the venue network, then worked on
+the hotspot. The complete native cycle passed on network 4001, server 3.4.0-rc1,
+with mentor-authorized open-ended testing despite enabled V1.1. See STATUS.
+The September 12 [SDK update comparison](SDK_UPDATE.md) explains beta.1 versus
+the stable SDK already used successfully, with an isolated compatibility check.

@@ -45,6 +45,11 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Fresh implementation evidence, September 12
 
+- Mentor beta.1 update evaluated. Both stable and beta.1 reproduced the real
+  signed cycle offline; no new transfer or dependency migration. Stable already
+  includes beta.1's counterparty signing fix. [Comparison](SDK_UPDATE.md).
+  The public Notion refresh still served beta.0 for Track 2 at 13:36 UTC.
+
 - Installed Node 24.19.0, npm 11.17.0, exact xrpl 5.2.0, TypeScript 7.0.2,
   ripple-binary-codec 2.11.0 and ripple-keypairs 3.1.0. Lockfile included with
   implementation. Workshop p.9 explicitly recommends JavaScript / TypeScript.

@@ -1,5 +1,27 @@
 # Recognitium developer-experience log
 
+## SDK-001: mentor beta.1 update checked against the working stable cycle
+
+- Founder relayed the mentors' xrpl 5.2.0-beta.1 update. At 13:36:23 UTC,
+  a full public Notion refresh (174 blocks, two chunks, exhausted cursor) still
+  returned stable for Track 1 and beta.0 for Track 2. The publication/cache
+  explanation is unresolved; do not claim the mentors gave incorrect guidance.
+- Actual npm package diffs show beta.1 fixes beta.0 counterparty/sponsor signing
+  prefixes. Our installed stable 5.2.0 already includes those signing changes.
+  Beta.1 additionally has closed-ended vault models absent from stable.
+- At 13:38:28 UTC an isolated candidate check reproduced the real LoanSet hash,
+  verified both signatures, rejected changed Data under both signatures, and
+  reproduced all eight other native transaction hashes with BOTH SDKs. This is
+  offline compatibility evidence, not a second live-funded cycle.
+- Decision: keep the validated stable Track 1 application. Candidate packages
+  remain ignored and separate. No new funds moved or approval bypassed.
+- Hook delivery at 13:40:12 UTC: HTTP 200, 150 cumulative accepted events,
+  zero buffered. This SDK investigation remained inside the active capture.
+- [Full comparison, source timestamps and reproduction commands](docs/SDK_UPDATE.md).
+  Suggested improvement: a timestamped network/SDK/codec compatibility matrix
+  with a short explanation of what each update changes. This note is based on
+  real observations; it is not the official participant-written feedback report.
+
 ## LIVE-001: mentor-guided native origination succeeded
 
 - September 12, network 4001, rippled 3.4.0-rc1, stable xrpl.js 5.2.0.
