@@ -1,6 +1,8 @@
 # Recognitium: XRPL developer feedback
 
-**DRAFT TEMPLATE. No lending transactions have been run yet.**
+**PARTICIPANT WRITING TEMPLATE. The final account remains unwritten.**
+The live cycle has now been executed; its facts and evidence are collected in
+the [shared developer journey](docs/DEVELOPER_JOURNEY.md).
 Final report: maximum three pages, located at the submitted repository root.
 
 The challenge slides, page 7, require: "Written by you, not generated."
@@ -9,7 +11,7 @@ actual experience. These blank prompts organize the work; they are not a
 generated final report. Codex may collect technical evidence and help reproduce
 issues. Do not submit an AI-written personal account.
 
-Track: 1 recommended, pending network confirmation.
+Track: record the executed track using the linked evidence.
 Flavour: Vanilla.
 Environment: custom hackathon Devnet, Lending V1.
 SDK version: fill from the actual package lock.

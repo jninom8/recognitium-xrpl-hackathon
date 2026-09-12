@@ -1,5 +1,9 @@
 # Recognitium developer-experience log
 
+**Team reading page: [Unified developer journey](docs/DEVELOPER_JOURNEY.md).**
+This file retains detailed technical observations and earlier checkpoints;
+the journey page gives their current outcome in chronological order.
+
 ## SDK-001: mentor beta.1 update checked against the working stable cycle
 
 - Founder relayed the mentors' xrpl 5.2.0-beta.1 update. At 13:36:23 UTC,

@@ -1,5 +1,8 @@
 # Start the Recognitium hackathon build
 
+For a team read-through, start with the [unified developer journey](docs/DEVELOPER_JOURNEY.md).
+It links the readable timeline and findings to the detailed evidence below.
+
 Open a fresh coding session rooted in this Desktop folder:
 
 `C:\Users\jnino\Desktop\Recognitium-XRPL-Hackathon`

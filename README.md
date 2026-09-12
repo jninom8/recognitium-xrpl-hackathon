@@ -5,6 +5,11 @@ loan, repayment and checkable receipt. AI can help discover and prepare a reques
 people approve the terms; XRPL moves test funds; Recognitium records commitments.
 
 **Status: complete native test cycle and real receipts independently verified.**
+
+**Read together: [Recognitium developer journey](docs/DEVELOPER_JOURNEY.md)**
+collects the timeline, problems, fixes, proof, hook status and next team work
+in one page. Start there for the shared overview.
+
 The hotspot resolved the venue connection failure. Following mentor guidance,
 an explicit trial on the same event server succeeded despite its enabled V1.1
 amendment and the documented open-ended broker restriction. See

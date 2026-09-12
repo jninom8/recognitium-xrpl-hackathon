@@ -1,5 +1,8 @@
 # Current status
 
+Start with the [unified developer journey](DEVELOPER_JOURNEY.md) for the shared
+team overview; this file retains implementation gates and outstanding work.
+
 Updated September 12, 2026, during the Nanterre hackathon. Update this document
 when evidence changes. The current time, not the original timetable, governs
 remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
