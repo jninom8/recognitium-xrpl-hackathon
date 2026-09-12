@@ -1,0 +1,27 @@
+# Local participant material, downloaded sources and monitoring data
+.local/
+reference/
+.xrpl-devex/
+.codex/
+.claude/
+.cursor/
+.grok/
+.github/hooks/
+*.private.*
+# Credentials and test wallets
+.env
+.env.*
+!.env.example
+wallets/
+secrets/
+# Build/runtime outputs
+node_modules/
+dist/
+.next/
+coverage/
+data/
+*.log
+*.db
+*.sqlite*
+.DS_Store
+Thumbs.db
