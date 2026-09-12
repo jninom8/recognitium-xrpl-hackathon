@@ -4,7 +4,8 @@ A small application connecting a private request and agreement to an actual XRPL
 loan, repayment and checkable receipt. AI can help discover and prepare a request;
 people approve the terms; XRPL moves test funds; Recognitium records commitments.
 
-**Status: complete native test cycle and real receipts independently verified.**
+**Status: complete native test cycle and real receipts checked by the standalone
+verifier. Teammate reproduction is pending.**
 
 **Read together: [Recognitium developer journey](docs/DEVELOPER_JOURNEY.md)**
 collects the timeline, problems, fixes, proof, hook status and next team work
@@ -21,9 +22,15 @@ realised interest before network fees. Both a liquidity refusal and a late
 payment refusal/recovery are recorded. Verify the published synthetic evidence:
 
 ```sh
+npm ci
 npm run build
 npm run verify -- evidence/synthetic-supplier-001.json --online --mentor-confirmed-open-ended
 ```
+
+For the next shared milestone, read the [frontend design and delivery plan](docs/FRONTEND_DESIGN.md)
+and the [fresh-clone reproduction guide](docs/REPRODUCTION_AND_RECOVERY.md).
+An original, simulated visual concept is available with `npm run design:preview`
+at http://127.0.0.1:3100. It is separate from the live application below.
 
 ## Run the application
 

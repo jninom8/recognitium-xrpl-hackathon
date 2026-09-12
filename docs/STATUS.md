@@ -38,6 +38,17 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Pending, not represented as completed
 
+The founder's OpenFX-inspired white fintech direction now has a
+[researched design brief and interactive concept](FRONTEND_DESIGN.md), plus a
+[fresh-clone guide and bounded recovery matrix](REPRODUCTION_AND_RECOVERY.md).
+The concept is isolated from the live app and explicitly uses simulated states.
+Browser preview behavior is not a new native, receipt or recovery acceptance test.
+Teammate reproduction, the four extended failure cases, fresh-run isolation and
+live frontend integration remain pending.
+At 18:05 Paris, Chrome preview checks passed for the three views and four
+simulated moments at desktop/mobile widths. Hook delivery returned HTTP 200,
+251 cumulative accepted events and zero buffered. See DESIGN-001 in DEVEX_LOG.
+
 At 17:29 Paris, context review recommends G7 frontend integration and rehearsal
 before further cover/impairment experiments. The [frontend handoff](FRONTEND_CONTRACT.md)
 lists the three views, current API/run/receipt gaps and acceptance criteria.

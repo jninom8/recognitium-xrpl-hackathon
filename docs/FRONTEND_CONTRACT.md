@@ -5,6 +5,12 @@ wallet or service dependency. Coordinate changes to its version before changing
 field names. The small `web/` interface is a functional starting point for the
 frontend lead; replace its presentation without replacing the backend semantics.
 
+The [white fintech design brief](FRONTEND_DESIGN.md) now provides an original
+interactive concept, the proposed field additions and ordered delivery gates.
+Use the [reproduction and recovery handoff](REPRODUCTION_AND_RECOVERY.md) for the
+teammate's checks and the four remaining bounded failure cases. The concept's
+fixture controls are not live API implementations.
+
 ## Recommended next milestone, September 12 at 17:29 Paris
 
 Prioritize G7: a complete, understandable browser demonstration of the proven

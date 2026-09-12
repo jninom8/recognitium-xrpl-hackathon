@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Recognitium · Design concept</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/prototype.js" defer></script>
+</head>
+<body>
+  <div class="concept-strip">DESIGN CONCEPT <span>Simulated data · No ledger connection · Controls preview states only</span></div>
+  <header class="topbar">
+    <a href="/" class="brand" aria-label="Recognitium design home"><span class="brand-mark" aria-hidden="true">r</span>recognitium<span class="brand-dot">.</span></a>
+    <span class="workspace-label">Lending workspace</span>
+    <span class="network"><span class="dot" aria-hidden="true"></span>Test funds only</span>
+  </header>
+  <main>
+    <div class="page-heading">
+      <div><p class="eyebrow">REQUEST / FIXTURE-001</p><h1>Every agreement. A clear outcome.</h1><p class="intro">Follow the approved version, the funds and the evidence.</p></div>
+      <span class="outline-badge">Synthetic supplier request</span>
+    </div>
+    <nav class="view-nav" aria-label="Workspace view">
+      <button type="button" data-view="request" aria-pressed="true">Request</button>
+      <button type="button" data-view="position" aria-pressed="false">Lender position</button>
+      <button type="button" data-view="evidence" aria-pressed="false">Evidence</button>
+    </nav>
+    <div class="preview-controls">
+      <span>Preview a moment</span>
+      <div role="group" aria-label="Simulated scenario">
+        <button type="button" data-state="approval" aria-pressed="false">01 Review</button>
+        <button type="button" data-state="funded" aria-pressed="true">02 Funded</button>
+        <button type="button" data-state="changed" aria-pressed="false">03 Changed copy</button>
+        <button type="button" data-state="recovered" aria-pressed="false">04 Recovered</button>
+      </div>
+    </div>
+    <section class="outcome" aria-label="Request outcome">
+      <div><span class="eyebrow">MONEY</span><h2 id="money-title">Funding confirmed.</h2><p id="money-description">100 test XRP reached the borrower in this simulated scenario.</p></div>
+      <div class="outcome-evidence"><span class="eyebrow">EXECUTION EVIDENCE</span><span id="receipt-status" class="badge amber">◷ Receipt pending</span><p id="receipt-description">Funding is preserved while the receipt is recovered.</p></div>
+    </section>
+    <p id="change-notice" class="change-notice" hidden><strong>Changed copy rejected.</strong> Its content differs from the approved version. The original loan remains funded.</p>
+    <div id="request-view" class="view">
+      <div class="workspace-grid">
+        <section class="panel agreement-panel" aria-labelledby="agreement-heading">
+          <div class="panel-heading"><div><span class="eyebrow">THE COMMITMENT</span><h2 id="agreement-heading">Supplier agreement</h2></div><span class="badge neutral">Version 1</span></div>
+          <div class="principal"><span>Requested principal</span><p>100 <span>test XRP</span></p></div>
+          <dl class="terms">
+            <div><dt>Annual interest</dt><dd>10%</dd></div>
+            <div><dt>Repayment</dt><dd>1 payment · 60 seconds</dd></div>
+            <div><dt>Additional loan fees</dt><dd>0 XRP</dd></div>
+            <div><dt>Network</dt><dd>Event network · 4001</dd></div>
+          </dl>
+          <p class="small-print">Illustrative terms only. A new live request needs fresh exact approval and a suitable repayment window.</p>
+          <div class="approval-row"><span><span class="role-icon" aria-hidden="true">B</span>Broker approval</span><span id="broker-state" class="positive">✓ Version 1 approved</span></div>
+          <div class="approval-row"><span><span class="role-icon" aria-hidden="true">B</span>Borrower approval</span><span id="borrower-state" class="positive">✓ Version 1 approved</span></div>
+          <details><summary>Exact terms and signature binding</summary><p>The live review must include account addresses, all fees and rates, approval expiry, transaction expiry, network, sequence, agreement hash and transaction digest. Both signatures must cover the bound metadata.</p><p>This concept contains no signable payload or valid approval.</p></details>
+        </section>
+        <aside class="panel timeline-panel" aria-labelledby="timeline-heading">
+          <div class="panel-heading"><div><span class="eyebrow">THE EXECUTION</span><h2 id="timeline-heading">One continuous history</h2></div><span class="small-label">SIMULATED</span></div>
+          <ol class="timeline">
+            <li id="step-approval"><span class="step-dot" aria-hidden="true">✓</span><div><h3>Exact version approved</h3><p>Broker and borrower · Same terms</p></div></li>
+            <li id="step-agreement"><span class="step-dot" aria-hidden="true">✓</span><div><h3>Agreement receipt checked</h3><p>Commitment and authority linked</p></div></li>
+            <li id="step-funding"><span class="step-dot" aria-hidden="true">✓</span><div><h3>Borrower funded</h3><p>100 test XRP · One LoanSet</p></div></li>
+            <li id="step-receipt" class="waiting"><span class="step-dot" aria-hidden="true">4</span><div><h3>Execution receipt</h3><p id="timeline-receipt">Pending recovery · Funding retained</p></div></li>
+          </ol>
+          <div class="next-action"><span class="eyebrow">NEXT STEP</span><h3 id="action-heading">Recover the existing receipt</h3><p id="action-description">Attach its verified ID to this execution. Keep the same funded transaction.</p><button id="next-preview" type="button" class="primary">Preview recovery <span aria-hidden="true">↗</span></button><span class="action-caption">Preview only · No API calls</span></div>
+        </aside>
+      </div>
+    </div>
+    <section id="position-view" class="view panel" hidden aria-labelledby="position-heading">
+      <div class="panel-heading"><div><span class="eyebrow">LENDER POSITION / SIMULATED</span><h2 id="position-heading">Know what is available.</h2></div></div>
+      <div class="position-grid"><div><span>Deposited</span><strong>200 <small>XRP</small></strong></div><div><span>Available cash</span><strong id="cash-amount">100 <small>XRP</small></strong></div><div><span>Loan principal</span><strong id="loan-amount">100 <small>XRP</small></strong></div><div><span>Realised yield</span><strong>0 <small>drops</small></strong></div></div>
+      <p class="position-note">This preview stops before repayment. Available cash and the value of vault shares are separate facts. Realised yield appears after repayment and redemption, with network fees accounted for separately.</p>
+      <details><summary>How a native refusal should appear</summary><p>A validated liquidity refusal should retain its actual transaction, code and ledger. Explain why available cash could not fill the withdrawal. Do not label it as a failed deposit or erase the lender's shares.</p><p>No refusal is executed by this concept.</p></details>
+    </section>
+    <section id="evidence-view" class="view panel" hidden aria-labelledby="evidence-heading">
+      <div class="panel-heading"><div><span class="eyebrow">EVIDENCE / SIMULATED</span><h2 id="evidence-heading">Three checks. Three distinct facts.</h2></div></div>
+      <div class="evidence-row"><div><h3>Document consistency</h3><p id="content-description">The locked version matches its commitment.</p></div><span id="content-result" class="badge green">✓ Original consistent</span></div>
+      <div class="evidence-row"><div><h3>Receipt authority</h3><p>Check the official record and retain the observation time.</p></div><span id="authority-result" class="badge amber">◷ Execution pending</span></div>
+      <div class="evidence-row"><div><h3>XRPL validation</h3><p>Reconcile the transaction result and borrower funding.</p></div><span id="ledger-result" class="badge green">✓ Funding confirmed</span></div>
+      <details><summary>What the live evidence view must expose</summary><p>The exact transaction hash, ledger index, result code, approval digests, receipt IDs and verification times. Offline consistency and fresh online validation require separate labels.</p><p>This panel displays illustrative states. It does not perform any cryptographic, authority or ledger verification.</p></details>
+    </section>
+    <div class="proof-principle"><span aria-hidden="true">↳</span><p><strong>The agreement says what was approved. The ledger shows what moved.</strong><br>Recognitium links the commitment to its execution. Each remains independently checkable.</p></div>
+    <footer><span>Recognitium · XRPL hackathon</span><span>Classical receipt service · Test funds · Synthetic documents</span></footer>
+    <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+</body>
+</html>

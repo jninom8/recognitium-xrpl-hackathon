@@ -195,8 +195,8 @@ independent live reproduction remains a useful next check; CI did not move funds
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **17:29:01**,
-the last recorded delivery returned **HTTP 200**, with **232 accepted events**
+is installed locally in this project, with eight trusted hooks. At **18:05:15**,
+the last recorded delivery returned **HTTP 200**, with **251 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 
@@ -207,6 +207,18 @@ stay out of GitHub. Each teammate's own machine needs its own consent and setup.
 [Hook setup and verification →](HOOK_SETUP.md)
 
 ## 5. Where the team continues
+
+The founder selected a clean white fintech direction inspired by OpenFX.
+The [design brief and original interactive concept](FRONTEND_DESIGN.md) translate
+that reference into a request, lender position and evidence workspace. Chrome
+inspection became available after the founder connected the browser extension.
+The concept is visibly simulated and does not connect to the live ledger or
+receipt service. It demonstrates the proposed distinction between funding,
+receipt recovery and rejection of a changed document copy.
+
+The next shared task has a [fresh-clone reproduction guide and failure matrix](REPRODUCTION_AND_RECOVERY.md).
+It identifies what the existing 21 tests cover and what the four bounded
+extensions must prove. A teammate's independent outcome remains pending.
 
 **Recommended next gate:** connect the three frontend views and rehearse the
 whole story before further protocol experiments. The current starter needs a

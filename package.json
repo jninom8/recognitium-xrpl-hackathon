@@ -14,7 +14,8 @@
     "cycle": "node --env-file-if-exists=.env dist/scripts/native-cycle.js",
     "verify": "node dist/scripts/verify-bundle.js",
     "export": "node dist/scripts/export-bundle.js",
-    "hook:status": "node scripts/hook-status.mjs"
+    "hook:status": "node scripts/hook-status.mjs",
+    "design:preview": "node scripts/preview-design.mjs"
   },
   "dependencies": {
     "ripple-binary-codec": "2.11.0",

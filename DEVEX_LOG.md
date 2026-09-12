@@ -4,6 +4,43 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## DESIGN-001: researched frontend direction and bounded team handoff
+
+- September 12, 2026, completed at 16:05 UTC. Read OpenFX's public payment-service-provider
+  page and styles, then inspected the rendered page through Chrome after the
+  founder connected the extension. Public source snapshots remain in ignored
+  `reference/openfx/`; no OpenFX code, logos or font assets were imported.
+- Created an original three-view design concept, visibly labelled simulated,
+  plus [the design/implementation brief](docs/FRONTEND_DESIGN.md) and
+  [the fresh-clone/recovery guide](docs/REPRODUCTION_AND_RECOVERY.md).
+  The existing live app, native evidence, wallets and manual participant report
+  were not changed. No loan, metered receipt or IVM publication occurred.
+- Re-read shared types, server/receipt interfaces, journal and crash tests.
+  Documented existing coverage separately from four proposed extensions:
+  concurrent valid HTTP submissions, file-persistence crash boundaries, remote
+  receipt issuance followed by response loss, and partial-history expiry recovery.
+  Those new cases have not been implemented or passed by this planning work.
+- Preview: `npm run design:preview`, loopback port 3100, static files only.
+  Chrome checked all three views and the review/funded/changed-copy/recovered
+  fixture states. Changed-copy rejection retained the funded heading; recovery
+  showed a receipt attached to the same illustrative execution. These are UI
+  presentation checks, not state-machine or native-ledger tests.
+- Inspected desktop at 1440x1000 and mobile at 390x844. Mobile document width
+  was 375px, within the viewport. Keyboard Tab reached the next scenario control
+  with visible solid focus outline. Chrome's error log was empty at the check.
+  One full-page screenshot request timed out; a normal viewport capture worked.
+  This browser-tool observation is not an XRPL defect.
+- `node --check` passed for the prototype and preview server; `git diff --check`
+  passed. Static routes returned HTTP 200; `/api/state` and a normalized `.env`
+  request returned 404. No live API route is exposed by the concept server.
+  Calculated selected text contrast ratios: ink/white 16.17, muted/white 5.84,
+  white/action-green 6.48, amber/tint 5.99, red/tint 6.27, muted/surface 5.52.
+  These checks do not constitute a full accessibility audit.
+- Hook delivery at `2026-09-12T16:01:28.638Z`: HTTP 200, 13 additional events
+  accepted, 249 cumulative, one buffered. At `16:05:15.170Z`, the next flush
+  accepted two more: 251 cumulative, zero buffered. Counts reflect actual
+  installed-hook delivery; no synthetic feedback event or manual report was sent.
+
 ## INTEGRATION-001: context review identifies the next product gate
 
 - Public Notion refreshed at `2026-09-12T15:27:15.078Z`: 174 blocks, two chunks,
