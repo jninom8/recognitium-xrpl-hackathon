@@ -133,7 +133,7 @@ function privateRequests() {
     : [];
 }
 function syncLabel(snapshot) {
- const publication = snapshot.bridgeByRequest?.[selected()?.agreement.requestId]?.publishedAt;
+ const publication = snapshot.bridgeByRequest?.[selected()?.agreement.requestId]?.publishedAt ?? Object.values(snapshot.bridgeByRequest ?? {}).map(p=>p.publishedAt).sort().at(-1);
  return 'Page refreshed ' + new Date(snapshot.observedAt).toLocaleTimeString() + (snapshot.hosting ? publication ? ' · Native progress published ' + fullTime(publication) : ' · No fresh native progress' : ' · See verification check times');
 }
 function rowStatus(request) {
@@ -224,7 +224,7 @@ function render() {
   } else if (!borrower)
     $("overview-content").innerHTML =
       requestList(true) +
-      `<div class='section-heading'><h2>Agreed financing</h2></div>` +
+      `<div class='section-heading'><h2>Loan offers and funding</h2></div>` +
       (r
         ? loanCard(r, c, outcome)
         : empty(
@@ -732,6 +732,7 @@ function openIntake(id) {
   const progress=state.bridgeByRequest?.[id];const native=cycleFor(state,id);
   if(progress) $('review-content').innerHTML += '<h3>Native preparation</h3><p class="hint">Published '+esc(fullTime(progress.publishedAt))+' · '+esc(progress.stage)+'</p><dl class="costs">'+fact(native?.steps.deposit?.resultCode==='tesSUCCESS'?'Lender deposit confirmed':'Planned lender deposit',native?amount(native.depositDrops):'Not confirmed')+fact(native?.steps.cover?.resultCode==='tesSUCCESS'?'Broker cover confirmed':'Planned broker cover',native?amount(native.coverDrops):'Not confirmed')+'</dl><ol class="journey">'+['vault','deposit','broker','cover'].map(name=>'<li><div><h3>'+esc(name)+'</h3><p>'+esc(native?.steps[name]?.resultCode??'Awaiting confirmation')+'</p></div></li>').join('')+'</ol>';
   const linked = state.requests.find(r=>r.agreement.requestId===id);
+  if(native?.steps['deposit-initial-refusal']) $('review-content').innerHTML += '<p class="hint">Setup recovery: the first deposit was refused with '+esc(native.steps['deposit-initial-refusal'].resultCode)+'. Its transaction is retained. A separate test-wallet top-up and deposit completed the setup.</p>';
   if(linked) $('review-actions').innerHTML += `<button class='primary' data-linked-loan='${esc(id)}'>View loan agreement →</button>`;
   $("review-warning").hidden = true;
   $("review-dialog").showModal();
@@ -800,7 +801,7 @@ function updateReview() {
       ? privateAvailable && intakeReviewMatches(review, intake)
       : review.action
         ? available && sameReview(review, state)
-        : true;
+        : available && review.instanceId === state.instanceId && JSON.stringify(review.request) === JSON.stringify(state.requests.find(r=>r.agreement.requestId===review.requestId));
   $("review-warning").hidden = valid;
   $("review-warning").textContent =
     "The request changed or the connection needs to be restored. Close this review and open the current version.";

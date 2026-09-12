@@ -93,14 +93,16 @@ export function verifyOffline(bundle: Bundle) {
     const cycle = bundle.nativeCycle;
     const repaymentName = cycle.transactions['repay-late'] ? 'repay-late' : 'repay';
     if (repaymentName === 'repay-late' && cycle.transactions.repay?.resultCode !== 'tecEXPIRED') throw new Error('Late retry requires original validated refusal');
-    const required = ['vault','deposit','broker','cover','native-refusal',repaymentName,'withdraw'];
+    const depositName = cycle.transactions['deposit-funded'] ? 'deposit-funded' : 'deposit';
+    if (depositName === 'deposit-funded' && cycle.transactions.deposit?.resultCode !== 'tecINSUFFICIENT_FUNDS') throw new Error('Deposit recovery requires original validated insufficient-funds refusal');
+    const required = ['vault',depositName,'broker','cover','native-refusal',repaymentName,'withdraw'];
     for (const name of required) {
       const result=cycle.transactions[name]; if(!result) throw new Error(`Missing native cycle step: ${name}`);
       // tx_json from API v2 is the signed transaction, metadata is separate.
       if(hashes.hashSignedTx(encode(result.tx as unknown as Transaction)) !== result.hash) throw new Error('Cycle transaction hash mismatch');
       if(name !== 'native-refusal' && result.resultCode !== 'tesSUCCESS') throw new Error(`Native step not successful: ${name}`);
     }
-    const deposit=cycle.transactions.deposit!,withdraw=cycle.transactions.withdraw!,repay=cycle.transactions[repaymentName]!;
+    const deposit=cycle.transactions[depositName]!,withdraw=cycle.transactions.withdraw!,repay=cycle.transactions[repaymentName]!;
     if(deposit.tx.Account !== agreement.accounts.lender || deposit.tx.VaultID !== agreement.vaultId || deposit.tx.Amount !== cycle.depositDrops || withdraw.tx.Account !== agreement.accounts.lender || withdraw.tx.VaultID !== agreement.vaultId || repay.tx.LoanID !== execution.loanId || repay.tx.Account !== agreement.accounts.borrower) throw new Error('Native cycle belongs to different accounts or objects');
     if(repay.ledgerIndex < bundle.transaction.ledgerIndex || withdraw.ledgerIndex < repay.ledgerIndex) throw new Error('Invalid native cycle ordering');
     const proceeds=balanceDelta(withdraw,agreement.accounts.lender)+BigInt(String(withdraw.tx.Fee));

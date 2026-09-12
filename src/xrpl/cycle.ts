@@ -114,7 +114,21 @@ export class Cycle {
     await this.cycles.write('native', record);
     const vault = await this.step(record, 'vault', native.vault(broker.address), broker);
     record.vaultId = createdId(vault, 'Vault'); await this.cycles.write('native', record);
-    await this.step(record, 'deposit', native.deposit(lender.address, record.vaultId, record.depositDrops), lender);
+    const initialDeposit = await this.journal.store.read('deposit');
+    if (initialDeposit?.result?.resultCode === 'tecINSUFFICIENT_FUNDS') {
+      // The first attempt is conclusively refused. Keep it, and journal the
+      // test-wallet top-up and corrected deposit under distinct operation IDs.
+      const topup = await this.journal.store.read('lender-topup');
+      const missing = topup ? String(topup.tx.Amount) : String(BigInt(record.depositDrops) + 20000000n - BigInt((await this.adapter.account(lender.address)).account_data.Balance));
+      if (BigInt(missing) <= 0n) throw new Error('Deposit recovery needs explicit inspection; no positive top-up');
+      if (!topup && BigInt((await this.adapter.account(broker.address)).account_data.Balance) < BigInt(missing) + BigInt(record.coverDrops) + 20000000n) throw new Error('Insufficient test setup capital; no top-up signed');
+      await this.step(record, 'lender-topup', {TransactionType:'Payment',Account:broker.address,Destination:lender.address,Amount:missing}, broker);
+      await this.step(record, 'deposit-funded', native.deposit(lender.address, record.vaultId, record.depositDrops), lender);
+      record.steps['deposit-initial-refusal'] = {hash:initialDeposit.result.hash,ledgerIndex:initialDeposit.result.ledgerIndex,resultCode:initialDeposit.result.resultCode};
+      record.steps.deposit = record.steps['deposit-funded']!;
+      await this.cycles.write('native',record);
+      await this.onProgress?.();
+    } else await this.step(record, 'deposit', native.deposit(lender.address, record.vaultId, record.depositDrops), lender);
     const loanBroker = await this.step(record, 'broker', native.broker(broker.address, record.vaultId), broker);
     record.loanBrokerId = createdId(loanBroker, 'LoanBroker'); await this.cycles.write('native', record);
     await this.step(record, 'cover', native.cover(broker.address, record.loanBrokerId, record.coverDrops), broker);
