@@ -3,7 +3,7 @@
 Open https://recognitium-xrpl-hackathon.vercel.app/ . No access code is required for hosted synthetic requests or review.
 
 1. Choose Request funding, enter made-up details, review and send.
-2. Open Team review area in a second tab: https://recognitium-xrpl-hackathon.vercel.app/?view=review . Start review, then mark the request reviewed.
+2. Open Team review area in a second tab: https://recognitium-xrpl-hackathon.vercel.app/review . Start review, then mark the request reviewed.
 3. Return to the request tab to see the updated state. Both views share saved data.
 4. Open the completed example to show the separately verified native test-money loan and repayment.
 
@@ -18,3 +18,5 @@ node scripts/hosted-smoke.mjs --write-synthetic
 ```
 
 This tests creation through completed review, duplicate retry, changed-details and stale-review rejection, and refusal of native operations. No hosted role credentials are needed. Local operator authentication is unchanged. Private Vercel Blob storage persists through deployments.
+
+Direct requester link: https://recognitium-xrpl-hackathon.vercel.app/borrow (mint). Reviewer: /review (lavender). Use the sidebar link to open the other role in a second tab.

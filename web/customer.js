@@ -56,6 +56,8 @@ try {
   /* Storage is optional; no credentials are stored. */
 }
 const entry = new URL(location.href).searchParams;
+const pathView = {"/borrow":"borrow", "/review":"review", "/lend":"lend"}[location.pathname];
+if (pathView) entry.set("view", pathView);
 $("source").value = entry.get("mode") === "recorded" ? "recorded" : "live";
 $("profile").value =
   entry.get("view") === "review"
@@ -70,7 +72,8 @@ function enterWorkspace(selectedRole) {
   $("profile").value = selectedRole;
   document.body.classList.remove("welcome");
   const url = new URL(location.href);
-  url.searchParams.set("view", selectedRole === "lender" ? "lend" : "borrow");
+  url.pathname = selectedRole === "lender" ? "/lend" : "/borrow";
+  url.searchParams.delete("view");
   url.searchParams.set("mode", "live");
   history.replaceState(null, "", url);
   sourceChanged("live");
@@ -134,6 +137,10 @@ function render() {
     borrower = role() === "borrower",
     lender = role() === "lender";
   const recorded = state.mode === "recorded";
+  document.body.dataset.workspace = recorded ? "example" : role();
+  $("role-heading").textContent = recorded ? "COMPLETED EXAMPLE" : role() === "broker" ? "REVIEWER WORKSPACE" : role() === "lender" ? "LENDER WORKSPACE" : "REQUESTER WORKSPACE";
+  $("role-switch").href = role() === "broker" ? "/borrow" : "/review";
+  $("role-switch").textContent = role() === "broker" ? "Open requester view ↗" : "Open reviewer view ↗";
   $("profile-label").hidden = !recorded;
   $("profile").querySelector('option[value="broker"]').hidden = recorded;
   $("workspace-name").textContent = recorded

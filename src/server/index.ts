@@ -45,7 +45,7 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
-    if (req.method === 'GET' && (path === '/' || path === '/operator')) {
+    if (req.method === 'GET' && (['/', '/borrow', '/review', '/lend', '/operator'].includes(path))) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
       return res.end(await readFile(path === '/operator' ? 'web/operator.html' : 'web/index.html'));
     }

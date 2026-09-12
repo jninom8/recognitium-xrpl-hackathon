@@ -1356,3 +1356,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
  .welcome-footer { flex-wrap:wrap; }
 }
 @media(prefers-reduced-motion:reduce) { .goal-card { transition:none; } .goal-card:hover { transform:none; } }
+
+/* Role color reinforces the explicit workspace label, never replaces it. */
+body[data-workspace="broker"] { --green:#645087; --soft:#ece6f6; --line:#e3ddec; background:#faf8fd; }
+body[data-workspace="broker"] .sidebar { background:#f0ebf7; }
+body[data-workspace="broker"] .sidebar nav button[aria-current="page"] { background:#e2d8f0; color:#513d70; }
+body[data-workspace="broker"] .source-bar,body[data-workspace="broker"] .list-header { background:#eee8f7; }
+body[data-workspace="broker"] .primary { background:#645087; }
+body[data-workspace="broker"] .primary:hover { background:#4f3b70; }
+body[data-workspace="broker"] .brand-icon { background:#645087; border-color:#645087; }
+#role-heading { font-size:10px; line-height:1.6; font-weight:700; }
+#role-switch { display:inline-block; border:1px solid var(--line); padding:9px 10px; border-radius:10px; background:#ffffff85; }
