@@ -54,7 +54,7 @@ timestamps. They are not estimates of hours spent coding.
 | 17:01:57 | Repeated the same probe after another Wi-Fi change | Event HTTP 573 ms, WebSocket 553 ms, SDK 766 ms; ledger 68408 |
 | By 17:06 | Reverified the earlier cycle and corrected optional CTID handling | Loan and metadata matched; fresh responses omitted an optional RPC locator. All online evidence checks then passed |
 | 17:07:31–17:08:01 | Ran the selected cap experiment in a separate 10-test-XRP vault | One competing deposit succeeded, the other and two cap violations were refused; full principal withdrawn |
-| 17:11:24 | Independently looked up all seven cap transactions and historical vault states | Cap evidence verified; original vault unchanged; empty experimental vault balance zero |
+| 17:11:24 | Used a separate verifier to look up all seven cap transactions and historical vault states | Cap evidence verified; original vault unchanged; empty experimental vault balance zero |
 
 ## 2. What we learned
 
@@ -187,7 +187,10 @@ The last command performs read-only checks. It does not fund wallets, create a
 loan or mint a receipt. Without `--online`, the verifier explicitly distinguishes
 offline consistency from fresh authority and ledger verification.
 
-[Successful implementation CI →](https://github.com/jninom8/recognitium-xrpl-hackathon/actions/runs/34696591456)
+[Successful CI for commit 5807683, including the 21 local tests →](https://github.com/jninom8/recognitium-xrpl-hackathon/actions/runs/34701664050)
+
+Live cap verification ran separately on the development machine. A teammate's
+independent live reproduction remains a useful next check; CI did not move funds.
 
 ## 4. The mandatory DevEx hook
 

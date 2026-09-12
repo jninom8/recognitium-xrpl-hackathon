@@ -6,6 +6,10 @@ the journey page gives their current outcome in chronological order.
 
 ## CAP-001: selected native cap experiment passed
 
+- Reviewed implementation/evidence commit `5807683` pushed to the public main
+  branch. [Its GitHub CI completed successfully](https://github.com/jninom8/recognitium-xrpl-hackathon/actions/runs/34701664050).
+  Native verification below used a separate script on the same development
+  machine/endpoint; a teammate's live reproduction is not claimed.
 - Final local publication check: `npm test`, 21 passed, zero failed,
   3,213.9404 ms. Synthetic cap JSON was checked for credential/blob fields:
   zero found. Original lending evidence and participant report were unchanged.

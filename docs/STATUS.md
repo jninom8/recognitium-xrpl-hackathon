@@ -90,6 +90,9 @@ See [the network comparisons](NETWORK_FINDING.md).
   recovers without signing or funding another loan. Additional tests cover API
   roles/origin, nanosecond precision, authority mismatches, stored signature
   integrity, exact repeat blobs, expired unknown history and writer locking.
+  Commit `5807683` was pushed and its [GitHub CI passed](https://github.com/jninom8/recognitium-xrpl-hackathon/actions/runs/34701664050).
+  CI covers the build/local tests; live cap verification was a separate run on
+  this development machine, not a claimed teammate reproduction.
 - Fresh live verification initially rejected a response missing optional
   `tx.ctid`; loan hash, ledger 66253, result and metadata matched. The comparison
   now validates CTID's ledger position/network if present and permits its absence,
