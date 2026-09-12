@@ -129,6 +129,14 @@ export class LendingService {
     }
     await this.store.write(id, r); return this.view(r);
   }
+  async prepareExternalReceipt(id: string, stage: 'agreement'|'execution') {
+    const r=await this.get(id);this.assertContent(r,stage==='agreement');
+    if(stage==='agreement'){this.assertApprovals(r);if(r.signed||r.agreementReceipt)throw Error('Agreement receipt already resolved or signed');}
+    else if(!r.validated || r.validated.resultCode!=='tesSUCCESS' || !r.executionManifest || r.executionReceipt)throw Error('Unreceipted validated execution required');
+    if(r.receiptAttempt)throw Error('Receipt issuance already prepared. Recover its result; do not issue again.');
+    r.receiptAttempt=stage;await this.store.write(id,r);
+    return {requestId:id,stage,hash:stage==='agreement'?r.agreementHash:digest(r.executionManifest),tickCost:1,recovery:'Record the returned receipt ID, then attach through recover. Never repeat issuance after a lost response.'};
+  }
   async receiptExecution(id: string): Promise<RequestView> {
     const r = await this.get(id); this.assertContent(r, false);
     if (!r.validated || r.validated.resultCode !== 'tesSUCCESS' || !r.executionManifest) throw new Error('Validated funding required');

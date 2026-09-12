@@ -8,7 +8,8 @@ import { RecognitiumClient } from '../recognitium/client.js';
 import { NativeAdapter, balanceDelta, createdId, type ValidatedTransaction } from './adapter.js';
 import { native } from './transactions.js';
 import { CONTRACT_VERSION, TRACK1, type Agreement } from '../shared/contract.js';
-import { digest, documentCommitment } from '../requests/commitment.js';
+import type { FinancingRequest } from '../shared/intake.js';
+import { canonical, digest, documentCommitment } from '../requests/commitment.js';
 
 interface SavedWallet { seed: string; fundingAttempted: boolean; balanceAfterFaucetDrops?: string }
 export interface CycleRecord {
@@ -99,7 +100,8 @@ export class Cycle {
     if (result.resultCode !== 'tesSUCCESS') throw new Error(`${name}: validated ${result.resultCode}`);
     return result;
   }
-  async setup(): Promise<CycleRecord> {
+  async setup(sizing = {depositDrops:'200000000',coverDrops:'20000000'}): Promise<CycleRecord> {
+    for (const value of Object.values(sizing)) if (!/^[1-9][0-9]*$/.test(value)) throw new Error('Invalid cycle sizing');
     if (!this.adapter.identity) throw new Error('Connect first');
     // Sequential faucet and transaction operations simplify exact attribution.
     const broker = await this.fund('broker'), lender = await this.fund('lender'), borrower = await this.fund('borrower');
@@ -107,7 +109,7 @@ export class Cycle {
     if (record) record = await this.record();
     else record = { schema: 'recognitium.native-cycle.v1', network: this.adapter.identity,
       accounts: { broker: broker.address, lender: lender.address, borrower: borrower.address },
-      depositDrops: '200000000', coverDrops: '20000000', steps: {} };
+      depositDrops: sizing.depositDrops, coverDrops: sizing.coverDrops, steps: {} };
     await this.cycles.write('native', record);
     const vault = await this.step(record, 'vault', native.vault(broker.address), broker);
     record.vaultId = createdId(vault, 'Vault'); await this.cycles.write('native', record);
@@ -117,17 +119,24 @@ export class Cycle {
     await this.step(record, 'cover', native.cover(broker.address, record.loanBrokerId, record.coverDrops), broker);
     return record;
   }
-  async prepareRequest(): Promise<unknown> {
+  async prepareRequest(intake?: FinancingRequest, paymentInterval = 60): Promise<unknown> {
     const r = await this.record();
     if (!r.vaultId || !r.loanBrokerId) throw new Error('Setup incomplete');
-    const id = 'synthetic-supplier-001';
+    const id = intake?.clientRequestId ?? 'synthetic-supplier-001';
+    if (intake && intake.status !== 'REVIEWED') throw new Error('Reviewed intake required');
+    if (!Number.isSafeInteger(paymentInterval) || paymentInterval < 60 || paymentInterval > 90*86400) throw new Error('Invalid payment interval');
     const existing = await this.requests.read(id);
-    if (existing) return this.service.view(existing);
-    const document = Buffer.from('SYNTHETIC DEMO: a supplier requests 100 test XRP for inventory. No real invoice, business, collateral or credit decision.');
+    if (existing) {
+      if (intake) { const bound=JSON.parse(Buffer.from(existing.documentBase64,'base64').toString('utf8')); if(digest(bound.intake)!==digest(intake) || existing.agreement.terms.paymentInterval!==paymentInterval)throw new Error('Existing offer differs from intake or duration'); }
+      if (r.requestId && r.requestId !== id) throw new Error('Run already bound to another request');
+      r.requestId = id; await this.cycles.write('native', r);
+      return this.service.view(existing);
+    }
+    const document = Buffer.from(intake ? canonical({schema:'recognitium.intake-agreement.v1',synthetic:true,intake,offer:{principalDrops:intake.requestedDrops,paymentInterval,interestRate:10000,notice:paymentInterval === intake.requestedDays*86400 ? 'Requested duration preserved' : 'Explicit counter-offer: accelerated test repayment; requested duration preserved in intake'}}) : 'SYNTHETIC DEMO: a supplier requests 100 test XRP for inventory. No real invoice, business, collateral or credit decision.');
     const commitment = documentCommitment(document);
     const agreement: Agreement = { schema: CONTRACT_VERSION, requestId: id, documentVersion: 1, documentCommitment: commitment.hash,
       synthetic: true, network: r.network, accounts: r.accounts, vaultId: r.vaultId, loanBrokerId: r.loanBrokerId, asset: 'XRP',
-      terms: { principalDrops: '100000000', interestRate: 10000, paymentTotal: 1, paymentInterval: 60, gracePeriod: 60,
+      terms: { principalDrops: intake?.requestedDrops ?? '100000000', interestRate: 10000, paymentTotal: 1, paymentInterval, gracePeriod: 60,
         originationFeeDrops: '0', serviceFeeDrops: '0', latePaymentFeeDrops: '0', closePaymentFeeDrops: '0',
         overpaymentFee: 0, lateInterestRate: 0, closeInterestRate: 0, overpaymentInterestRate: 0, flags: 0 },
       expiresAt: new Date(Date.now() + 3600000).toISOString(), policyVersion: 'human-exact-approval.v1' };

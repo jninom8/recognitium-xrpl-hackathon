@@ -717,3 +717,7 @@ At 21:44:31 UTC, the deployed smoke passed without loading or sending any role c
 ## September 13: distinct jury workspaces
 
 Added /borrow (requester, mint), /review (reviewer, lavender) and /lend routes, with explicit role labels and a second-tab link between request and review. Both views use the same backend; colors and routes do not authenticate identities. Existing query links remain compatible. Local suite: 36 passed, 0 failed. The fresh intake-to-native-loan bridge remains the main functional gap; no new native funding is claimed.
+
+## September 13: request-to-native bridge implemented, first live run pending
+
+Added a local bridge with per-request data/wallet isolation, exact reviewed-intake binding, unchanged submitted principal, explicit duration/counter-offer, existing native setup/sign/submit/repay/withdraw recovery, durable external receipt handoff and filtered progress publication to the website. Public users cannot sign or approve through this bridge. 39 tests pass, including simulated fresh preparation/restart and changed-intake rejection. The actual event endpoint probe succeeded at 22:16 UTC on network 4001, rippled 3.4.0-rc1; SDK call 867 ms. No new loan has been funded. Request E0403F17 (600 test XRP, 60 days) is still UNDER_REVIEW at the last check. Founder review and duration choice are pending before preparing exact transaction approval. See NATIVE_BRIDGE.md for repeatable commands.

@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { readPublicRuns } from './runs.js';
 import { HostedIntake } from './intake.js';
 import { BlobIntakeDatabase } from './blob.js';
 import { checkHostedOrigin } from './security.js';
@@ -20,6 +21,8 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     if (req.method === 'GET' && path === '/api/state') {
       const mode = url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live';
       const state = JSON.parse(await readFile(join(process.cwd(), 'hosted', mode + '.json'), 'utf8'));
+      const progress = mode === 'live' ? await readPublicRuns() : undefined;
+      if (progress?.runs.length) { state.requests = progress.runs.map(r=>r.request); state.cyclesByRequest = Object.fromEntries(progress.runs.map(r=>[r.request.agreement.requestId,r.cycle])); state.cycle = progress.runs[0]!.cycle; state.revision = progress.revision; }
       return reply(res, 200, { ...state, instanceId, observedAt: new Date().toISOString(), hosting: { sharedIntake: true, nativeActions: false, openDemo: true } });
     }
     if (req.method === 'GET' && path === '/api/evidence/published') {

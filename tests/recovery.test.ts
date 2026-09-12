@@ -132,3 +132,16 @@ test('timeout, restart, validated funding and receipt outage do not originate an
     assert.ok(!('signed' in t.service.view(after))); assert.ok(!('documentSalt' in t.service.view(after)));
   } finally { await t.cleanup(); }
 });
+
+test('external receipt handoff requires approvals and survives restart without another issuance',async()=>{
+ const t=await setup();try{
+  await assert.rejects(t.service.prepareExternalReceipt(t.id,'agreement'));
+  await t.approve();const intent=await t.service.prepareExternalReceipt(t.id,'agreement');assert.equal(intent.hash,t.view.agreementHash);
+  t.restart();await assert.rejects(t.service.prepareExternalReceipt(t.id,'agreement'),/already prepared/);
+  await assert.rejects(t.service.receiptAgreement(t.id),/unresolved/);
+  assert.deepEqual(t.calls(),{submissions:0,receiptCalls:0});
+  await t.service.attachRecoveredReceipt(t.id,'agreement',{receiptId:'FIXTURE',commitmentHash:intent.hash,receiptWire:'{}',verificationWire:'{}',authorityCheckedAt:new Date().toISOString()});
+  await t.service.sign(t.id,t.f.broker,t.f.borrower);
+  assert.deepEqual(t.calls(),{submissions:0,receiptCalls:0});
+ }finally{await t.cleanup();}
+});

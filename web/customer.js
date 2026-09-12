@@ -41,6 +41,7 @@ let state,
   page = "overview",
   pollBusy = false;
 let inboxSequence = 0;
+let selectedLoanId;
 const pendingKey = "recognitium.synthetic-intake.pending.v1";
 try {
   const value = JSON.parse(localStorage.getItem(pendingKey));
@@ -90,6 +91,7 @@ function requestError(text) {
   $("request-error").textContent = text;
 }
 function selected() {
+  if (selectedLoanId && state?.mode === 'live') { const loan=state.requests.find(r=>r.agreement.requestId===selectedLoanId); if(loan && privateRequests().some(r=>r.clientRequestId===selectedLoanId))return loan; }
   return customerLoan(
     state,
     privateRequests(),
@@ -132,7 +134,7 @@ function privateRequests() {
 function render() {
   if (!state || state.mode !== $("source").value) return;
   const r = selected(),
-    c = $("source").value === "recorded" || r ? state.cycle : undefined,
+    c = r && state.cyclesByRequest ? state.cyclesByRequest[r.agreement.requestId] : $("source").value === "recorded" || r ? state.cycle : undefined,
     outcome = loanOutcome(r, c),
     borrower = role() === "borrower",
     lender = role() === "lender";
@@ -340,7 +342,7 @@ function requestList(compact) {
     .slice(0, compact ? 4 : 100)
     .map(
       (r) =>
-        `<div class='request-row'><div><h3>${esc(purposes[r.purpose])}</h3><p>Request ${esc(shortId(r.clientRequestId))} · ${date(r.createdAt)}</p></div><div><strong>${esc(drops(r.requestedDrops))} test XRP</strong><p>${r.requestedDays} days requested</p></div><div>${badge(intakeStates[r.status].label, intakeStates[r.status].tone)}</div><button class='secondary' data-intake='${esc(r.clientRequestId)}'>${role() === "broker" ? "Review request" : "View request"}</button></div>`,
+        `<div class='request-row'><div><h3>${esc(purposes[r.purpose])}</h3><p>Request ${esc(shortId(r.clientRequestId))} · ${date(r.createdAt)}</p></div><div><strong>${esc(drops(r.requestedDrops))} test XRP</strong><p>${r.requestedDays} days requested</p></div><div>${badge(state.requests.some(loan=>loan.agreement.requestId===r.clientRequestId) ? 'Loan agreement available' : intakeStates[r.status].label, intakeStates[r.status].tone)}</div><button class='secondary' data-intake='${esc(r.clientRequestId)}'>${role() === "broker" ? "Review request" : "View request"}</button></div>`,
     )
     .join(
       "",
@@ -716,6 +718,8 @@ function openIntake(id) {
   if (role() === "broker")
     $("review-content").innerHTML +=
       `<p class='hint'>Marking intake reviewed does not approve credit or create loan terms. Native preparation and its exact approvals are separate.</p>`;
+  const linked = state.requests.find(r=>r.agreement.requestId===id);
+  if(linked) $('review-actions').innerHTML += `<button class='primary' data-linked-loan='${esc(id)}'>View loan agreement →</button>`;
   $("review-warning").hidden = true;
   $("review-dialog").showModal();
   updateReview();
@@ -890,6 +894,7 @@ document.addEventListener("click", (e) => {
   if (b.hasAttribute("data-completed")) sourceChanged("recorded");
   if (b.dataset.intake) openIntake(b.dataset.intake);
   if (b.hasAttribute("data-loan")) openLoan();
+  if (b.dataset.linkedLoan) {selectedLoanId=b.dataset.linkedLoan;closeReview();openLoan();}
   if (b.hasAttribute("data-close-review")) closeReview();
   if (b.dataset.decision) void applyReview(b.dataset.decision);
   if (b.hasAttribute("data-approve")) void applyReview();
