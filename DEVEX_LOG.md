@@ -4,6 +4,32 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## UX-002: start with the person's goal, keep the historical loan in an example
+
+- September 12, 2026, 19:39–19:49 UTC. Founder said the app remained difficult
+  for someone without an economics background. Replaced the initial workspace
+  with two plain-language choices: Request funding and Provide funding.
+  The former opens the request form; the latter explains interest, possible
+  loss and unavailable funds before linking to the completed lender example.
+- Removed role/source switches from the normal path. Team review has its own
+  entrance; recorded data is an explicitly labelled example. A new visitor's
+  workspace no longer shows the previous shared 100-XRP loan. Normal loan
+  display requires a matching authenticated intake request ID; this display
+  rule does not claim multi-tenant identity or replace backend authorization.
+- Plain request language explains amount, purpose and preferred repayment time.
+  Review says that submitting is not accepting a loan. REVIEWED displays
+  Waiting for an offer; the missing fresh offer bridge remains explicit.
+- npm test: 32 passed, zero failed, 6,128.7006 ms. New regression covers an empty
+  visitor, wrong request ID, matching request ID, and recorded/live separation.
+  JavaScript syntax checks passed after copy edits and formatting.
+- Chrome DOM checks verified the entrance and direct request form; the review
+  screenshot preserved 250.000001 test XRP and a 60-day preference. No code was
+  entered and no request/loan/receipt created. Screenshot capture later timed
+  out; reconnect reported Unable to load browser request-header policy and the
+  retry also timed out. Final mobile QA remains unverified, not an XRPL finding.
+- Hook flush 19:49:08.635 UTC: HTTP 200, 11 observed events delivered,
+  380 cumulative, zero buffered. No generated participant report submitted.
+
 ## ALIGNMENT-001: complete challenge PDF review and fresh native evidence check
 
 - September 12, 2026, 19:28 UTC. Read all ten pages of XRPL Lending Protocol

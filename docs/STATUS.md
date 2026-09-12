@@ -38,6 +38,13 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Pending, not represented as completed
 
+Customer simplification: the root entrance now offers Request funding and
+Provide funding, with the completed example and team review area separate.
+Normal visitors start without the historical loan. 32 tests passed, including
+request-matched loan display; Chrome checked the request/review path. Final
+mobile QA was interrupted by the browser connection. Fresh native offer
+preparation from a new request remains pending, explicitly stated in the UI.
+
 The founder's customer-UX correction is implemented: / now provides borrower,
 lender and broker task views, while /operator retains technical controls.
 Borrower intake submission and broker review are durable authenticated actions;

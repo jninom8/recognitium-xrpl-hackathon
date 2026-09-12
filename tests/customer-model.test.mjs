@@ -6,6 +6,7 @@ import {
   lenderOutcome,
   intakeReviewMatches,
   intakeStates,
+  customerLoan,
 } from "../web/customer-model.mjs";
 
 test("customer amounts remain exact and pending receipts do not hide received funds", () => {
@@ -35,7 +36,7 @@ test("customer amounts remain exact and pending receipts do not hide received fu
     loanOutcome({ ...request, funding: { status: "unknown" } }, null).label,
     "Confirming funding",
   );
-  assert.equal(intakeStates.REVIEWED.label, "Review complete");
+  assert.equal(intakeStates.REVIEWED.label, "Waiting for an offer");
   assert.match(intakeStates.REVIEWED.description, /No loan has been funded/);
   assert.equal(
     lenderOutcome({ steps: { deposit: { resultCode: "tecEXPIRED" } } })
@@ -46,6 +47,33 @@ test("customer amounts remain exact and pending receipts do not hide received fu
     lenderOutcome({ steps: { deposit: { resultCode: "tesSUCCESS" } } })
       .redeemed,
     false,
+  );
+});
+test("a new customer never inherits the shared historical demo loan", () => {
+  const historical = { agreement: { requestId: "synthetic-supplier-001" } };
+  const own = { agreement: { requestId: "request-own" } };
+  const snapshot = { mode: "live", requests: [historical, own] };
+  assert.equal(customerLoan(snapshot, [], false), undefined);
+  assert.equal(
+    customerLoan(snapshot, [{ clientRequestId: "request-other" }], false),
+    undefined,
+  );
+  assert.equal(
+    customerLoan(snapshot, [{ clientRequestId: "request-own" }], false),
+    own,
+  );
+  assert.equal(customerLoan(snapshot, [], true), undefined);
+  assert.equal(
+    customerLoan({ ...snapshot, mode: "recorded" }, [], true),
+    historical,
+  );
+  assert.equal(
+    customerLoan(
+      { ...snapshot, mode: "recorded" },
+      [{ clientRequestId: "request-own" }],
+      false,
+    ),
+    undefined,
   );
 });
 test("broker review becomes stale after an intake change or backend restart", () => {

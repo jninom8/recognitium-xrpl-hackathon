@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **21:28 Paris time (UTC+2)**. About eight minutes to read.
+Evidence through **21:49 Paris time (UTC+2)**. About eight minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -17,9 +17,9 @@ Evidence through **21:28 Paris time (UTC+2)**. About eight minutes to read.
 | Realised interest | **20 drops before network fees**, not net profit |
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
-| Customer interface | Borrower request form and tracking, lender position, protected broker inbox at `/`; technical workspace at `/operator` |
-| Tests | 31 passing local tests, including process crashes with simulated external systems, two-client state checks and durable request intake |
-| Developer capture | Team **Recognitium**; 366 events accepted at the last recorded check |
+| Customer interface | Plain-language task entrance, request form and tracking; separate completed example and team inbox; technical workspace at `/operator` |
+| Tests | 32 passing local tests, including process crashes with simulated external systems, two-client state checks, durable intake and example separation |
+| Developer capture | Team **Recognitium**; 380 events accepted at the last recorded check |
 | Last connection checkpoint | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
 | Still to finish | Reviewed request to fresh loan, independent reproduction, fresh joint rehearsal and participant-written final report |
 
@@ -59,6 +59,7 @@ timestamps. They are not estimates of hours spent coding.
 | By 18:05 | Researched and previewed the founder's clean white fintech direction in Chrome | Original concept labelled simulated; no new ledger evidence asserted |
 | By 18:58 | Integrated the three views with shared state/health and tested two local clients plus browser reconnection | 27 tests passed; recorded funding survived an idle backend stop/restart; teammate reproduction still pending |
 | 19:17–19:44 | Founder identified that the browser showed operator information, not a usable customer journey; added a customer home, request wizard and broker inbox | Persisted synthetic requests and reviews work; fresh loan creation from those requests remains a separate step; 31 tests passed |
+| 21:39–21:49 | Founder challenged the financial jargon and confusing start; rebuilt entry around Request funding and Provide funding | The normal workspace starts without the historical loan; example and review area separate; 32 tests passed; final mobile check blocked by browser tool |
 
 ## 2. What we learned
 
@@ -186,6 +187,14 @@ This is an application finding, not an XRPL protocol defect.
 
 ## 3. Check the result
 
+**21:49 usability checkpoint:** the entrance now asks what the person wants to
+do, with plain-language request questions and a separate completed example.
+Fresh visitors do not see the shared historical loan as their own. The new
+regression brings the suite to 32 passing tests. Desktop form/review checks
+passed; browser connectivity interrupted final mobile QA. The request-to-fresh-
+offer bridge remains pending and is stated in the interface.
+[Actual changes and checks →](../DEVEX_LOG.md#ux-002-start-with-the-persons-goal-keep-the-historical-loan-in-an-example)
+
 **21:28 challenge alignment check:** all ten PDF pages were reread from the
 founder's ZIP. The recorded native cycle covers page 3's six Track 1 gates;
 the off-ledger agreement/receipt layer is consistent with page 5's Vanilla
@@ -252,8 +261,8 @@ independent live reproduction remains a useful next check; CI did not move funds
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **21:28:42**,
-the last recorded delivery returned **HTTP 200**, with **366 accepted events**
+is installed locally in this project, with eight trusted hooks. At **21:49:08**,
+the last recorded delivery returned **HTTP 200**, with **380 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 

@@ -5,16 +5,24 @@ operator information without providing a usable customer journey. The root page
 now starts with customer tasks. The technical workspace is at /operator.
 The terminal health script remains a third view of the same backend.
 
+The entrance now asks **What would you like to do?**: Request funding or
+Provide funding. Technical roles and live/recorded switches are removed from
+the normal customer path. New visitors do not inherit the shared historical
+loan. A customer loan is displayed only when its request ID matches an intake
+in the authenticated workspace. This is a presentation boundary, not a new
+multi-tenant authentication system.
+
 | View | Working actions and information |
 |---|---|
-| Borrower | Enter amount, purpose and requested term; review; send a synthetic request; track broker review; inspect existing loan terms and exact approval when eligible |
-| Lender | Read validated deposit, redemption and gross interest separately from fees; inspect chronological activity |
-| Broker | Open protected intake inbox; start review; request revision; mark intake reviewed; inspect and approve an existing eligible exact loan agreement |
+| Request funding | Enter amount, purpose and preferred repayment time; review; send a synthetic request; track review. Fresh offer preparation remains pending |
+| Provide funding | Plain-language explanation of interest, loss and withdrawal risks; link to the completed lender example. No new customer deposit action |
+| Team review area | Separate entrance at /?view=review; protected inbox; start review, request revision, mark reviewed. Exact native agreement controls remain in /operator |
 | Operations | Native setup/sign/submit/repay/withdraw, receipt recovery, full evidence and system health |
 
 Open http://127.0.0.1:3000/?mode=recorded for the completed real test-network
-loan in customer language. Select demo views at the top. The role selector
-changes presentation; it does not authenticate or approve. The completed
+loan in customer language. An explicit banner says this is an example, not
+the visitor's loan. The example perspective selector changes presentation;
+it does not authenticate or approve. The completed
 agreement is read-only, with expired approval and no repeat loan.
 
 ## Try the request journey
@@ -22,21 +30,21 @@ agreement is read-only, with expired approval and no repeat loan.
 On the backend PC, run `npm run demo:access` once, then restart `npm start`.
 This creates an ignored .env with separate random borrower, broker and operator
 codes; it never prints them and leaves an existing .env untouched. Open .env
-locally to use your assigned role value in **Demo access**. Keep the operator
+locally to use your assigned role value in **Open my requests**. Keep the operator
 code with the backend owner. No service key or wallet is copied by this command.
 
-1. Choose Borrower and **Request financing**. New requests explicitly use the
-   live local workspace, even when starting from the completed demo.
+1. Open / and choose **Request funding**. The request form opens directly.
+   Returning requesters can open /?view=borrow and choose Open my requests.
 2. Enter 1 to 10,000 test XRP, one of three purposes and a requested repayment
    window. Only synthetic structured fields are collected; there is no document
    upload or personal-information field.
 3. Review the amount and requested term. Interest, fees and the final repayment
    schedule have not been offered. Sending is an intake action, not approval.
-4. Open demo access with the borrower role code configured in ignored .env,
+4. Choose Continue with my code and use the borrower role code in ignored .env,
    then choose **Send for review**. The code stays only in tab memory, cleared
    by locking the workspace, changing roles or reloading.
-5. In another browser connected to the same backend, choose Broker and open
-   demo access with the separate broker code. The request appears in its inbox.
+5. In another browser connected to the same backend, open **Team review area**
+   at /?view=review and use the separate broker code. The request appears there.
 6. Start review, then mark reviewed or request revision. The borrower sees the
    refreshed status. Open reviews become stale when the revision or backend
    instance changes. Connection failures do not remove saved records.
@@ -80,6 +88,14 @@ AI discovery and public hosting remain outside this slice. The native operator
 workflow and reviewed historical evidence are preserved.
 
 ## Observed validation
+
+The simplification passed 32 tests, including new coverage that prevents a
+historical demo loan from appearing as a new visitor's loan and requires a
+matching request ID for the normal view. Chrome verified the new entrance,
+borrower form and exact 250.000001-XRP / 60-day request review. The later mobile
+check was interrupted by a browser-tool connection failure and is not claimed
+as passed. No access code was typed by browser automation and no request or loan
+was submitted in this UX pass. The checks below describe the prior interface.
 
 31 local tests passed, including two HTTP clients, role/origin enforcement,
 immutable details, duplicate submission reconciliation, broker revision checks

@@ -1,31 +1,31 @@
 export const purposes = {
-  inventory: "Purchase inventory",
-  receivables: "Bridge a customer payment",
-  "working-capital": "Working capital",
+  inventory: "Buy stock or materials",
+  receivables: "Wait for a customer to pay",
+  "working-capital": "Cover everyday expenses",
 };
 export const intakeStates = {
   AWAITING_REVIEW: {
     label: "Sent for review",
     description:
-      "Your request is in the broker’s inbox. Loan terms have not been offered yet.",
+      "Your request has been sent. Next, the review team will check it. You have not agreed to borrow anything.",
     tone: "amber",
   },
   UNDER_REVIEW: {
     label: "Under review",
     description:
-      "The broker is reviewing your requested amount, purpose and repayment window.",
+      "The review team is checking your request. There is no offer to accept yet.",
     tone: "amber",
   },
   NEEDS_REVISION: {
     label: "Revision requested",
     description:
-      "The broker has asked you to revisit the request. A revised request needs its own review.",
+      "The review team needs a different request. You can send a new request with updated details; it will be reviewed separately.",
     tone: "amber",
   },
   REVIEWED: {
-    label: "Review complete",
+    label: "Waiting for an offer",
     description:
-      "Your request has been reviewed. Exact loan terms still need to be prepared and approved. No loan has been funded from this request.",
+      "Your request has been reviewed. The next step is an offer showing what you receive and what you repay. Preparing that offer is not yet connected in this demo. No loan has been funded from this request.",
     tone: "neutral",
   },
 };
@@ -126,4 +126,17 @@ export function lenderOutcome(cycle) {
       cycle?.steps.withdraw?.resultCode === "tesSUCCESS" &&
       Boolean(cycle.yield),
   };
+}
+
+/** A shared demo's historical loan must never appear as a new visitor's loan. */
+export function customerLoan(snapshot, requests, example = false) {
+  if (!snapshot) return undefined;
+  if (example)
+    return snapshot.mode === "recorded" ? snapshot.requests[0] : undefined;
+  if (snapshot.mode !== "live") return undefined;
+  return snapshot.requests.find((loan) =>
+    requests.some(
+      (request) => request.clientRequestId === loan.agreement.requestId,
+    ),
+  );
 }

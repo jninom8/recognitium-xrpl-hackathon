@@ -6,6 +6,7 @@ import {
   loanOutcome,
   lenderOutcome,
   intakeReviewMatches,
+  customerLoan,
 } from "/customer-model.mjs";
 const $ = (id) => document.getElementById(id);
 const esc = (value) =>
@@ -52,10 +53,28 @@ try {
 } catch {
   /* Storage is optional; no credentials are stored. */
 }
-$("source").value =
-  new URL(location.href).searchParams.get("mode") === "live"
-    ? "live"
-    : "recorded";
+const entry = new URL(location.href).searchParams;
+$("source").value = entry.get("mode") === "recorded" ? "recorded" : "live";
+$("profile").value =
+  entry.get("view") === "review"
+    ? "broker"
+    : entry.get("view") === "lend"
+      ? "lender"
+      : "borrower";
+if (entry.has("view") || $("source").value === "recorded")
+  document.body.classList.remove("welcome");
+if (role() === "broker") $("source").value = "live";
+function enterWorkspace(selectedRole) {
+  $("profile").value = selectedRole;
+  document.body.classList.remove("welcome");
+  const url = new URL(location.href);
+  url.searchParams.set("view", selectedRole === "lender" ? "lend" : "borrow");
+  url.searchParams.set("mode", "live");
+  history.replaceState(null, "", url);
+  sourceChanged("live");
+  setPage("overview");
+  if (selectedRole === "borrower") openRequest();
+}
 function notice(text, error = false) {
   $("notice").hidden = !text;
   $("notice").textContent = text;
@@ -66,7 +85,11 @@ function requestError(text) {
   $("request-error").textContent = text;
 }
 function selected() {
-  return state?.requests[0];
+  return customerLoan(
+    state,
+    privateRequests(),
+    $("source").value === "recorded",
+  );
 }
 function role() {
   return $("profile").value;
@@ -103,54 +126,79 @@ function privateRequests() {
 function render() {
   if (!state) return;
   const r = selected(),
-    c = state.cycle,
+    c = $("source").value === "recorded" || r ? state.cycle : undefined,
     outcome = loanOutcome(r, c),
     borrower = role() === "borrower",
     lender = role() === "lender";
   const recorded = state.mode === "recorded";
+  $("profile-label").hidden = !recorded;
+  $("profile").querySelector('option[value="broker"]').hidden = recorded;
+  $("workspace-name").textContent = recorded
+    ? "Explore an example"
+    : lender
+      ? "Providing funding"
+      : borrower
+        ? "Your funding request"
+        : "Team review area";
   $("source-note").textContent = recorded
-    ? "Completed demonstration · Real test-network transactions · Read only"
-    : "Live demo workspace · Synthetic requests and test funds";
+    ? "Example · A completed loan using test money. This is not your loan."
+    : "Demo · test money. Use made-up business details only.";
   if (r?.mode === "fixture")
     $("source-note").textContent =
       "Simulated fixture workspace · No live ledger result is claimed";
   $("operator-link").href = "/operator?mode=" + state.mode;
   $("access-button").textContent = hasAccess()
     ? "Lock workspace"
-    : "Demo access";
-  $("access-button").hidden = lender;
+    : "Open my requests";
+  $("access-button").hidden = lender || recorded;
   $("requests-label").textContent =
     role() === "broker" ? "Review inbox" : "My requests";
   document.querySelector("[data-page=requests]").hidden = lender;
-  $("page-eyebrow").textContent = role().toUpperCase() + " WORKSPACE";
+  $("page-eyebrow").textContent = recorded
+    ? "A REAL TEST TRANSACTION, EXPLAINED"
+    : borrower
+      ? "ONE STEP AT A TIME"
+      : lender
+        ? "BEFORE YOU PROVIDE FUNDING"
+        : "REQUESTS TO REVIEW";
   $("page-title").textContent =
     page === "activity"
-      ? "Your activity & records."
+      ? "History & documents."
       : page === "requests"
         ? role() === "broker"
-          ? "Your review inbox."
-          : "Your financing requests."
+          ? "Requests to review."
+          : "Your requests."
         : lender
-          ? "Your capital at work."
+          ? recorded
+            ? "What the lender received."
+            : "Help a business move forward."
           : borrower
-            ? "Your financing."
+            ? recorded
+              ? "From request to repayment."
+              : "A little room to move forward."
             : "Requests, ready for your review.";
   $("page-subtitle").textContent =
     page === "requests"
-      ? "Follow each request from submission to broker review."
+      ? "See where things stand and what happens next."
       : page === "activity"
-        ? "A clear history of your financing, with the records behind it."
+        ? "Your agreement and payment history, in one place."
         : lender
-          ? "Track what you deposited, what you received and the interest earned."
+          ? recorded
+            ? "The original amount, the return and the fees, shown separately."
+            : "Understand where the money goes, what you might earn and what could go wrong."
           : borrower
-            ? "Request funding, review the terms and follow your loan."
+            ? recorded
+              ? "Follow a completed example. No money moves when you explore it."
+              : "Tell us what you need. See the full cost before you agree."
             : "Review the business request before preparing any loan terms.";
-  $("new-request").hidden = !borrower || page === "activity";
+  $("new-request").hidden = !borrower || page === "activity" || recorded;
   $("sync-note").textContent = available
     ? "Updated " + new Date(state.observedAt).toLocaleTimeString()
     : "Connection paused · Last recorded facts retained";
   if (lender) renderLender(r, c);
-  else if (!borrower)
+  else if (borrower && !recorded && !r) {
+    $("overview-content").innerHTML = borrowerStart();
+  } else if (!borrower)
     $("overview-content").innerHTML =
       requestList(true) +
       `<div class='section-heading'><h2>Agreed financing</h2></div>` +
@@ -175,13 +223,18 @@ function render() {
   $("activity-content").innerHTML = activity(r, c);
   if (pending && !$("request-dialog").open)
     notice(
-      "A request submission still needs confirmation. Choose Request financing to recover or retry that same request.",
+      "A request submission still needs confirmation. Choose Request funding to recover or retry that same request.",
       true,
     );
   updateReview();
 }
+function borrowerStart() {
+  const requests = privateRequests();
+  if (hasAccess() && requests.length) return requestList(false);
+  return `<section class='card next-step-card'><p class='eyebrow'>HOW IT WORKS</p><h2>You stay in control.</h2><ol class='simple-steps'><li><span>1</span><div><h3>Tell us what you need</h3><p>Choose an amount, what it is for and when you would like to pay it back.</p></div></li><li><span>2</span><div><h3>Read your offer</h3><p>See what you receive, what you repay, when it is due and every fee. You decide whether to accept.</p></div></li><li><span>3</span><div><h3>Receive the money</h3><p>Funding follows only after the final agreement has been approved by both sides.</p></div></li></ol><p class='plain-note'>Today, this demo lets you send a request and follow its review. Creating a new loan from that request is the next feature being connected.</p></section><p class='help-line'>Already sent a request? <button class='text-button' data-access>Open my requests →</button></p>`;
+}
 function loanCard(r, c, outcome) {
-  return `<section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>SUPPLIER FINANCING</p><h2>${outcome.funded ? "Financing received" : "Your loan agreement"}</h2></div>${badge(outcome.label, outcome.tone)}</div><div class='big-amount'>${esc(drops(outcome.funded ? r.funding.borrowerFundingDrops : r.agreement.terms.principalDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Annual interest", r.agreement.terms.interestRate / 1000 + "%")}${fact("Repayment", outcome.repaid ? "Complete" : outcome.funded ? "In progress" : "Not started")}${fact("Agreement", "Version " + r.agreement.documentVersion)}</dl><div class='card-bottom'><p class='hint'>${esc(outcome.description)}</p><button class='text-button' data-loan>View agreement →</button></div></section>`;
+  return `<section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>BUSINESS FUNDING</p><h2>${outcome.funded ? "Money received" : "Your loan agreement"}</h2></div>${badge(outcome.label, outcome.tone)}</div><div class='big-amount'>${esc(drops(outcome.funded ? r.funding.borrowerFundingDrops : r.agreement.terms.principalDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Interest rate per year", r.agreement.terms.interestRate / 1000 + "%")}${fact("Repayment", outcome.repaid ? "Complete" : outcome.funded ? "In progress" : "Not started")}${fact("Agreement", "Version " + r.agreement.documentVersion)}</dl><div class='card-bottom'><p class='hint'>${esc(outcome.description)}</p><button class='text-button' data-loan>View agreement →</button></div></section>`;
 }
 function journeyCard(r, outcome) {
   const signed = Boolean(r.transaction);
@@ -213,15 +266,12 @@ function journeyCard(r, outcome) {
 function renderLender(r, c) {
   const { deposited, redeemed } = lenderOutcome(c);
   if (!deposited) {
-    $("overview-content").innerHTML = empty(
-      "Your position starts here.",
-      "This workspace has no confirmed deposit. Explore the completed demo to see a lender’s journey.",
-      `<button class='primary' data-completed>View completed example</button>`,
-    );
+    $("overview-content").innerHTML =
+      `<section class='card next-step-card'><p class='eyebrow'>THE IDEA</p><h2>You provide money. A business borrows it.</h2><p class='subtitle'>If the business repays as agreed, you receive your contribution back plus interest. Interest is the amount paid for borrowing.</p><div class='risk-grid'><div><h3>The return is not guaranteed</h3><p>A borrower might pay late or fail to repay. You could lose money.</p></div><div><h3>Your money may be unavailable</h3><p>Money that has been lent out cannot always be withdrawn when you want it.</p></div></div><p class='plain-note'>You cannot add money through this customer demo yet. You can explore the completed test loan to see a deposit, repayment and withdrawal.</p><a class='primary button-link' href='/?mode=recorded&view=lend'>Explore the lender example →</a></section>`;
     return;
   }
   $("overview-content").innerHTML =
-    `<div class='dashboard-grid'><section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>YOUR LENDING POSITION</p><h2>${redeemed ? "Capital returned to you" : "Your recorded deposit"}</h2></div>${badge(redeemed ? "Withdrawn" : "Deposited", "green")}</div><div class='big-amount'>${esc(drops(redeemed ? c.yield?.withdrawnDrops : c.depositDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Original deposit", amount(c.depositDrops))}${fact("Gross interest", c.yield ? amount(c.yield.realisedYieldDrops) : "Not yet observed")}${fact("Position", redeemed ? "Redeemed" : "Open")}</dl><div class='card-bottom'><p class='hint'>Interest is shown before network fees.</p><button class='text-button' data-open-page='activity'>View activity →</button></div></section><section class='card'><p class='eyebrow'>YOUR CAPITAL JOURNEY</p><h2>From deposit to return.</h2><ol class='journey'>${[
+    `<div class='dashboard-grid'><section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>YOUR LENDING POSITION</p><h2>${redeemed ? "Money returned" : "Money provided"}</h2></div>${badge(redeemed ? "Withdrawn" : "Deposited", "green")}</div><div class='big-amount'>${esc(drops(redeemed ? c.yield?.withdrawnDrops : c.depositDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Money provided", amount(c.depositDrops))}${fact("Interest before fees", c.yield ? amount(c.yield.realisedYieldDrops) : "Not yet observed")}${fact("Status", redeemed ? "Redeemed" : "Open")}</dl><div class='card-bottom'><p class='hint'>Interest is shown before network fees.</p><button class='text-button' data-open-page='activity'>View activity →</button></div></section><section class='card'><p class='eyebrow'>YOUR CAPITAL JOURNEY</p><h2>From deposit to return.</h2><ol class='journey'>${[
       [true, "Capital deposited", "Your contribution entered the vault."],
       [
         Boolean(r?.funding.status === "funded"),
@@ -240,7 +290,7 @@ function renderLender(r, c) {
       )
       .join(
         "",
-      )}</ol></section></div><div class='metric-row'><div class='card'><span class='eyebrow'>GROSS REALISED INTEREST</span><strong>${c.yield ? esc(c.yield.realisedYieldDrops) + " drops" : "Not observed"}</strong><p class='hint'>1 XRP = 1,000,000 drops.</p></div><div class='card'><span class='eyebrow'>WITHDRAWAL NETWORK FEE</span><strong>${c.yield ? esc(c.yield.withdrawalFeeDrops) + " drops" : "Not observed"}</strong><p class='hint'>Other transaction fees are separate.</p></div><div class='card'><span class='eyebrow'>AVAILABLE TO WITHDRAW NOW</span><strong>Not checked</strong><p class='hint'>Current vault cash is not polled. Position value alone does not guarantee liquidity.</p></div></div>`;
+      )}</ol></section></div><div class='metric-row'><div class='card'><span class='eyebrow'>INTEREST EARNED BEFORE FEES</span><strong>${c.yield ? esc(c.yield.realisedYieldDrops) + " drops" : "Not observed"}</strong><p class='hint'>1 XRP = 1,000,000 drops.</p></div><div class='card'><span class='eyebrow'>FEE TO WITHDRAW</span><strong>${c.yield ? esc(c.yield.withdrawalFeeDrops) + " drops" : "Not observed"}</strong><p class='hint'>Other transaction fees are separate.</p></div><div class='card'><span class='eyebrow'>AVAILABLE TO WITHDRAW NOW</span><strong>Not checked</strong><p class='hint'>Current vault cash is not polled. Position value alone does not guarantee liquidity.</p></div></div>`;
 }
 function requestList(compact) {
   if (state.mode === "recorded")
@@ -254,8 +304,8 @@ function requestList(compact) {
       role() === "broker"
         ? "Open your review inbox."
         : "Your requests belong here.",
-      "Use your demo role’s access code to load the requests saved on this backend.",
-      `<button class='primary' data-access>Open demo workspace →</button>`,
+      "Enter the code given to you by the person hosting the demo.",
+      `<button class='primary' data-access>Open my requests →</button>`,
     );
   const requests = privateRequests();
   if (!privateAvailable)
@@ -275,7 +325,7 @@ function requestList(compact) {
         ? `<button class='primary' data-new>Request financing ↗</button>`
         : "",
     );
-  return `<div class='card request-list'><div class='list-header'>SYNTHETIC FINANCING REQUESTS · ${requests.length}</div>${requests
+  return `<div class='card request-list'><div class='list-header'>YOUR DEMO REQUESTS · ${requests.length}</div>${requests
     .slice(0, compact ? 4 : 100)
     .map(
       (r) =>
@@ -283,7 +333,7 @@ function requestList(compact) {
     )
     .join(
       "",
-    )}</div><p class='hint'>Review status is separate from loan approval. No loan or receipt is created by submitting or reviewing an intake request.</p>`;
+    )}</div><p class='hint'>Review status is separate from loan approval. Sending or reviewing a request does not create a loan or move money.</p>`;
 }
 function activity(r, c) {
   if (!r)
@@ -294,18 +344,20 @@ function activity(r, c) {
   const events = [];
   if (role() === "lender" && c?.steps.deposit)
     events.push({
-      title: c.steps.deposit.resultCode === "tesSUCCESS" ? "Capital deposited" : "Deposit attempt",
-      description: c.steps.deposit.resultCode === "tesSUCCESS"
-        ? amount(c.depositDrops) + " deposited into the vault."
-        : "This attempt did not establish a successful deposit.",
+      title:
+        c.steps.deposit.resultCode === "tesSUCCESS"
+          ? "Capital deposited"
+          : "Deposit attempt",
+      description:
+        c.steps.deposit.resultCode === "tesSUCCESS"
+          ? amount(c.depositDrops) + " deposited into the vault."
+          : "This attempt did not establish a successful deposit.",
       ...c.steps.deposit,
     });
   if (r.transaction)
     events.push({
       title:
-        r.funding.status === "funded"
-          ? "Financing received"
-          : "Loan transaction",
+        r.funding.status === "funded" ? "Money received" : "Loan transaction",
       description:
         r.funding.status === "funded"
           ? amount(r.funding.borrowerFundingDrops) +
@@ -325,8 +377,14 @@ function activity(r, c) {
           value.resultCode === "tesSUCCESS"
             ? "Loan repaid"
             : "Scheduled payment declined",
-        "repay-late": value.resultCode === "tesSUCCESS" ? "Loan repaid with late-payment handling" : "Late-payment attempt",
-        withdraw: value.resultCode === "tesSUCCESS" ? "Lender capital returned" : "Withdrawal attempt",
+        "repay-late":
+          value.resultCode === "tesSUCCESS"
+            ? "Loan repaid with late-payment handling"
+            : "Late-payment attempt",
+        withdraw:
+          value.resultCode === "tesSUCCESS"
+            ? "Lender capital returned"
+            : "Withdrawal attempt",
       }[key],
       description:
         key === "repay" && value.resultCode === "tecEXPIRED"
@@ -411,9 +469,9 @@ async function loadIntake() {
 function openAccess() {
   if (role() === "lender") return;
   $("access-description").textContent =
-    "Open the " +
-    role() +
-    " view with its own demo access code. Selecting a view does not authenticate you.";
+    role() === "broker"
+      ? "Use the review team's code to open the shared request inbox."
+      : "Use your requester code to send and find your requests. The demo host can give it to you.";
   $("access-code").value = "";
   $("access-error").hidden = true;
   $("access-dialog").showModal();
@@ -442,7 +500,7 @@ $("access-form").addEventListener("submit", async (e) => {
     closeAccess();
     if (draft && $("request-dialog").open) showDraftReview();
     render();
-    notice("Demo workspace opened. You can now continue your action.");
+    notice("Your requests are open. You can continue.");
   } catch {
     $("access-error").textContent =
       "The workspace could not be opened. Check the role code with the demo operator and try again.";
@@ -476,17 +534,17 @@ function showDraftReview() {
   $("amount").required = false;
   $("request-summary").hidden = false;
   $("request-back").hidden = Boolean(pending);
-  $("request-step").textContent = "NEW FINANCING REQUEST / 2 OF 2";
-  $("request-title").textContent = "Review your financing request.";
+  $("request-step").textContent = "YOUR REQUEST / STEP 2 OF 2";
+  $("request-title").textContent = "Check your request.";
   $("request-intro").textContent =
-    "This will be sent to the demo broker for review. It does not approve a loan.";
+    "The review team will receive these details. You are not agreeing to borrow money yet.";
   $("request-summary").innerHTML =
-    `<div class='summary-box'><dl>${fact("Requested amount", amount(draft.requestedDrops))}${fact("Requested term", draft.requestedDays + " days")}${fact("Business purpose", purposes[draft.purpose])}${fact("Interest and fees", "To be proposed after review")}</dl></div><p class='hint'>A final agreement will need its own exact approval before any signing or funding. ${pending ? "An earlier submission has an uncertain outcome. Retrying keeps the same request ID." : ""}</p>`;
+    `<div class='summary-box'><dl>${fact("Requested amount", amount(draft.requestedDrops))}${fact("When you would like to repay", draft.requestedDays + " days")}${fact("Business purpose", purposes[draft.purpose])}${fact("What you will repay", "You will see the full cost in an offer")}</dl></div><p class='hint'>You will decide whether to accept an offer later. Sending this request does not commit you to a loan. ${pending ? "An earlier submission has an uncertain outcome. Retrying keeps the same request ID." : ""}</p>`;
   $("request-next").textContent = pending
     ? "Retry same request"
     : hasAccess()
       ? "Send for review"
-      : "Open demo access";
+      : "Continue with my code";
 }
 function openRequest() {
   if (role() !== "borrower") return;
@@ -501,10 +559,10 @@ function openRequest() {
     $("amount").required = true;
     $("request-summary").hidden = true;
     $("request-back").hidden = true;
-    $("request-step").textContent = "NEW FINANCING REQUEST / 1 OF 2";
+    $("request-step").textContent = "YOUR REQUEST / STEP 1 OF 2";
     $("request-title").textContent = "What does your business need?";
     $("request-intro").textContent =
-      "Tell the broker what you are looking for. You will review any loan terms separately.";
+      "Start with what you need. Sending a request does not commit you to a loan.";
     $("request-next").textContent = "Review request →";
   }
   $("request-dialog").showModal();
@@ -516,7 +574,7 @@ $("request-back").addEventListener("click", () => {
   $("request-summary").hidden = true;
   $("request-back").hidden = true;
   $("request-title").textContent = "What does your business need?";
-  $("request-step").textContent = "NEW FINANCING REQUEST / 1 OF 2";
+  $("request-step").textContent = "YOUR REQUEST / STEP 1 OF 2";
   $("request-next").textContent = "Review request →";
   requestError("");
 });
@@ -614,7 +672,7 @@ function openIntake(id) {
   $("review-eyebrow").textContent = "FINANCING REQUEST / " + shortId(id);
   $("review-title").textContent = purposes[request.purpose];
   $("review-content").innerHTML =
-    `${badge(intakeStates[request.status].label, intakeStates[request.status].tone)}<div class='summary-box'><dl>${fact("Requested amount", amount(request.requestedDrops))}${fact("Requested term", request.requestedDays + " days")}${fact("Submitted", fullTime(request.createdAt))}${fact("Loan terms", "Not prepared")}</dl></div><p class='subtitle'>${esc(intakeStates[request.status].description)}</p><ol class='journey'>${request.history.map((h, i) => `<li><span class='step done'>✓</span><div><h3>${esc({ submitted: "Request submitted", "start-review": "Broker review started", "request-revision": "Revision requested", "finish-review": "Intake review completed" }[h.event])}</h3><p>${esc(fullTime(h.at))}</p></div></li>`).join("")}</ol>`;
+    `${badge(intakeStates[request.status].label, intakeStates[request.status].tone)}<div class='summary-box'><dl>${fact("Requested amount", amount(request.requestedDrops))}${fact("When you would like to repay", request.requestedDays + " days")}${fact("Submitted", fullTime(request.createdAt))}${fact("Loan terms", "Not prepared")}</dl></div><p class='subtitle'>${esc(intakeStates[request.status].description)}</p><ol class='journey'>${request.history.map((h, i) => `<li><span class='step done'>✓</span><div><h3>${esc({ submitted: "Request submitted", "start-review": "Broker review started", "request-revision": "Revision requested", "finish-review": "Intake review completed" }[h.event])}</h3><p>${esc(fullTime(h.at))}</p></div></li>`).join("")}</ol>`;
   $("approval-consent").hidden = true;
   $("approval-check").checked = false;
   const decisions =
@@ -674,7 +732,7 @@ function openLoan() {
     ["Early close fee", t.closePaymentFeeDrops],
   ];
   $("review-content").innerHTML =
-    `<div class='summary-box'><dl>${fact("Loan principal", amount(t.principalDrops))}${fact("Annual interest", t.interestRate / 1000 + "%")}${fact("Payments", t.paymentTotal + " × every " + t.paymentInterval + " seconds")}${fact("Grace period", t.gracePeriod + " seconds")}</dl></div><h3>Rates, costs and limits</h3><dl class='costs'>${fees.map(([label, value]) => fact(label, amount(value))).join("")}${rates
+    `<div class='summary-box'><dl>${fact("Loan principal", amount(t.principalDrops))}${fact("Interest rate per year", t.interestRate / 1000 + "%")}${fact("Payments", t.paymentTotal + " × every " + t.paymentInterval + " seconds")}${fact("Grace period", t.gracePeriod + " seconds")}</dl></div><h3>Rates, costs and limits</h3><dl class='costs'>${fees.map(([label, value]) => fact(label, amount(value))).join("")}${rates
       .slice(1)
       .map(([label, value]) => fact(label, value / 1000 + "%"))
       .join(
@@ -803,6 +861,7 @@ $("profile").addEventListener("change", () => {
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
+  if (b.dataset.enter) enterWorkspace(b.dataset.enter);
   if (b.dataset.page) setPage(b.dataset.page);
   if (b.dataset.openPage) setPage(b.dataset.openPage);
   if (b.hasAttribute("data-new")) openRequest();
