@@ -91,6 +91,7 @@ function requestError(text) {
   $("request-error").textContent = text;
 }
 function selected() {
+  if (role() === "lender" && state?.hosting?.openDemo && state?.mode === "live" && state?.cyclesByRequest) return state.requests.find(r=>r.agreement.requestId===state.cycle?.requestId);
   if (selectedLoanId && state?.mode === 'live') { const loan=state.requests.find(r=>r.agreement.requestId===selectedLoanId); if(loan && privateRequests().some(r=>r.clientRequestId===selectedLoanId))return loan; }
   return customerLoan(
     state,
