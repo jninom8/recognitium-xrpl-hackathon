@@ -2,7 +2,10 @@
 
 Research and design proposal, September 12, 2026. This is a team implementation
 brief, compiled with AI assistance, not the participant-written event report.
-The existing live application and its ledger evidence remain unchanged.
+This records the original proposal. Subsequent implementation now connects the
+white interface at port 3000 to shared state and health. See the current
+[contract](FRONTEND_CONTRACT.md) and [two-PC guide](TEAM_TESTING.md). Existing
+native evidence remains unchanged; the concept at port 3100 stays simulated.
 
 **Direction: a white, calm fintech workspace that makes one loan easy to explain
 and independently check.** Build the frontend now, alongside a bounded recovery

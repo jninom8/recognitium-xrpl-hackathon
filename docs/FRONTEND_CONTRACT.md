@@ -2,21 +2,53 @@
 
 Import types from `src/shared/contract.ts`. This file is browser-safe and has no
 wallet or service dependency. Coordinate changes to its version before changing
-field names. The small `web/` interface is a functional starting point for the
-frontend lead; replace its presentation without replacing the backend semantics.
+field names. The white `web/` interface now consumes the shared snapshot for its
+request, lender position, evidence and system-status views.
 
 The [white fintech design brief](FRONTEND_DESIGN.md) now provides an original
 interactive concept, the proposed field additions and ordered delivery gates.
 Use the [reproduction and recovery handoff](REPRODUCTION_AND_RECOVERY.md) for the
 teammate's checks and the four remaining bounded failure cases. The concept's
-fixture controls are not live API implementations.
+fixture controls are not live API implementations. For the implemented interface
+and two-PC workflow, start with [TEAM_TESTING](TEAM_TESTING.md).
+
+## Implemented synchronization, September 12 at 19:00 Paris
+
+`GET /api/state?mode=live|recorded` returns `recognitium.dashboard.v1`, a backend
+instance ID, revision, observation time, public cycle summary, request evidence,
+action eligibility and service health. The agreement format remains
+`recognitium.lending.v1`; dashboard changes do not change signed commitments.
+Private documents, salts, signed blobs, keys and internal records are excluded.
+
+The browser polls every three seconds while visible and after an action. It
+discards delayed snapshots and invalidates an open review if its request hashes,
+eligibility or backend instance change. Exact terms in a review never update
+silently. Backend loss preserves displayed funding and pauses actions. Ledger
+health gates native actions; receipt recovery can proceed without ledger access.
+`npm run health -- --watch` consumes the same endpoint and revision contract.
+
+Published mode verifies the reviewed real bundle offline and disables mutations.
+It never becomes the live source automatically. Its stored signatures do not
+invent human approval timestamps. Fresh online verification remains a separate
+CLI operation. Current available vault cash and share value are not polled.
+
+System status reports event-server identity, public receipt-service availability
+and whitelisted hook registration/counters. `POST /api/health/check` is a
+rate-limited read-only check, subject to Host/Origin controls. It neither flushes
+the hook nor signs, submits or mints receipts. A reachable receipt service does
+not establish issuance permission or validate an individual receipt.
+
+Validation: 27 local tests pass, including two HTTP clients observing exact role
+approvals and reconciling concurrent writes. Browser checks covered desktop and
+mobile, plus a real idle backend stop/restart with a review open. These are not
+a teammate reproduction, concurrent funding test or fresh native loan run.
 
 ## Recommended next milestone, September 12 at 17:29 Paris
 
 Prioritize G7: a complete, understandable browser demonstration of the proven
 lending/evidence flow. Native cover and impairment experiments remain selected,
-but follow the first successful integrated rehearsal. These are recommended
-next tasks, not UI capabilities already implemented.
+but follow the first successful integrated rehearsal. The table below retains
+the original handoff; the checkpoint above records the parts now implemented.
 
 The refreshed event brief at 15:27 UTC still weights feedback 40%, technical
 execution 30%, use case 20% and presentation 10%. The challenge slides say Loaded
@@ -33,16 +65,15 @@ the user's decisions; visual polish alone does not satisfy this milestone.
 
 ### Current integration gaps
 
-- The starter has role tabs, state/JSON display and approval buttons. It does
-  not expose the full operator lifecycle or a browser evidence verifier.
-- `GET /api/state` returns `cycle`, but `AppState` currently omits its type.
-  Add a public browser-safe cycle summary before the frontend depends on it;
-  private records stay server-side.
+- The interface now exposes operator actions, receipt-ID recovery and a typed
+  public cycle. Published browser evidence checks are offline; fresh online
+  transaction and receipt verification remains in the standalone CLI.
 - The native runner uses fixed cycle/request/operation IDs. Add explicit run
   isolation for another rehearsal, preserving previous evidence and requiring
   fresh exact approvals. Do not simulate a new run by deleting history.
 - The live cycle used authorized MCP receipt issuance and receipt-ID recovery.
-  Make that operator step usable and visible, or fix direct access before
+  Receipt-ID recovery is now visible. External MCP issuance still needs a
+  durable prepared-attempt handoff, or direct access must be fixed before
   describing the workflow as fully automated.
 - Distinguish connection status, fresh validation, recorded real runs and
   fixtures. A readable recorded-evidence mode is a useful connection fallback;
@@ -69,6 +100,9 @@ labelled in `tests/fixtures.ts`; no mock loan is loaded into the live UI.
 | Endpoint | Capability | Purpose |
 |---|---|---|
 | GET /api/state | local read | roles, requests, checks, native cycle evidence |
+| GET /api/state?mode=recorded | local read | verified offline, read-only published real evidence |
+| GET /api/evidence/published | local read | fixed reviewed public bundle download |
+| POST /api/health/check | local read with Host/Origin checks | rate-limited service availability checks |
 | POST /api/connect | operator | connect and read event server identity |
 | POST /api/setup | operator | test faucet, vault, lender deposit, broker, cover |
 | POST /api/prepare | operator | prepare synthetic request and exact LoanSet |
@@ -83,7 +117,7 @@ labelled in `tests/fixtures.ts`; no mock loan is loaded into the live UI.
 | POST /api/repay | operator | one scheduled LoanPay using stored debt |
 | POST /api/withdraw | operator | lender redemption and realised-yield accounting |
 
-POST requests require `Content-Type: application/json` and a Bearer capability.
+Mutation POST requests require `Content-Type: application/json` and a Bearer capability.
 Ordinary actions have `{}` bodies; approval bodies are
 `{"agreementHash":"...","transactionDigest":"..."}`. Recovery takes
 `{"stage":"agreement|execution","receiptId":"DG-...","hash":"..."}`.

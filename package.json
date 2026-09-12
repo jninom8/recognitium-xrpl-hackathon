@@ -8,14 +8,15 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && node --test dist/tests/*.test.js",
+    "test": "npm run build && node --test dist/tests/*.test.js tests/*.test.mjs",
     "probe": "node scripts/probe.mjs",
     "start": "node --env-file-if-exists=.env dist/src/server/index.js",
     "cycle": "node --env-file-if-exists=.env dist/scripts/native-cycle.js",
     "verify": "node dist/scripts/verify-bundle.js",
     "export": "node dist/scripts/export-bundle.js",
     "hook:status": "node scripts/hook-status.mjs",
-    "design:preview": "node scripts/preview-design.mjs"
+    "design:preview": "node scripts/preview-design.mjs",
+    "health": "node scripts/console-health.mjs"
   },
   "dependencies": {
     "ripple-binary-codec": "2.11.0",

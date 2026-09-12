@@ -38,29 +38,32 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Pending, not represented as completed
 
-The founder's OpenFX-inspired white fintech direction now has a
-[researched design brief and interactive concept](FRONTEND_DESIGN.md), plus a
-[fresh-clone guide and bounded recovery matrix](REPRODUCTION_AND_RECOVERY.md).
-The concept is isolated from the live app and explicitly uses simulated states.
-Browser preview behavior is not a new native, receipt or recovery acceptance test.
-Teammate reproduction, the four extended failure cases, fresh-run isolation and
-live frontend integration remain pending.
-At 18:05 Paris, Chrome preview checks passed for the three views and four
-simulated moments at desktop/mobile widths. Hook delivery returned HTTP 200,
-251 cumulative accepted events and zero buffered. See DESIGN-001 in DEVEX_LOG.
+The white frontend is now integrated into the actual application at port 3000.
+Its request, lender position, evidence and system-status views consume the same
+typed snapshot as `npm run health`. Live local records and published real evidence
+are explicitly separate sources. The [two-PC guide](TEAM_TESTING.md) covers
+independent evidence review and the private connection needed for shared actions.
+The earlier concept at port 3100 remains visibly simulated.
+
+Teammate reproduction, the four extended failure cases, fresh-run isolation,
+private two-PC connection setup and a complete new joint rehearsal remain pending.
+The current wallets are backend-managed xrpl.js test accounts; browser-wallet
+compatibility is a separate pending check. See [wallet notes](WALLETS.md).
 
 At 17:29 Paris, context review recommends G7 frontend integration and rehearsal
 before further cover/impairment experiments. The [frontend handoff](FRONTEND_CONTRACT.md)
 lists the three views, current API/run/receipt gaps and acceptance criteria.
-No new UI implementation or human report is claimed by this planning update.
+That earlier planning checkpoint is superseded by the UI implementation below;
+the official human report remains unwritten by the agent.
 
 The event probe failed again on venue Wi-Fi at 14:20 UTC, then succeeded after
 another Wi-Fi change at 15:01:57 UTC: HTTP 573 ms, WebSocket 553 ms and SDK 766 ms,
 network 4001, ledger 68408. Native experiment access is restored at this check.
 See [the network comparisons](NETWORK_FINDING.md).
 
-1. Teammate frontend integration and an interactive demonstration of the local
-   approval/evidence screens. The adapter, shared contract and live evidence exist.
+1. Teammate independent reproduction and a fresh joint demonstration. The
+   synchronized interface exists; the runner still needs new-run isolation and
+   an explicit durable handoff for external MCP issuance.
 2. Direct Recognitium HTTP issuance access returned 403. Authorized MCP issuance
    plus application verification works; diagnose direct service access separately.
 3. Participant-authored final report, pitch and eventual submission. The agent
@@ -68,6 +71,20 @@ See [the network comparisons](NETWORK_FINDING.md).
 4. Optional MCP discovery and pilot discussion after the native acceptance gates.
 
 ## Fresh implementation evidence, September 12
+
+- Shared UI/console integration: 27 local tests passed, zero failed, 3,818.7502 ms.
+  New coverage includes safe public projections, stale snapshots, exact review
+  invalidation, read-only published evidence and two HTTP clients observing role
+  approvals/concurrent-write reconciliation with simulated external systems.
+  Receipt recovery no longer forces a ledger connection. Chrome desktop/mobile
+  checks passed; a real idle backend stop/restart retained recorded funding,
+  disabled confirmation and invalidated the open review on the new instance.
+  No capability was entered and no new loan or metered receipt was made.
+  At 16:46:48 UTC, read-only health observed network 4001, build 3.4.0-rc1,
+  ledger 70504, 99 ms. Public authority availability is separate from issuance
+  permission and from fresh transaction/receipt verification.
+  Hook flush at 16:58:39.386 UTC: HTTP 200, 17 more accepted, 293 cumulative,
+  zero buffered. See SYNC-001 in DEVEX_LOG.
 
 - Isolated native cap experiment passed after the Wi-Fi change. At cap 10 test
   XRP, one competing deposit succeeded and one returned `tecLIMIT_EXCEEDED` in
@@ -100,7 +117,7 @@ See [the network comparisons](NETWORK_FINDING.md).
   builders and adapter, durable operation journal, request approval/receipt
   state machine, CLI cycle, local role views and authenticated mutation API
   implemented. The native results and passed acceptance gates are listed below.
-- Latest complete run: 21 tests passed, zero failed, 3,213.9404 ms. Both actual SDK signatures cover Data and the full
+- Earlier baseline: 21 tests passed, zero failed, 3,213.9404 ms. Both actual SDK signatures cover Data and the full
   transaction; changed terms/documents reject; missing human approvals or
   agreement receipt block; simulated uncertain submission/restart/receipt outage
   recovers without signing or funding another loan. Additional tests cover API
@@ -139,8 +156,8 @@ issued through the authorized MCP and independently verified by the application.
 G6 local recovery tests pass; live submission followed by a new process's lookup
 recovered the same funded transaction, and the execution receipt was attached
 after funding without another loan. Forced transport-failure injection remains
-simulated. G7 local UI/API
-implemented, live demonstration pending. G8/G9 not completed.
+simulated. G7 synchronized local UI/API implemented; a fresh joint demonstration
+and teammate reproduction remain pending. G8/G9 not completed.
 
 ## Live cycle completed, September 12
 
@@ -203,5 +220,6 @@ separate and read-only. The user authorized the build, project-local hook and
 GitHub sharing. Real-money actions, public IVM signals and event submission are
 outside that authorization. The public Recognitium API was separately verified
 live on Scalingo; the adapter and live synthetic receipt probe are implemented.
-The real loan agreement/execution receipt gates are now verified. UI polish,
-teammate integration, participant-authored report and final event package remain.
+The real loan agreement/execution receipt gates are now verified. Fresh joint
+rehearsal, teammate reproduction, participant-authored report and final event
+package remain.

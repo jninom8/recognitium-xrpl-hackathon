@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **17:29 Paris time (UTC+2)**. About six minutes to read.
+Evidence through **18:58 Paris time (UTC+2)**. About seven minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -17,10 +17,10 @@ Evidence through **17:29 Paris time (UTC+2)**. About six minutes to read.
 | Realised interest | **20 drops before network fees**, not net profit |
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
-| Tests | 21 passing local tests, including two real process crashes with simulated external systems |
-| Developer capture | Team **Recognitium**; 232 events accepted at the last recorded check |
-| Current connection | New Wi-Fi works: HTTP, WebSocket and SDK each connected in under one second |
-| Still to finish | Frontend/demo integration and participant-written final report |
+| Tests | 27 passing local tests, including process crashes with simulated external systems and two-client state checks |
+| Developer capture | Team **Recognitium**; 293 events accepted at the last recorded check |
+| Current connection | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
+| Still to finish | Independent reproduction, fresh joint rehearsal and participant-written final report |
 
 The business request and document are explicitly **synthetic**. The ledger
 transactions and receipt calls are real observations. All XRP is test XRP.
@@ -55,6 +55,8 @@ timestamps. They are not estimates of hours spent coding.
 | By 17:06 | Reverified the earlier cycle and corrected optional CTID handling | Loan and metadata matched; fresh responses omitted an optional RPC locator. All online evidence checks then passed |
 | 17:07:31–17:08:01 | Ran the selected cap experiment in a separate 10-test-XRP vault | One competing deposit succeeded, the other and two cap violations were refused; full principal withdrawn |
 | 17:11:24 | Used a separate verifier to look up all seven cap transactions and historical vault states | Cap evidence verified; original vault unchanged; empty experimental vault balance zero |
+| By 18:05 | Researched and previewed the founder's clean white fintech direction in Chrome | Original concept labelled simulated; no new ledger evidence asserted |
+| By 18:58 | Integrated the three views with shared state/health and tested two local clients plus browser reconnection | 27 tests passed; recorded funding survived an idle backend stop/restart; teammate reproduction still pending |
 
 ## 2. What we learned
 
@@ -157,6 +159,17 @@ ledgers, so a same-ledger race remains untested.
 
 ## 3. Check the result
 
+**Shared interface checkpoint:** the actual app at port 3000 now shows request,
+lender position and evidence from the same state as the console. Source labels
+separate private live records from read-only published real evidence. Backend
+instance IDs and revisions let two reviewers check that they see the same run.
+An open approval review is invalidated when its exact request or backend changes.
+The 27-test suite includes two HTTP clients observing approvals and reconciling
+concurrent writes with simulated external services. These are two clients on
+the author's machine, not independent teammate reproduction. A separate real
+idle backend stop/restart in Chrome retained the recorded funding and disabled
+the open review. [Observations](../DEVEX_LOG.md#sync-001-shared-uiconsole-state-two-client-checks-and-wallet-clarification).
+
 **Latest hardening:** a simulated authority outage exposed an unnecessary
 dependency in funding recovery, and repeating an earlier receipt action exposed
 a backwards state transition. Both were reproduced before correction. Four
@@ -195,8 +208,8 @@ independent live reproduction remains a useful next check; CI did not move funds
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **18:05:15**,
-the last recorded delivery returned **HTTP 200**, with **251 accepted events**
+is installed locally in this project, with eight trusted hooks. At **18:58:39**,
+the last recorded delivery returned **HTTP 200**, with **293 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 
@@ -208,27 +221,33 @@ stay out of GitHub. Each teammate's own machine needs its own consent and setup.
 
 ## 5. Where the team continues
 
-The founder selected a clean white fintech direction inspired by OpenFX.
-The [design brief and original interactive concept](FRONTEND_DESIGN.md) translate
-that reference into a request, lender position and evidence workspace. Chrome
-inspection became available after the founder connected the browser extension.
-The concept is visibly simulated and does not connect to the live ledger or
-receipt service. It demonstrates the proposed distinction between funding,
-receipt recovery and rejection of a changed document copy.
+The founder selected a clean white fintech direction inspired by OpenFX. The
+[design brief](FRONTEND_DESIGN.md) led to an original simulated concept at port
+3100 and then the integrated application at port 3000. The actual interface
+uses shared state, exact request reviews, operator actions, receipt-ID recovery
+and a service-status drawer. It preserves money facts during connectivity loss.
+Fresh-clone users can immediately explore the published real cycle without keys.
+The [two-PC guide](TEAM_TESTING.md) explains independent checks and the private
+connection needed for two browsers to observe one backend's live approvals.
+
+The demo uses three backend-managed xrpl.js wallets. A browser-wallet adapter
+is a separate compatibility test for network 4001 and two-party native LoanSet
+signing. [Custody and wallet choices](WALLETS.md).
 
 The next shared task has a [fresh-clone reproduction guide and failure matrix](REPRODUCTION_AND_RECOVERY.md).
-It identifies what the existing 21 tests cover and what the four bounded
-extensions must prove. A teammate's independent outcome remains pending.
+It distinguishes the original 21-test baseline, six new state/UI/health/client
+tests and what the four bounded extensions still must prove. A teammate's
+independent outcome remains pending.
 
-**Recommended next gate:** connect the three frontend views and rehearse the
-whole story before further protocol experiments. The current starter needs a
-complete lifecycle, fresh-run isolation and an explicit usable receipt handoff.
-The [frontend contract](FRONTEND_CONTRACT.md) records the current gaps and target;
-this is recommended work, not a completed UI milestone.
+**Recommended next gate:** independently reproduce the evidence, complete
+fresh-run isolation and the durable external MCP issuance handoff, then rehearse
+the whole story together. The old loan's approval has expired; deleting its
+history is not a valid reset. The [frontend contract](FRONTEND_CONTRACT.md)
+separates the implemented synchronization from these remaining requirements.
 
 | Work | Starting point | Current state |
 |---|---|---|
-| Frontend and demo | [Shared API contract](FRONTEND_CONTRACT.md), `web/` | Starter UI/API implemented; polished shared demonstration pending |
+| Frontend and demo | [Shared API contract](FRONTEND_CONTRACT.md), `web/` | Synchronized white UI/console implemented; fresh joint demonstration pending |
 | Backend and receipts | [Current status](STATUS.md), `src/` | Native cycle verified; direct receipt issuance access needs diagnosis |
 | Targeted experiments | [External review and test matrix](EXTERNAL_REVIEW.md) | Recovery and native cap tests passed; selected cover/impairment tests follow the integrated rehearsal |
 | Mentor discussion | Problems and fixes above, linked evidence | Technical observations collected; unresolved causes stay labelled |

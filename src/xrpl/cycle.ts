@@ -1,5 +1,6 @@
 import { Wallet, type SubmittableTransaction } from 'xrpl';
 import { readFile, open } from 'node:fs/promises';
+import { join } from 'node:path';
 import { Store } from '../requests/store.js';
 import { Journal, type Operation } from '../requests/journal.js';
 import { LendingService, type PrivateRequest } from '../requests/service.js';
@@ -10,7 +11,7 @@ import { CONTRACT_VERSION, TRACK1, type Agreement } from '../shared/contract.js'
 import { digest, documentCommitment } from '../requests/commitment.js';
 
 interface SavedWallet { seed: string; fundingAttempted: boolean; balanceAfterFaucetDrops?: string }
-interface CycleRecord {
+export interface CycleRecord {
   schema: 'recognitium.native-cycle.v1';
   network: Agreement['network'];
   accounts: Agreement['accounts'];
@@ -21,14 +22,17 @@ interface CycleRecord {
   yield?: { withdrawnDrops: string; depositedDrops: string; realisedYieldDrops: string; withdrawalFeeDrops: string; calculation: string };
 }
 export class Cycle {
-  readonly wallets = new Store<SavedWallet>('wallets');
-  readonly cycles = new Store<CycleRecord>('data/cycles');
-  readonly requests = new Store<PrivateRequest>('data/requests');
+  readonly wallets: Store<SavedWallet>;
+  readonly cycles: Store<CycleRecord>;
+  readonly requests: Store<PrivateRequest>;
   readonly journal: Journal;
   readonly receipts = new RecognitiumClient();
   readonly service: LendingService;
-  constructor(readonly adapter: NativeAdapter) {
-    this.journal = new Journal(new Store<Operation>('data/operations'), adapter);
+  constructor(readonly adapter: NativeAdapter, readonly dataDirectory = 'data', readonly walletDirectory = 'wallets') {
+    this.wallets = new Store<SavedWallet>(walletDirectory);
+    this.cycles = new Store<CycleRecord>(join(dataDirectory, 'cycles'));
+    this.requests = new Store<PrivateRequest>(join(dataDirectory, 'requests'));
+    this.journal = new Journal(new Store<Operation>(join(dataDirectory, 'operations')), adapter);
     this.service = new LendingService(this.requests, adapter, this.receipts);
   }
   async wallet(role: 'broker' | 'borrower' | 'lender'): Promise<Wallet> {
@@ -44,7 +48,7 @@ export class Cycle {
       if (!saved.balanceAfterFaucetDrops) { saved.balanceAfterFaucetDrops = account.account_data.Balance; await this.wallets.write(role, saved); }
       return wallet;
     } catch (error) { if ((error as { data?: { error?: string } }).data?.error !== 'actNotFound') throw error; }
-    const responsePath=`wallets/${role}-faucet.private.json`;
+    const responsePath=join(this.walletDirectory,`${role}-faucet.private.json`);
     let wire:string|undefined;
     try{wire=await readFile(responsePath,'utf8');}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
     if(!wire){

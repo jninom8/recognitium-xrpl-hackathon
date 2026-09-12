@@ -27,10 +27,11 @@ npm run build
 npm run verify -- evidence/synthetic-supplier-001.json --online --mentor-confirmed-open-ended
 ```
 
-For the next shared milestone, read the [frontend design and delivery plan](docs/FRONTEND_DESIGN.md)
-and the [fresh-clone reproduction guide](docs/REPRODUCTION_AND_RECOVERY.md).
-An original, simulated visual concept is available with `npm run design:preview`
-at http://127.0.0.1:3100. It is separate from the live application below.
+Use the [two-PC testing guide](docs/TEAM_TESTING.md) to review the same evidence
+with a teammate and understand the private connection needed for shared actions.
+The white interface is integrated into the application at port 3000. The earlier
+simulated design concept remains available with `npm run design:preview` at
+http://127.0.0.1:3100, separate from the application.
 
 ## Run the application
 
@@ -43,9 +44,15 @@ npm test
 npm start
 ```
 
-Open http://127.0.0.1:3000. Empty/disconnected state is intentional until real
-ledger objects exist. The frontend lead can replace `web/` against the documented
-[shared API contract](docs/FRONTEND_CONTRACT.md), without importing signing code.
+Open http://127.0.0.1:3000/?mode=recorded to inspect the published real evidence
+without credentials. The source selector explicitly separates published evidence
+from this backend's live local records; a fresh clone has no private live run.
+The interface and `npm run health -- --recorded --watch` consume the same typed
+[state and health contract](docs/FRONTEND_CONTRACT.md). GitHub shares code and
+evidence; sharing live approvals requires one privately connected backend.
+
+The three demo accounts use server-side xrpl.js wallets. No browser wallet is
+connected. See [wallet custody and compatibility checks](docs/WALLETS.md).
 
 Copy `.env.example` to ignored `.env` and supply three distinct local prototype
 capabilities and, for direct receipt issuance, an authorized Recognitium API key.

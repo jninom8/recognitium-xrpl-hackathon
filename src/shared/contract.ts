@@ -92,10 +92,51 @@ export interface RequestView {
   checks: ProofChecks;
 }
 export interface AppState {
+  stateVersion: 'recognitium.dashboard.v1';
+  instanceId: string;
+  revision: number;
+  observedAt: string;
   contractVersion: typeof CONTRACT_VERSION;
-  mode: 'live' | 'fixture';
+  mode: 'live' | 'recorded';
   network: typeof TRACK1;
   connected: boolean;
-  requests: RequestView[];
+  requests: DashboardRequest[];
+  cycle: CycleView | null;
+  health: DashboardHealth;
+  actions: ActionView[];
+  verification: { scope: 'local-records' | 'published-bundle-offline'; checkedAt: string };
   disclosure: string;
+}
+export interface ServiceHealth {
+  status: 'unchecked' | 'checking' | 'ready' | 'unavailable' | 'blocked';
+  checkedAt: string | null;
+  message: string;
+}
+export interface DashboardHealth {
+  ledger: ServiceHealth & { networkId?: number; serverBuild?: string; ledgerIndex?: number; latencyMs?: number };
+  receipts: ServiceHealth & { issuance: 'operator-mcp-or-configured-rest'; };
+  hook: ServiceHealth & { accepted?: number; buffered?: number; version?: string };
+}
+/** A projection, never the private cycle record or account wallet. */
+export interface CycleView {
+  requestId?: string;
+  vaultId?: string;
+  loanBrokerId?: string;
+  depositDrops: string;
+  coverDrops: string;
+  steps: Record<string, { hash: string; ledgerIndex: number; resultCode: string }>;
+  refusal?: { hash: string; resultCode: string };
+  yield?: { withdrawnDrops: string; depositedDrops: string; realisedYieldDrops: string; withdrawalFeeDrops: string; calculation: string };
+}
+export interface ActionView {
+  id: string;
+  label: string;
+  role: 'operator' | Role;
+  allowed: boolean;
+  reason: string;
+}
+export interface DashboardRequest extends RequestView {
+  actions: ActionView[];
+  receiptRecovery: { agreementHash: string; executionHash?: string; pendingStage?: 'agreement' | 'execution' };
+  funding: { status: 'unfunded' | 'unknown' | 'funded' | 'refused'; borrowerFundingDrops?: string };
 }

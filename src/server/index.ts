@@ -1,22 +1,29 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { timingSafeEqual } from 'node:crypto';
-import { CONTRACT_VERSION, TRACK1, type AppState, type Role } from '../shared/contract.js';
+import { type Role } from '../shared/contract.js';
 import { NativeAdapter } from '../xrpl/adapter.js';
 import { Cycle } from '../xrpl/cycle.js';
 import { processLock } from '../requests/store.js';
+import { Dashboard, readPublishedBundle, repositoryBundlePath } from './dashboard.js';
+import { HealthMonitor } from './health.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const adapter = new NativeAdapter(process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1'); adapter.client.on('error', () => {});
-const cycle = new Cycle(adapter);
-const disclose = 'Development funds only. Recognitium is a pre-existing classical software receipt service. This application was built with AI assistance. No QCP hardware is used.';
+const cycle = new Cycle(adapter, process.env.RECOGNITIUM_DATA_DIR ?? 'data', process.env.RECOGNITIUM_WALLET_DIR ?? 'wallets');
+const health = new HealthMonitor(adapter, cycle.receipts, process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1');
+const dashboard = new Dashboard({ records: async () => ({ cycle: await cycle.cycles.read('native') ?? null, requests: await cycle.requests.all() }),
+  health: () => health.snapshot(), connected: () => adapter.client.isConnected(), published: readPublishedBundle });
+function checkOrigin(req: IncomingMessage): void {
+  if (req.headers.origin && req.headers.origin !== `http://localhost:${port}` && req.headers.origin !== `http://127.0.0.1:${port}`) throw new Error('Origin rejected');
+}
 function authorize(req: IncomingMessage, role: 'operator' | Role): void {
   const expected = process.env[`PROTOTYPE_${role.toUpperCase()}_TOKEN`];
   const supplied = req.headers.authorization?.replace(/^Bearer /, '') ?? '';
   if (!expected || !/^[A-Za-z0-9_-]{24,256}$/.test(expected) || !/^[A-Za-z0-9_-]{24,256}$/.test(supplied) || supplied.length !== expected.length || !timingSafeEqual(Buffer.from(expected), Buffer.from(supplied))) throw new Error('Unauthorized role');
   const capabilities = ['broker','borrower','operator'].map(r => process.env[`PROTOTYPE_${r.toUpperCase()}_TOKEN`]).filter(Boolean);
   if (new Set(capabilities).size !== capabilities.length) throw new Error('Role capabilities must be distinct');
-  if (req.headers.origin && req.headers.origin !== `http://localhost:${port}` && req.headers.origin !== `http://127.0.0.1:${port}`) throw new Error('Origin rejected');
+  checkOrigin(req);
 }
 async function body(req: IncomingMessage): Promise<Record<string, unknown>> {
   if (req.headers['content-type'] !== 'application/json') throw new Error('application/json required');
@@ -32,32 +39,44 @@ const server = createServer(async (req, res) => {
   try {
     const host = req.headers.host;
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
-    const path = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
+    const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
+    const path = url.pathname;
     if (req.method === 'GET' && path === '/') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
       return res.end(await readFile('web/index.html'));
     }
-    if (req.method === 'GET' && (path === '/app.js' || path === '/style.css')) {
-      res.writeHead(200, { 'Content-Type': path.endsWith('.js') ? 'text/javascript' : 'text/css', 'X-Content-Type-Options': 'nosniff' });
+    if (req.method === 'GET' && (path === '/app.js' || path === '/state-client.mjs' || path === '/style.css')) {
+      res.writeHead(200, { 'Content-Type': path.endsWith('.css') ? 'text/css' : 'text/javascript', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(await readFile('web' + path));
     }
     if (req.method === 'GET' && path === '/api/state') {
-      const state: AppState = { contractVersion: CONTRACT_VERSION, mode: 'live', network: TRACK1, connected: adapter.client.isConnected(),
-        requests: (await cycle.requests.all()).map(r => cycle.service.view(r)), disclosure: disclose };
-      return respond(res,200,{ ...state, cycle: await cycle.cycles.read('native') ?? null });
+      return respond(res,200,await dashboard.snapshot(url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live'));
+    }
+    if (req.method === 'GET' && path === '/api/evidence/published') {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Disposition': 'attachment; filename="synthetic-supplier-001.json"', 'Cache-Control': 'no-store' });
+      return res.end(await readFile(repositoryBundlePath));
+    }
+    if (req.method === 'POST' && path === '/api/health/check') {
+      checkOrigin(req); await body(req); await health.check();
+      return respond(res,200,health.snapshot());
     }
     if (req.method === 'POST') {
       const approval = /^\/api\/requests\/([a-zA-Z0-9_-]+)\/approve\/(broker|borrower)$/.exec(path);
       authorize(req, approval ? approval[2] as Role : 'operator');
       const input = await body(req);
-      const release = await processLock();
+      const release = await processLock(cycle.dataDirectory);
       try {
         let result: unknown;
         if (approval) {
           if (typeof input.agreementHash !== 'string' || typeof input.transactionDigest !== 'string') throw new Error('Exact hashes required');
           result = await cycle.service.approve(approval[1]!,approval[2] as Role,input.agreementHash,input.transactionDigest);
         } else {
-          if (!adapter.client.isConnected() || !adapter.identity) await adapter.connect();
+          // Receipt recovery/verification does not require ledger connectivity.
+          const needsLedger = ['/api/connect','/api/setup','/api/prepare','/api/refusal','/api/repay','/api/withdraw'].includes(path) || /\/(sign|submit)$/.test(path);
+          if (needsLedger) {
+            await health.checkLedger();
+            if (health.snapshot().ledger.status !== 'ready') throw new Error(health.snapshot().ledger.message);
+          }
           switch (path) {
             case '/api/connect': result = adapter.identity; break;
             case '/api/setup': result = await cycle.setup(); break;
@@ -91,4 +110,6 @@ const server = createServer(async (req, res) => {
   }
 });
 server.listen(port,'127.0.0.1',() => console.log(`Recognitium local development app: http://127.0.0.1:${port}`));
-for (const signal of ['SIGINT','SIGTERM'] as const) process.on(signal, () => { server.close(); if (adapter.client.isConnected()) void adapter.disconnect(); });
+const healthTimer = setInterval(() => { if (process.env.DASHBOARD_LIVE_CHECKS === '1') void health.check(); }, 30000); healthTimer.unref();
+if (process.env.DASHBOARD_LIVE_CHECKS === '1') void health.check();
+for (const signal of ['SIGINT','SIGTERM'] as const) process.on(signal, () => { clearInterval(healthTimer); server.close(); if (adapter.client.isConnected()) void adapter.disconnect(); });

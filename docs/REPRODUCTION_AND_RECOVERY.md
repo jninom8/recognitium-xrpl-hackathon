@@ -3,6 +3,8 @@
 September 12, 2026. This is an executable handoff and a proposed test matrix.
 It does not claim the teammate has reproduced the application or that planned
 failure cases have passed. See [status](STATUS.md) for actual completed checks.
+The [two-PC guide](TEAM_TESTING.md) covers the integrated white interface and
+console, independent published-evidence review and shared-backend requirements.
 
 ## Fresh clone, read-only evidence checks
 
@@ -26,8 +28,10 @@ npm run verify -- evidence/synthetic-supplier-001.json --online --mentor-confirm
 node dist/scripts/verify-cap-test.js --mentor-confirmed-open-ended
 ```
 
-`npm test` builds first. At the current implementation baseline there are 21
-passing tests, including cryptographic checks and labelled simulated failures.
+`npm test` builds first. The current implementation has 27 passing tests,
+including cryptographic checks, labelled simulated failures and six additional
+UI/state/health/two-client tests. The latter do not replace the four remaining
+failure cases below or a teammate's independent reproduction.
 Offline verification checks the saved bundle's consistency and signatures;
 only the online command adds fresh authority records and event-ledger checks.
 The cap verifier additionally checks seven transactions and historical states.

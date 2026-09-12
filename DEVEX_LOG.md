@@ -4,6 +4,51 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## SYNC-001: shared UI/console state, two-client checks and wallet clarification
+
+- September 12, 2026, evening integration. Connected the original white interface
+  at port 3000 to typed public request/cycle projections, backend instance and
+  revision, action eligibility and service health. Console and browser consume
+  the same `/api/state`. Published real evidence is an explicit read-only source;
+  the earlier port-3100 concept remains simulated. Agreement commitment bytes
+  and original native evidence bundles were not changed.
+- `npm test`: 27 passed, zero failed, 3,818.7502 ms. Initial new tests caught an
+  incorrect parent path to the compiled module's public bundle and use of strict
+  agreement canonicalization on optional UI fields. Corrected the bundle path
+  and used the serialized public response only for revision fingerprints.
+  These were application implementation errors, not XRPL defects.
+- Two local HTTP clients observed exact role approvals. Wrong hashes returned
+  409; concurrent writes returned success or busy and reconciled on retry.
+  External ledger/receipt systems were explicitly simulated. An invalid receipt
+  ID reached receipt validation while ledger health stayed unchecked, confirming
+  recovery no longer forces a ledger connection. This is not the pending
+  concurrent funding-submission test or a second person's reproduction.
+- Chrome: desktop 1440x1000 and mobile 390x844. A real mobile evidence-text
+  overflow measured 510px; the corrected layout measured 375px in the 390px
+  viewport. A real idle backend stop, with an empty receipt-recovery review open,
+  retained the recorded redemption and disabled confirmation. After restart,
+  the changed instance invalidated the review. No capability was entered or
+  action submitted. This was not termination during transaction persistence.
+  Final browser review found the public bundle's key order placed late-payment
+  recovery before its original refusal. The UI now sorts native steps by ledger
+  index and uses readable operation labels; evidence bytes remain unchanged.
+- Read-only health at `2026-09-12T16:46:48.079Z`: network 4001, rippled
+  3.4.0-rc1, ledger 70504, 99 ms. The public receipt authority endpoint also
+  responded. These observations establish availability, not new verification
+  of all historical transactions/receipts or direct issuance permission.
+- Re-read workshop pages 10/12 and the event wallet resources. The completed
+  cycle uses three backend-managed xrpl.js test accounts. No browser wallet is
+  connected. Current official XRPL Connect adapter documentation was checked;
+  custom-network and co-signed native LoanSet compatibility remains untested.
+  [Wallet explanation](docs/WALLETS.md); [two-PC handoff](docs/TEAM_TESTING.md).
+- Hook flush at `2026-09-12T16:58:39.386Z`: HTTP 200, 17 additional captured
+  events accepted, 293 cumulative, zero buffered. Version 2.4.0 registration and
+  real accepted delivery remain observed. No fabricated event or participant
+  manual report was submitted. Raw hook data and identities remain ignored.
+- No new ledger transfer, metered receipt, IVM publication or public deployment
+  occurred. Fresh-run isolation, durable external MCP issuance preparation,
+  four bounded failure cases and a teammate's own verification remain pending.
+
 ## DESIGN-001: researched frontend direction and bounded team handoff
 
 - September 12, 2026, completed at 16:05 UTC. Read OpenFX's public payment-service-provider
