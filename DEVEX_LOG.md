@@ -4,6 +4,24 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## INTEGRATION-001: context review identifies the next product gate
+
+- Public Notion refreshed at `2026-09-12T15:27:15.078Z`: 174 blocks, two chunks,
+  cursor exhausted. Scoring remains 40% feedback, 30% XRPL execution, 20% use case
+  and 10% presentation. Sunday freeze 12:30 and deadline 13:00; Notion still says
+  four-minute demo/two-minute Q&A. The slide-duration conflict remains unresolved.
+- Read challenge slides and current app/API source again. Native/receipt gates
+  are complete. The starter UI lacks the full lifecycle. Code inspection found
+  the runtime cycle property absent from AppState's type, fixed run IDs, and
+  direct receipt issuance still unavailable. These are integration work items,
+  not newly tested runtime failures or protocol defects.
+- Recommended next checkpoint: integrated three-view demo, fresh approved
+  rehearsal, teammate reproduction and participant-authored feedback. More
+  native features follow that checkpoint. [Handoff](docs/FRONTEND_CONTRACT.md).
+- Hook flush at 15:29:01.010 UTC: HTTP 200, eight more captured events accepted,
+  232 cumulative, zero buffered at that observation. No metered receipt or native
+  transaction was made during this context/priority review.
+
 ## CAP-001: selected native cap experiment passed
 
 - Reviewed implementation/evidence commit `5807683` pushed to the public main

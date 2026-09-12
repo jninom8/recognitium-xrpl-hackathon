@@ -1,7 +1,9 @@
 # Build handoff
 
-This document specifies work to implement. The repository currently has plans
-and reference material, not a working lending application. Read STATUS first.
+This is the implementation specification and acceptance checklist. The native
+cycle and receipt integration are now implemented and verified; read
+[STATUS](STATUS.md) for evidence. The recommended next gate is G7, the integrated
+browser demonstration, described in [FRONTEND_CONTRACT](FRONTEND_CONTRACT.md).
 
 ## Target and fixed scope
 
@@ -22,7 +24,7 @@ No extra database service, production account system or paid LLM is required.
 Use simple durable local run records with atomic writes for this single-process
 prototype. Keep private run state under ignored data/ and wallets separately.
 
-Suggested boundaries, to create during implementation:
+Implementation boundaries:
 
 - `src/xrpl/`: connection, account setup, transaction preparation, co-signing,
   submit/lookup, vault/broker/loan reads and balance accounting.
@@ -33,8 +35,8 @@ Suggested boundaries, to create during implementation:
 - `scripts/`: health probe, native cycle and independent bundle verifier.
 - `tests/`: meaningful state/recovery tests and gated Devnet integration tests.
 
-These paths and commands are design targets, not existing runnable code. The
-implementer may simplify them while preserving the boundaries and evidence.
+These boundaries guided the implementation. Use the current README and frontend
+contract for runnable commands; preserve the boundaries and evidence when editing.
 
 ## Build gates, in order
 

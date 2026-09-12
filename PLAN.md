@@ -1,11 +1,14 @@
 # Recognitium: hackathon execution plan
 
 12 September 2026. Team: the integration lead and frontend lead. Hardware work is paused.
-This is the build plan; no XRPL lending integration has been implemented yet.
+This is the execution plan. The native lending/receipt cycle is implemented and
+verified; [current status](docs/STATUS.md) supersedes the original planning baseline
+retained below. The next recommended gate is the integrated frontend demonstration,
+followed by a fresh rehearsal and participant report.
 
 The canonical hackathon home is now the separate Desktop repository. Start a
 fresh implementation session using [START_HERE.md](START_HERE.md), then read
-[docs/BUILD_HANDOFF.md](docs/BUILD_HANDOFF.md). Current evidence and pending
+[docs/BUILD_HANDOFF.md](docs/BUILD_HANDOFF.md). Current evidence and verified hook
 activation are in [docs/STATUS.md](docs/STATUS.md). The timetable below began
 before the morning-material review; rebase elapsed Saturday slots to the actual
 time, preserving the Sunday submission deadline and the native-flow priority.
@@ -225,7 +228,8 @@ on each developer's machine. Its privacy documentation describes selected XRPL
 prompts, output excerpts, retries and analyses sent to the organizer under a
 pseudonym. It requires explicit consent and project-local installation.
 Review and enable it for the isolated hackathon workspace, then verify capture
-and delivery. Planning has not installed or enabled it.
+and delivery. The planning step did not enable it; subsequent activation and
+accepted runtime delivery are recorded in STATUS and the shared developer journey.
 
 ## Submission inventory
 
@@ -260,5 +264,6 @@ privately to a mentor before presentation.
   This is a local connectivity observation, not a protocol bug. Have a mentor
   confirm the endpoint and test from the venue before choosing the final track.
 
-The next build gate is a validated transaction on the chosen hackathon network.
-After that, execute the minimum native lending cycle before adding the receipt UI.
+That initial gate has passed, including repayment, yield and native refusals.
+Continue with the [integrated UI milestone](docs/FRONTEND_CONTRACT.md), preserving
+the proven cycle while making it understandable and repeatable.

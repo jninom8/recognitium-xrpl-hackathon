@@ -5,6 +5,56 @@ wallet or service dependency. Coordinate changes to its version before changing
 field names. The small `web/` interface is a functional starting point for the
 frontend lead; replace its presentation without replacing the backend semantics.
 
+## Recommended next milestone, September 12 at 17:29 Paris
+
+Prioritize G7: a complete, understandable browser demonstration of the proven
+lending/evidence flow. Native cover and impairment experiments remain selected,
+but follow the first successful integrated rehearsal. These are recommended
+next tasks, not UI capabilities already implemented.
+
+The refreshed event brief at 15:27 UTC still weights feedback 40%, technical
+execution 30%, use case 20% and presentation 10%. The challenge slides say Loaded
+receives no automatic advantage. The interface should expose the evidence and
+the user's decisions; visual polish alone does not satisfy this milestone.
+
+| Owner | Next work | Acceptance condition |
+|---|---|---|
+| Frontend lead | Three views: lender position, exact request/approval, execution/evidence | A reviewer follows the request, both approvals, funding, repayment and withdrawal without reading raw JSON |
+| Integration lead | Complete the state contract and connect operator actions | Actions target the selected run; amounts, accounts, phases and errors remain consistent with the API |
+| Integration lead | Make new runs and receipt handoff usable | A fresh rehearsal cannot reuse completed approvals/journal IDs; MCP issuance and receipt recovery are explicit while direct issuance returns 403 |
+| Both | Rehearse a fresh synthetic flow and verify from a clean clone | No hidden terminal repair; funding reconciles once; changed-document rejection and native refusal are understandable |
+| Participants | Select three observed feedback items and write the manual account | Precise reproductions and proposed improvements support the human-written final report |
+
+### Current integration gaps
+
+- The starter has role tabs, state/JSON display and approval buttons. It does
+  not expose the full operator lifecycle or a browser evidence verifier.
+- `GET /api/state` returns `cycle`, but `AppState` currently omits its type.
+  Add a public browser-safe cycle summary before the frontend depends on it;
+  private records stay server-side.
+- The native runner uses fixed cycle/request/operation IDs. Add explicit run
+  isolation for another rehearsal, preserving previous evidence and requiring
+  fresh exact approvals. Do not simulate a new run by deleting history.
+- The live cycle used authorized MCP receipt issuance and receipt-ID recovery.
+  Make that operator step usable and visible, or fix direct access before
+  describing the workflow as fully automated.
+- Distinguish connection status, fresh validation, recorded real runs and
+  fixtures. A readable recorded-evidence mode is a useful connection fallback;
+  label offline checks by their actual limits.
+
+The views should answer: what did the lender deposit and redeem; what exact
+terms did each person approve; which document commitment and receipt link to
+which validated transaction? Show XRP amounts, ledger timestamps, due status,
+native result codes and separate content/authority/ledger checks. Keep JSON
+available under details rather than making it the primary workflow.
+
+The checkpoint is one complete story, one native refusal and changed-document
+rejection, with verification from a second checkout. Additional assets, DEX,
+freeze workflows and AI discovery remain optional after that checkpoint. Live
+IVM publication still needs approval of its exact text, cost and expiry.
+
+## Existing API
+
 Run `npm ci`, `npm run build`, `npm start`; open http://127.0.0.1:3000.
 `GET /api/state` returns the live local view, including disconnected/empty state.
 It never turns a failed connection into a fixture. Unit fixtures are explicitly

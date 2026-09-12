@@ -38,6 +38,11 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
 
 ## Pending, not represented as completed
 
+At 17:29 Paris, context review recommends G7 frontend integration and rehearsal
+before further cover/impairment experiments. The [frontend handoff](FRONTEND_CONTRACT.md)
+lists the three views, current API/run/receipt gaps and acceptance criteria.
+No new UI implementation or human report is claimed by this planning update.
+
 The event probe failed again on venue Wi-Fi at 14:20 UTC, then succeeded after
 another Wi-Fi change at 15:01:57 UTC: HTTP 573 ms, WebSocket 553 ms and SDK 766 ms,
 network 4001, ledger 68408. Native experiment access is restored at this check.

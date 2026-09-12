@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **17:13 Paris time (UTC+2)**. About six minutes to read.
+Evidence through **17:29 Paris time (UTC+2)**. About six minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -18,7 +18,7 @@ Evidence through **17:13 Paris time (UTC+2)**. About six minutes to read.
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Tests | 21 passing local tests, including two real process crashes with simulated external systems |
-| Developer capture | Team **Recognitium**; 219 events accepted at the last recorded check |
+| Developer capture | Team **Recognitium**; 232 events accepted at the last recorded check |
 | Current connection | New Wi-Fi works: HTTP, WebSocket and SDK each connected in under one second |
 | Still to finish | Frontend/demo integration and participant-written final report |
 
@@ -195,8 +195,8 @@ independent live reproduction remains a useful next check; CI did not move funds
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **17:13:57**,
-the last recorded delivery returned **HTTP 200**, with **219 accepted events**
+is installed locally in this project, with eight trusted hooks. At **17:29:01**,
+the last recorded delivery returned **HTTP 200**, with **232 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 
@@ -208,11 +208,17 @@ stay out of GitHub. Each teammate's own machine needs its own consent and setup.
 
 ## 5. Where the team continues
 
+**Recommended next gate:** connect the three frontend views and rehearse the
+whole story before further protocol experiments. The current starter needs a
+complete lifecycle, fresh-run isolation and an explicit usable receipt handoff.
+The [frontend contract](FRONTEND_CONTRACT.md) records the current gaps and target;
+this is recommended work, not a completed UI milestone.
+
 | Work | Starting point | Current state |
 |---|---|---|
 | Frontend and demo | [Shared API contract](FRONTEND_CONTRACT.md), `web/` | Starter UI/API implemented; polished shared demonstration pending |
 | Backend and receipts | [Current status](STATUS.md), `src/` | Native cycle verified; direct receipt issuance access needs diagnosis |
-| Targeted experiments | [External review and test matrix](EXTERNAL_REVIEW.md) | Recovery and native cap tests passed; isolated cover/impairment tests selected next |
+| Targeted experiments | [External review and test matrix](EXTERNAL_REVIEW.md) | Recovery and native cap tests passed; selected cover/impairment tests follow the integrated rehearsal |
 | Mentor discussion | Problems and fixes above, linked evidence | Technical observations collected; unresolved causes stay labelled |
 | Final developer report | [Participant writing template](../DEVELOPER_FEEDBACK.md) | **Participants must write the final account themselves** |
 | Pitch and submission | [Pitch draft](../PITCH.md) | Confirm duration; no event submission made |
