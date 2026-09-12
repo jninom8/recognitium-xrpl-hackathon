@@ -4,6 +4,29 @@
 This file retains detailed technical observations and earlier checkpoints;
 the journey page gives their current outcome in chronological order.
 
+## RECOVERY-001: targeted simulated failures exposed two application issues
+
+- September 12, reviewed after the live cycle while assessing product value
+  and next testing priorities. No new ledger transaction or metered receipt.
+- Before correction, two added regression tests failed: 16 total, 14 passed,
+  2 failed, 5,816.4196 ms. These are findings in our application, not XRPL bugs.
+- First failure: a SIMULATED authority lookup outage prevented `advance` from
+  looking up an already-validated LoanSet. Fresh receipt verification happened
+  before ledger reconciliation. Correction: reconcile the existing signed hash
+  first; retain fresh receipt verification before any submission/resubmission.
+- Second failure: calling `receiptAgreement` on a signed request moved phase
+  backwards to AGREEMENT_RECEIPTED. Correction: an existing agreement receipt
+  can be reverified without rewinding signed/funded states. Reverification also
+  preserves any unresolved execution-receipt attempt, preventing a stale action
+  from reopening metered issuance. This latter condition has an added regression.
+- Four scoped tests now cover validated funding during authority outage, no
+  state regression, continued refusal of new submission during authority outage,
+  and preservation of unresolved execution issuance. The successful recorded
+  native cycle remains unchanged and labelled separately from these simulations.
+- After correction: `npm test`, 18 passed, zero failed, 5,742.5857 ms.
+- Hook flush at 14:05:52 UTC: HTTP 200, 167 cumulative accepted events,
+  zero buffered at that observation. No fabricated protocol report submitted.
+
 ## SDK-001: mentor beta.1 update checked against the working stable cycle
 
 - Founder relayed the mentors' xrpl 5.2.0-beta.1 update. At 13:36:23 UTC,

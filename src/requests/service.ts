@@ -63,7 +63,11 @@ export class LendingService {
     const r = await this.get(id); this.assertContent(r); this.assertApprovals(r);
     if (r.agreementReceipt) {
       await this.receipts.verify(r.agreementReceipt, r.agreementHash);
-      delete r.receiptAttempt; r.phase = 'AGREEMENT_RECEIPTED'; r.checks.receiptAuthority = 'online-verified';
+      // Rechecking an earlier receipt must not rewind signing/funding or clear
+      // an unresolved execution-receipt issuance (which could charge twice).
+      if (r.receiptAttempt === 'agreement') delete r.receiptAttempt;
+      if (r.phase === 'AGREEMENT_LOCKED') r.phase = 'AGREEMENT_RECEIPTED';
+      r.checks.receiptAuthority = 'online-verified';
       await this.store.write(id, r); return this.view(r);
     }
     if (r.receiptAttempt) throw new Error('Receipt issuance unresolved. Recover the receipt by ID; do not blindly charge again.');
@@ -91,7 +95,8 @@ export class LendingService {
     const r = await this.get(id); this.assertContent(r, !r.signed); this.assertApprovals(r);
     if (!r.signed || !r.transaction || !r.agreementReceipt) throw new Error('Signed receipted request required');
     if (r.validated) return this.view(r);
-    await this.receipts.verify(r.agreementReceipt, r.agreementHash);
+    // An authority outage cannot change an already-executed ledger result.
+    // Reconcile first; still require fresh receipt verification before any send.
     const result = await this.ledger.lookup(r.signed.hash);
     if (result) {
       // Compare every prepared field with validated signed payload, not just Data.
@@ -117,6 +122,7 @@ export class LendingService {
       // Expiry prevents a first submission after consent expires. Already-submitted blobs
       // may validate regardless, so always perform lookup above, including after expiry.
       if (r.phase === 'SIGNED' && Date.parse(r.agreement.expiresAt) <= Date.now()) throw new Error('Consent expired before submission');
+      await this.receipts.verify(r.agreementReceipt, r.agreementHash);
       r.phase = 'SUBMITTED'; await this.store.write(id, r);
       try { await this.ledger.submit(r.signed.tx_blob); } catch { /* uncertainty remains */ }
       r.phase = 'VALIDATION_UNKNOWN'; r.checks.xrplValidation = 'unknown';

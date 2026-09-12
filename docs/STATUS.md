@@ -60,12 +60,18 @@ remaining build time. Official event submission is Sunday 13:00, freeze 12:30.
   builders and adapter, durable operation journal, request approval/receipt
   state machine, CLI cycle, local role views and authenticated mutation API
   implemented. These are implementation milestones, not passed live gates.
-- Latest complete run: 14 tests passed, zero failed, 5,620.1306 ms. Both actual SDK signatures cover Data and the full
+- Latest complete run: 18 tests passed, zero failed, 5,742.5857 ms. Both actual SDK signatures cover Data and the full
   transaction; changed terms/documents reject; missing human approvals or
   agreement receipt block; simulated uncertain submission/restart/receipt outage
   recovers without signing or funding another loan. Additional tests cover API
   roles/origin, nanosecond precision, authority mismatches, stored signature
   integrity, exact repeat blobs, expired unknown history and writer locking.
+- Targeted simulated regressions exposed and fixed two application issues:
+  authority availability blocked recovery of already-validated funding, and
+  replaying an agreement-receipt action rewound signed/funded phase. Four new
+  checks preserve ledger recovery, submission gates and unresolved execution
+  receipt attempts. No live funds moved during this test round. See RECOVERY-001
+  in DEVEX_LOG. Hook delivery reached 167 accepted events at 14:05:52 UTC.
 - Receipt integration probe minted once through authorized MCP at 11:31:11 UTC,
   cost 1 tick, ID `DG-8ab218c99d844c4a92b0385f87475887`. Committed text explicitly
   says synthetic integration probe, no loan/payment asserted. Official public

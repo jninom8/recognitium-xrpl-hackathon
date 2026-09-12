@@ -13,11 +13,11 @@ import type { ReceiptEvidence } from '../src/shared/contract.js';
 async function setup() {
   const directory = await mkdtemp(join(tmpdir(), 'recognitium-test-'));
   const f = fixture(); let submissions = 0; let receiptCalls = 0;
-  let found: ValidatedTransaction | undefined; let failReceipt = false;
+  let found: ValidatedTransaction | undefined; let failReceipt = false; let failVerification = false;
   const ledger: LedgerPort = { lookup: async () => found, ledgerIndex: async () => 100, submit: async () => { submissions++; throw new Error('SIMULATED connection reset after accepted submission'); } };
   const receipts: ReceiptPort = {
     seal: async (hash) => { receiptCalls++; if (failReceipt) throw new Error('SIMULATED receipt outage'); return { receiptId: 'FIXTURE', commitmentHash: hash, receiptWire: '{}', verificationWire: '{}', authorityCheckedAt: new Date().toISOString() }; },
-    verify: async (e, h) => { assert.equal(e.commitmentHash, h); },
+    verify: async (e, h) => { if (failVerification) throw new Error('SIMULATED authority lookup outage'); assert.equal(e.commitmentHash, h); },
   };
   const store = new Store<PrivateRequest>(directory); let service = new LendingService(store, ledger, receipts);
   const view = await service.create(f.agreement, f.document, f.salt, f.prepare);
@@ -27,6 +27,7 @@ async function setup() {
     restart: () => { service = new LendingService(new Store(directory), ledger, receipts); },
     cleanup: () => rm(directory, { recursive: true, force: true }),
     calls: () => ({ submissions, receiptCalls }), failReceipt: () => { failReceipt = true; },
+    failVerification: () => { failVerification = true; },
     validate: async () => {
       const r = (await store.read(id))!;
       found = { hash: r.signed!.hash, ledgerIndex: 110, resultCode: 'tesSUCCESS', raw: { fixture: true },
@@ -44,6 +45,58 @@ test('approval is request-bound and both roles plus a verified receipt are requi
     await assert.rejects(t.service.receiptAgreement(t.id));
     await t.approve(); await assert.rejects(t.service.sign(t.id, t.f.broker, t.f.borrower));
     assert.deepEqual(t.calls(), { submissions: 0, receiptCalls: 0 });
+  } finally { await t.cleanup(); }
+});
+
+test('SIMULATED authority lookup outage does not hide already-validated borrower funding', async () => {
+  const t = await setup(); try {
+    await t.approve(); await t.service.receiptAgreement(t.id); await t.service.sign(t.id,t.f.broker,t.f.borrower);
+    await t.service.advance(t.id); await t.validate(); t.failVerification(); t.restart();
+    const recovered = await t.service.advance(t.id);
+    assert.equal(recovered.phase,'VALIDATED_RECEIPT_PENDING');
+    assert.equal(recovered.checks.xrplValidation,'validated-success');
+    assert.equal(t.calls().submissions,1);
+    assert.equal((await t.store.read(t.id))!.executionManifest!.borrowerFundingDrops,'100000000');
+  } finally { await t.cleanup(); }
+});
+
+test('repeating an agreement receipt action cannot move a signed or funded request backwards', async () => {
+  const t = await setup(); try {
+    await t.approve(); await t.service.receiptAgreement(t.id); await t.service.sign(t.id,t.f.broker,t.f.borrower);
+    const signed = (await t.store.read(t.id))!.signed;
+    assert.equal((await t.service.receiptAgreement(t.id)).phase,'SIGNED');
+    await t.service.advance(t.id);
+    assert.equal((await t.service.receiptAgreement(t.id)).phase,'VALIDATION_UNKNOWN');
+    await t.validate(); await t.service.advance(t.id);
+    assert.equal((await t.service.receiptAgreement(t.id)).phase,'VALIDATED_RECEIPT_PENDING');
+    await t.service.receiptExecution(t.id);
+    assert.equal((await t.service.receiptAgreement(t.id)).phase,'FUNDED_WITH_EVIDENCE');
+    await assert.rejects(t.service.approve(t.id,'broker',t.view.agreementHash,t.view.transactionDigest),/phase closed/);
+    assert.deepEqual((await t.store.read(t.id))!.signed,signed);
+    assert.deepEqual(t.calls(),{submissions:1,receiptCalls:2});
+  } finally { await t.cleanup(); }
+});
+
+test('SIMULATED authority outage still blocks a new submission', async () => {
+  const t = await setup(); try {
+    await t.approve(); await t.service.receiptAgreement(t.id); await t.service.sign(t.id,t.f.broker,t.f.borrower);
+    t.failVerification();
+    await assert.rejects(t.service.advance(t.id),/SIMULATED authority lookup outage/);
+    assert.equal(t.calls().submissions,0);
+    assert.equal((await t.store.read(t.id))!.phase,'SIGNED');
+  } finally { await t.cleanup(); }
+});
+
+test('rechecking an agreement receipt preserves unresolved execution issuance without another charge', async () => {
+  const t = await setup(); try {
+    await t.approve(); await t.service.receiptAgreement(t.id); await t.service.sign(t.id,t.f.broker,t.f.borrower);
+    await t.service.advance(t.id); await t.validate(); await t.service.advance(t.id);
+    t.failReceipt(); await assert.rejects(t.service.receiptExecution(t.id),/SIMULATED receipt outage/);
+    t.restart(); await t.service.receiptAgreement(t.id);
+    assert.equal((await t.store.read(t.id))!.receiptAttempt,'execution');
+    assert.equal((await t.store.read(t.id))!.phase,'VALIDATED_RECEIPT_PENDING');
+    await assert.rejects(t.service.receiptExecution(t.id),/unresolved/);
+    assert.deepEqual(t.calls(),{submissions:1,receiptCalls:2});
   } finally { await t.cleanup(); }
 });
 test('changed document, amount, network, expiry, metadata invalidate existing approvals', async () => {

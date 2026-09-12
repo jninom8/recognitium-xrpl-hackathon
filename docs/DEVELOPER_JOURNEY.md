@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **15:40 Paris time (UTC+2)**. About five minutes to read.
+Evidence through **16:05 Paris time (UTC+2)**. About five minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -17,8 +17,8 @@ Evidence through **15:40 Paris time (UTC+2)**. About five minutes to read.
 | Realised interest | **20 drops before network fees**, not net profit |
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
-| Tests | 14 passing local tests; implementation CI passed |
-| Developer capture | Team **Recognitium**; 150 events accepted at the last recorded check |
+| Tests | 18 passing local tests; original implementation CI passed |
+| Developer capture | Team **Recognitium**; 167 events accepted at the last recorded check |
 | Still to finish | Frontend/demo integration and participant-written final report |
 
 The business request and document are explicitly **synthetic**. The ledger
@@ -47,6 +47,7 @@ timestamps. They are not estimates of hours spent coding.
 | **15:21:51** | **Withdrew 200.000020 XRP** | The lender realised 20 drops of interest before fees |
 | After the cycle | Verified saved signatures, receipts and transactions through fresh lookups; published reviewed code | Evidence was reproducible independently of the application UI |
 | 15:36–15:40 | Refreshed the brief and compared mentor-recommended beta.1 with stable | Both SDKs verified the recorded cycle; stable already included the signing fix |
+| By 16:05 | Added targeted simulated failure tests, observed two failures and fixed the application | Receipt outages no longer hide validated funding; stale receipt actions cannot rewind progress |
 
 ## 2. What we learned
 
@@ -126,6 +127,13 @@ on stable 5.2.0.
 
 ## 3. Check the result
 
+**Latest hardening:** a simulated authority outage exposed an unnecessary
+dependency in funding recovery, and repeating an earlier receipt action exposed
+a backwards state transition. Both were reproduced before correction. Four
+regression checks now pass, including the rule that a new submission still needs
+receipt verification and unresolved execution issuance cannot be silently reset.
+[Exact before/after observations →](../DEVEX_LOG.md#recovery-001-targeted-simulated-failures-exposed-two-application-issues)
+
 The [synthetic evidence bundle](../evidence/synthetic-supplier-001.json) contains
 the actual transaction hashes, ledger metadata and receipts. The funded LoanSet
 is at **ledger 66253**; successful repayment at **66381**; withdrawal at **66407**.
@@ -147,8 +155,8 @@ offline consistency from fresh authority and ledger verification.
 ## 4. The mandatory DevEx hook
 
 Capture was associated with **Recognitium** from activation. Version **2.4.0**
-is installed locally in this project, with eight trusted hooks. At **15:40:12**,
-the last recorded delivery returned **HTTP 200**, with **150 accepted events**
+is installed locally in this project, with eight trusted hooks. At **16:05:52**,
+the last recorded delivery returned **HTTP 200**, with **167 accepted events**
 cumulatively and zero buffered at that instant. These are timestamped counters,
 not a claim that every action is captured: the hook selects relevant events.
 
