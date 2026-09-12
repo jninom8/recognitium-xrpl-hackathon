@@ -34,16 +34,20 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     authorizeHosted(role, req.headers.authorization?.replace(/^Bearer /, '') ?? '', { borrower: process.env.HOSTED_BORROWER_TOKEN, broker: process.env.HOSTED_BROKER_TOKEN });
     if (isList) return reply(res, 200, { instanceId, observedAt: new Date().toISOString(), requests: await intake.list() });
     if (req.headers['content-type'] !== 'application/json') throw new Error('application/json required');
-    let input = req.body;
+    let input: unknown;
+    // Vercel parses body lazily; malformed client JSON is not a storage outage.
+    try { input = req.body; } catch { throw new Error('Invalid request body'); }
     if (input === undefined) {
       let wire = ''; for await (const chunk of req) { wire += String(chunk); if (wire.length > 16000) throw new Error('Request too large'); }
-      input = JSON.parse(wire);
+      try { input = JSON.parse(wire); } catch { throw new Error("Invalid request body"); }
     }
     if (!input || typeof input !== 'object' || Array.isArray(input) || JSON.stringify(input).length > 16000) throw new Error('Invalid request body');
     return reply(res, 200, await intake.mutate(review?.[1], input as Record<string, unknown>));
   } catch (error) {
     const message = error instanceof Error ? error.message : '';
     if (message === 'Unauthorized role') return reply(res,401,{error:message});
+    if (message === 'Invalid request body' || message === 'application/json required') return reply(res,400,{error:message});
+    if (message === 'Request too large') return reply(res,413,{error:message});
     if (message === 'Origin rejected') return reply(res,403,{error:message});
     // Do not return provider errors, store URLs, tokens or raw exceptions.
     const safe = /^(Only synthetic|A valid|Request between|Choose |This request ID|This demo workspace|Exact request|Unknown financing|Request changed|This review action|application\/json|Request too large|Invalid request body|Shared storage could)/.test(message);

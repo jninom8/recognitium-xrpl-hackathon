@@ -23,7 +23,7 @@ export const intakeStates = {
     tone: "amber",
   },
   REVIEWED: {
-    label: "Waiting for an offer",
+    label: "Review complete",
     description:
       "Your request has been reviewed. The next step is an offer showing what you receive and what you repay. Preparing that offer is not yet connected in this demo. No loan has been funded from this request.",
     tone: "neutral",
@@ -139,4 +139,9 @@ export function customerLoan(snapshot, requests, example = false) {
       (request) => request.clientRequestId === loan.agreement.requestId,
     ),
   );
+}
+
+/** Only the latest inbox response for the current role and mode may be applied. */
+export function currentInboxResponse(ticket, latest, session, active, mode) {
+  return ticket === latest && session === active && mode === "live";
 }

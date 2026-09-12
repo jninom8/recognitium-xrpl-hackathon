@@ -49,6 +49,8 @@ test('hosted HTTP roles share intake; wrong roles, origins and native actions ar
     assert.equal((await call('/api/intake',borrower,example(),'https://untrusted.invalid')).status,403);
     assert.equal((await call('/api/setup',borrower,{})).status,403);
     assert.equal((await call('/api/requests/example/sign',broker,{})).status,403);
+    const malformed = await fetch(base+'/api/intake',{method:'POST',headers:{Authorization:'Bearer '+borrower,'Content-Type':'application/json'},body:'{'});
+    assert.equal(malformed.status,400);
     const created = await call('/api/intake',borrower,example()); assert.equal(created.status,200);
     const r = await created.json();
     const inbox = await (await call('/api/intake?role=broker',broker)).json();
@@ -58,4 +60,14 @@ test('hosted HTTP roles share intake; wrong roles, origins and native actions ar
     assert.equal(next.requests[0].status,'UNDER_REVIEW'); assert.equal(next.instanceId,inbox.instanceId);
     assert.equal('transaction' in next.requests[0],false);
   } finally { server.closeAllConnections(); await new Promise<void>(resolve=>server.close(()=>resolve())); delete process.env.HOSTED_BORROWER_TOKEN;delete process.env.HOSTED_BROKER_TOKEN; }
+});
+
+test('private storage requests identity encoding and refuses weak write versions', async () => {
+ const {BlobIntakeDatabase} = await import('../src/hosted/blob.js');
+ const {get} = await import('@vercel/blob');
+ const response = (weak:boolean) => ({statusCode:200 as const,headers:new Headers(),stream:new Response(JSON.stringify({schema:'recognitium.hosted-intake.v1',records:[]})).body!,blob:{url:'https://fixture.invalid',downloadUrl:'https://fixture.invalid',pathname:'fixture',contentDisposition:'',cacheControl:'',contentType:'application/json',uploadedAt:new Date(),etag:weak?'W/"version"':'"version"',size:80}});
+ const db = new BlobIntakeDatabase((async (_path, options) => response(new Headers(options.headers).get('Accept-Encoding') !== 'identity')) as typeof get);
+ assert.equal((await db.read()).etag,'"version"');
+ const weak = new BlobIntakeDatabase((async()=>response(true)) as typeof get);
+ await assert.rejects(weak.read(),/non-authoritative version/);
 });

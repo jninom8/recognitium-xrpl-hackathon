@@ -4,9 +4,12 @@ import type { IntakeDatabase, IntakeSnapshot } from './intake.js';
 
 const path = 'recognitium/shared-intake-v1.json';
 export class BlobIntakeDatabase implements IntakeDatabase {
+  constructor(private readonly fetchBlob: typeof get = get) {}
   async read(): Promise<IntakeSnapshot> {
-    const result = await get(path, { access: 'private', useCache: false, abortSignal: AbortSignal.timeout(8000) });
+    // Compressed downloads can carry a weak ETag, which cannot satisfy If-Match.
+    const result = await this.fetchBlob(path, { access: 'private', useCache: false, headers: { 'Accept-Encoding': 'identity' }, abortSignal: AbortSignal.timeout(8000) });
     if (!result) return { records: [] };
+    if (!result.blob.etag || result.blob.etag.startsWith('W/')) throw new Error('Shared storage returned a non-authoritative version');
     if (!result.stream || (result.blob.size ?? Infinity) > 256000) throw new Error('Shared storage record is unavailable');
     const body: unknown = await new Response(result.stream).json();
     const data = body as { schema?: string; records?: FinancingRequest[] };

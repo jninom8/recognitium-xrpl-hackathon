@@ -1,5 +1,6 @@
 import { SnapshotCursor, sameReview, drops } from "/state-client.mjs";
 import {
+  currentInboxResponse,
   purposes,
   intakeStates,
   amountToDrops,
@@ -39,6 +40,7 @@ let state,
   sending = false,
   page = "overview",
   pollBusy = false;
+let inboxSequence = 0;
 const pendingKey = "recognitium.synthetic-intake.pending.v1";
 try {
   const value = JSON.parse(localStorage.getItem(pendingKey));
@@ -105,6 +107,7 @@ function setPage(value) {
   render();
 }
 function sourceChanged(value) {
+  inboxSequence++;
   $("source").value = value;
   const url = new URL(location.href);
   url.searchParams.set("mode", value);
@@ -124,7 +127,7 @@ function privateRequests() {
     : [];
 }
 function render() {
-  if (!state) return;
+  if (!state || state.mode !== $("source").value) return;
   const r = selected(),
     c = $("source").value === "recorded" || r ? state.cycle : undefined,
     outcome = loanOutcome(r, c),
@@ -150,7 +153,7 @@ function render() {
   $("operator-link").href = "/operator?mode=" + state.mode;
   $("access-button").textContent = hasAccess()
     ? "Lock workspace"
-    : "Open my requests";
+    : role() === "broker" ? "Open review inbox" : "Open my requests";
   $("access-button").hidden = lender || recorded;
   $("requests-label").textContent =
     role() === "broker" ? "Review inbox" : "My requests";
@@ -232,10 +235,10 @@ function render() {
 function borrowerStart() {
   const requests = privateRequests();
   if (hasAccess() && requests.length) return requestList(false);
-  return `<section class='card next-step-card'><p class='eyebrow'>HOW IT WORKS</p><h2>You stay in control.</h2><ol class='simple-steps'><li><span>1</span><div><h3>Tell us what you need</h3><p>Choose an amount, what it is for and when you would like to pay it back.</p></div></li><li><span>2</span><div><h3>Read your offer</h3><p>See what you receive, what you repay, when it is due and every fee. You decide whether to accept.</p></div></li><li><span>3</span><div><h3>Receive the money</h3><p>Funding follows only after the final agreement has been approved by both sides.</p></div></li></ol><p class='plain-note'>Today, this demo lets you send a request and follow its review. Creating a new loan from that request is the next feature being connected.</p></section><p class='help-line'>Already sent a request? <button class='text-button' data-access>Open my requests →</button></p>`;
+  return `<section class='card next-step-card'><p class='eyebrow'>HOW IT WORKS</p><h2>You stay in control.</h2><ol class='simple-steps'><li><span>1</span><div><h3>Tell us what you need</h3><p>Choose an amount, what it is for and when you would like to pay it back.</p></div></li><li><span>2</span><div><h3>Follow the review</h3><p>Your teammate checks the request. See the same progress on both computers.</p></div></li><li><span>3</span><div><h3>Understand what comes next</h3><p>Review is not loan approval. A future offer must show every cost before both sides agree.</p></div></li></ol><p class='plain-note'>Available now: request and review together. New offers and funding are not connected to this website yet. Explore the completed example to follow a real test loan.</p></section><p class='help-line'>Already sent a request? <button class='text-button' data-access>Open my requests →</button></p>`;
 }
 function loanCard(r, c, outcome) {
-  return `<section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>BUSINESS FUNDING</p><h2>${outcome.funded ? "Money received" : "Your loan agreement"}</h2></div>${badge(outcome.label, outcome.tone)}</div><div class='big-amount'>${esc(drops(outcome.funded ? r.funding.borrowerFundingDrops : r.agreement.terms.principalDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Interest rate per year", r.agreement.terms.interestRate / 1000 + "%")}${fact("Repayment", outcome.repaid ? "Complete" : outcome.funded ? "In progress" : "Not started")}${fact("Agreement", "Version " + r.agreement.documentVersion)}</dl><div class='card-bottom'><p class='hint'>${esc(outcome.description)}</p><button class='text-button' data-loan>View agreement →</button></div></section>`;
+  return `<section class='card loan-card'><div class='card-head'><div><p class='eyebrow'>BUSINESS FUNDING</p><h2>${outcome.repaid ? "Loan repaid" : outcome.funded ? "Money received" : "Your loan agreement"}</h2></div>${badge(outcome.label, outcome.tone)}</div><div class='big-amount'>${esc(drops(outcome.funded ? r.funding.borrowerFundingDrops : r.agreement.terms.principalDrops))}<span>test XRP</span></div><dl class='facts'>${fact("Interest rate per year", r.agreement.terms.interestRate / 1000 + "%")}${fact("Repayment", outcome.repaid ? "Complete" : outcome.funded ? "In progress" : "Not started")}${fact("Agreement", "Version " + r.agreement.documentVersion)}</dl><div class='card-bottom'><p class='hint'>${esc(outcome.description)}</p><button class='text-button' data-loan>View agreement →</button></div></section>`;
 }
 function journeyCard(r, outcome) {
   const signed = Boolean(r.transaction);
@@ -306,7 +309,7 @@ function requestList(compact) {
         ? "Open your review inbox."
         : "Your requests belong here.",
       "Enter the code given to you by the person hosting the demo.",
-      `<button class='primary' data-access>Open my requests →</button>`,
+      `<button class='primary' data-access>${role() === "broker" ? "Open review inbox" : "Open my requests"} →</button>`,
     );
   const requests = privateRequests();
   if (!privateAvailable)
@@ -330,7 +333,7 @@ function requestList(compact) {
     .slice(0, compact ? 4 : 100)
     .map(
       (r) =>
-        `<div class='request-row'><div><h3>${esc(purposes[r.purpose])}</h3><p>Request ${esc(shortId(r.clientRequestId))} · ${date(r.createdAt)}</p></div><div><strong>${esc(drops(r.requestedDrops))} XRP</strong><p>${r.requestedDays} days requested</p></div><div>${badge(intakeStates[r.status].label, intakeStates[r.status].tone)}</div><button class='secondary' data-intake='${esc(r.clientRequestId)}'>${role() === "broker" ? "Review request" : "View request"}</button></div>`,
+        `<div class='request-row'><div><h3>${esc(purposes[r.purpose])}</h3><p>Request ${esc(shortId(r.clientRequestId))} · ${date(r.createdAt)}</p></div><div><strong>${esc(drops(r.requestedDrops))} test XRP</strong><p>${r.requestedDays} days requested</p></div><div>${badge(intakeStates[r.status].label, intakeStates[r.status].tone)}</div><button class='secondary' data-intake='${esc(r.clientRequestId)}'>${role() === "broker" ? "Review request" : "View request"}</button></div>`,
     )
     .join(
       "",
@@ -435,7 +438,7 @@ async function refresh() {
 }
 async function loadIntake() {
   if (!hasAccess() || $("source").value !== "live") return;
-  const session = access;
+  const session = access, ticket = ++inboxSequence;
   try {
     const response = await fetch("/api/intake?role=" + session.role, {
       headers: { Authorization: "Bearer " + session.token },
@@ -443,7 +446,7 @@ async function loadIntake() {
     });
     if (!response.ok) throw Error();
     const next = await response.json();
-    if (access !== session) return;
+    if (!currentInboxResponse(ticket, inboxSequence, session, access, $("source").value)) return;
     const changed =
       !privateAvailable ||
       JSON.stringify(intake?.requests) !== JSON.stringify(next.requests) ||
@@ -462,7 +465,7 @@ async function loadIntake() {
     if (changed) render();
     updateReview();
   } catch {
-    if (access !== session) return;
+    if (!currentInboxResponse(ticket, inboxSequence, session, access, $("source").value)) return;
     privateAvailable = false;
     render();
   }
@@ -495,6 +498,7 @@ $("access-form").addEventListener("submit", async (e) => {
     if (!response.ok) throw Error();
     const next = await response.json();
     if (role() !== selectedRole) return;
+    inboxSequence++;
     access = { role: selectedRole, token };
     intake = next;
     privateAvailable = true;
@@ -512,6 +516,7 @@ $("access-form").addEventListener("submit", async (e) => {
 });
 $("access-button").addEventListener("click", () => {
   if (hasAccess()) {
+    inboxSequence++;
     access = undefined;
     intake = undefined;
     privateAvailable = false;
@@ -576,6 +581,7 @@ $("request-back").addEventListener("click", () => {
   $("request-back").hidden = true;
   $("request-title").textContent = "What does your business need?";
   $("request-step").textContent = "YOUR REQUEST / STEP 1 OF 2";
+  $("request-intro").textContent = "Start with what you need. Sending a request does not commit you to a loan.";
   $("request-next").textContent = "Review request →";
   requestError("");
 });
@@ -602,9 +608,9 @@ $("request-form").addEventListener("submit", async (e) => {
     openAccess();
     return;
   }
-  if (!available) {
+  if (!available || !privateAvailable) {
     requestError(
-      "Reconnect to this backend before sending. Your entered details are retained.",
+      "Reconnect to your request inbox before sending. Your entered details are retained.",
     );
     return;
   }

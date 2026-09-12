@@ -36,7 +36,7 @@ test("customer amounts remain exact and pending receipts do not hide received fu
     loanOutcome({ ...request, funding: { status: "unknown" } }, null).label,
     "Confirming funding",
   );
-  assert.equal(intakeStates.REVIEWED.label, "Waiting for an offer");
+  assert.equal(intakeStates.REVIEWED.label, "Review complete");
   assert.match(intakeStates.REVIEWED.description, /No loan has been funded/);
   assert.equal(
     lenderOutcome({ steps: { deposit: { resultCode: "tecEXPIRED" } } })
@@ -104,3 +104,12 @@ test("broker review becomes stale after an intake change or backend restart", ()
     false,
   );
 });
+
+ test('older inbox responses and responses after locking or changing mode are ignored', async () => {
+ const {currentInboxResponse} = await import('../web/customer-model.mjs');
+ const session = {};
+ assert.equal(currentInboxResponse(1,2,session,session,'live'),false);
+ assert.equal(currentInboxResponse(2,2,session,undefined,'live'),false);
+ assert.equal(currentInboxResponse(2,2,session,session,'recorded'),false);
+ assert.equal(currentInboxResponse(2,2,session,session,'live'),true);
+ });

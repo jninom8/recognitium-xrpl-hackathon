@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12, 2026.
-Evidence through **22:28 Paris time (UTC+2)**. About eight minutes to read.
+Evidence through **22:49 Paris time (UTC+2)**. About eight minutes to read.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -18,8 +18,8 @@ Evidence through **22:28 Paris time (UTC+2)**. About eight minutes to read.
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Plain-language task entrance, request form and tracking; separate completed example and team inbox; technical workspace at `/operator` |
-| Tests | 34 passing local tests, including process crashes with simulated external systems, two-client state checks, durable intake and example separation |
-| Developer capture | Team **Recognitium**; 412 events accepted at the last recorded check |
+| Tests | 36 passing local tests, including process crashes with simulated external systems, two-client state checks, durable intake and example separation |
+| Developer capture | Team **Recognitium**; 432 events accepted at the last recorded check |
 | Last connection checkpoint | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
 | Still to finish | Reviewed request to fresh loan, independent reproduction, fresh joint rehearsal and participant-written final report |
 
@@ -330,3 +330,12 @@ working journal is not the official participant-written final report.*
 - Hook 2.4.0: registered; flush accepted 27 actual events with HTTP 200 at 20:27:52 UTC, 412 cumulative, zero remaining. No generated participant report was submitted.
 
 Deployment follow-up at 20:30:48 UTC: commit 84a51cb pushed to main; GitHub Actions run 34717285392 passed. GitHub-triggered redeployment changed the hosted instance from hosted-8c26095fdd828f824ef61d5a to hosted-ae81fdc89039880a14fdb8b8. A same-origin authenticated read returned HTTP 200 and retained the same single synthetic request at UNDER_REVIEW revision 2. This verifies persistence across an actual application deployment, not only a simulated restart. Chrome also rendered the completed repayment example successfully.
+
+## September 12, 22:49 Paris: friendly UI and deployed failure testing
+
+- Refreshed customer screens with mint, lavender and apricot on warm white; rounded controls, visible keyboard focus and reduced-motion support. Chrome desktop and 390px mobile checks exercised the entrance, exact 125.000001 XRP request review and recorded repayment screen. Brand links now resist automatic translation.
+- Corrected misleading review-complete and repaid labels, explicit test-XRP amounts, and the hosted request-to-offer boundary. New hosted requests still do not originate a loan. A sequence guard prevents delayed inbox responses or mode changes from restoring stale private state.
+- Expanded the deployed smoke script through completed review, changed-details rejection and stale-review rejection. It exposed a genuine Blob concurrency failure: get() returned a weak ETag W/ while head() returned the strong equivalent. Repeated conditional writes failed even without another writer. An identity-encoding GET returned a strong ETag and the previously blocked request advanced. The adapter now requests identity encoding and refuses weak ETags; it never removes the conditional-write guard. See the provider's [conditional-write documentation](https://vercel.com/docs/vercel-blob).
+- The first expanded run stopped at review with HTTP 409; the next passed review completion but exposed malformed JSON returning 503 because Vercel parses req.body lazily. Body-access parsing errors now return 400, separate from storage errors. Synthetic test records are retained; no ledger money moved.
+- Local suite: 36 passed, 0 failed at 20:48 UTC; includes weak-ETag and delayed-response regression cases. Build and frontend syntax checks pass. Fresh online evidence verification returned both-valid signatures, online-authority-record-verified and validated-success, with content/receipt-chain hashes checked separately.
+- DevEx hook 2.4.0 flushed 10 actual events with HTTP 200 at 20:44:12 UTC: 432 cumulative, zero buffered at that checkpoint. No participant report generated. Final deployed smoke outcome follows below.

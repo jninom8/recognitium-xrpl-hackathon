@@ -29,7 +29,7 @@ The founder can run this explicitly writing check from the repository:
 node --env-file=.local/hosted-access.env scripts/hosted-smoke.mjs --write-synthetic
 ```
 
-It creates one synthetic request, verifies requester/reviewer visibility, reviews it, retries submission concurrently and checks that only one revision-2 request remains. It also checks wrong-role, cross-origin and native-operation refusals. It uses existing demo codes without printing them and moves no funds. The result is saved under ignored .local/. This is an author-operated HTTP check; independent teammate browser reproduction is still required.
+It creates one synthetic request, verifies requester/reviewer visibility, reviews it, retries submission concurrently and checks that only one request remains, completes its review at revision 3, and rejects changed details and stale reviews. It also checks wrong-role, cross-origin and native-operation refusals. It uses existing demo codes without printing them and moves no funds. The result is saved under ignored .local/. This is an author-operated HTTP check; independent teammate browser reproduction is still required.
 
 ## Deployment boundary
 
