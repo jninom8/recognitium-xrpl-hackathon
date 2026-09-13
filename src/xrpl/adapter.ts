@@ -28,7 +28,7 @@ export class NativeAdapter implements LedgerPort {
     await this.client.connect();
     const info = (await this.client.request({ command: 'server_info' })).result.info;
     const networkId = info.network_id;
-    if (!Number.isInteger(networkId) || networkId === undefined || networkId <= 0) throw new Error('Missing development network identity');
+    if (networkId !== 4001) throw new Error('Missing development network identity');
     if (info.amendment_blocked || !info.validated_ledger) throw new Error('Server is not providing usable validated ledgers');
     // Public Amendments ledger object: UInt16 namespace 'f', SHA-512Half.
     // Querying feature may require admin access; this reads actual enabled IDs.
@@ -39,7 +39,7 @@ export class NativeAdapter implements LedgerPort {
     await mkdir('data/environment',{recursive:true});
     await writeFile('data/environment/track1.json',JSON.stringify({observedAt:new Date().toISOString(),serverInfo:info,amendments},null,2));
     for (const name of ['SingleAssetVault','LendingProtocol']) if (!enabled.includes(half(name))) throw new Error(`Required ${name} amendment not enabled`);
-    if (enabled.includes(half('LendingProtocolV1_1')) && !(this.allowV11ReadAndRecovery && networkId === 4001)) throw new Error('Lending V1.1 detected; new Track 1 loans require a V1-only environment');
+    if (enabled.includes(half('LendingProtocolV1_1')) && !((this.allowV11ReadAndRecovery || TRACK1.allowEventV11Trial) && networkId === 4001)) throw new Error('Lending V1.1 detected; new Track 1 loans require a V1-only environment');
     this.identity = { track: TRACK1.track, websocket: TRACK1.websocket, networkId, serverBuild: info.build_version };
     return this.identity;
     } catch (error) {

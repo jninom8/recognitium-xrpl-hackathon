@@ -7,6 +7,8 @@ export const TRACK1 = {
   faucet: 'https://lending-hackathon-faucet.dev.ripplex.io/accounts',
   explorer: 'https://custom.xrpl.org/lending-hackathon.dev.ripplex.io:51233/',
   sdk: 'xrpl@5.2.0',
+  // Founder renewed mentor-endpoint demo authorization on September 13.
+  allowEventV11Trial: true,
 } as const;
 export type Role = 'broker' | 'borrower';
 export type Phase = 'DRAFT' | 'AGREEMENT_LOCKED' | 'AGREEMENT_RECEIPTED' | 'SIGNED'
