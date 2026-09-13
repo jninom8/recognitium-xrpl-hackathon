@@ -565,3 +565,6 @@ Pitch layout revision: enlarged architecture boxes, checked the corrected slide 
 Added an explicit event Devnet connection observation with check time, network ID, validated ledger index/hash, server build, explorer link and an independent JSON-RPC request. New-loan eligibility remains a separate status: V1.1 is still enabled and the requested V1-only gate still blocks origination.
 
 Fresh online verification of evidence/ai-request-1708833c.json passed: exact content, both signatures, receipt-chain consistency, both official receipt authority records, funding and all saved native-cycle transactions matched the event ledger. A direct ledger RPC independently returned validated=true for ledger 92108 with hash 0B5DF1D354D753AE604151F9F51C4902072287A994AF44B5BBBFB83467A85A9A, matching the frontend observation. This checks the existing completed cycle, not a new availability-matched run. Pitch and one-page participant-dictated PDF opened through the Chrome extension.
+
+### English-only interface, September 13
+Chrome inspection showed French auto-translations around protected English labels. Both HTML entry points now declare English and disable automatic translation; UI dates use en-GB and the financing assistant is instructed to reply in English. User-entered records remain unchanged. Hosted build and 10 focused assistant/hosted tests passed.

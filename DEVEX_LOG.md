@@ -1043,3 +1043,6 @@ Identity fixture audit: Chrome preview returned commitment cc17c7313f9919407b985
 Pitch evidence review: seven slides use public native-cycle records and the shared journey. Security wording is limited to no cryptographic break identified in our tests, not a security audit or quantum-safety claim. Integration/state-recovery findings remain distinct from protocol vulnerabilities. No new network transaction or service receipt issued for deck creation.
 
 Fresh external verification: node dist/scripts/verify-bundle.js evidence/ai-request-1708833c.json --online --mentor-confirmed-open-ended returned contentHash consistent, signatures both-valid, receiptChainHash consistent, receiptAuthority online-authority-record-verified, xrplValidation validated-success. The legacy-named option allows reading/recovery, not bypassing new origination checks. Independent ledger POST for 92108 matched the displayed hash and validated=true. No new funds moved.
+
+### English-only interface, September 13
+Chrome inspection showed French auto-translations around protected English labels. Both HTML entry points now declare English and disable automatic translation; UI dates use en-GB and the financing assistant is instructed to reply in English. User-entered records remain unchanged. Hosted build and 10 focused assistant/hosted tests passed.

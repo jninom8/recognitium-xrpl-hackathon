@@ -7,7 +7,7 @@ const $ = id => document.getElementById(id);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const json = value => `<pre>${escape(JSON.stringify(value, null, 2))}</pre>`;
 const badge = (text, color = 'neutral') => `<span class="badge ${color}">${escape(text)}</span>`;
-const time = value => value ? new Date(value).toLocaleString() : 'Not checked';
+const time = value => value ? new Date(value).toLocaleString('en-GB') : 'Not checked';
 const cursor = new SnapshotCursor();
 let state, selectedId = new URL(location.href).searchParams.get('request') || undefined, review, busy = false, refreshing = false, available = false, renderedExpiryKey = '', selectedIntake;
 const expiryKey = snapshot => snapshot.requests.map(r=>r.agreement.requestId+':'+(Date.parse(r.agreement.expiresAt)<=Date.now())).join('|');

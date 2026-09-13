@@ -1,7 +1,7 @@
 import { financingJourney, ledgerHistory } from './journey-model.mjs';
 import { drops } from './state-client.mjs';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
-const time = value => value ? new Date(value).toLocaleString() : 'Not checked';
+const time = value => value ? new Date(value).toLocaleString('en-GB') : 'Not checked';
 
 export function authorizationGuide(role = 'borrower', hosted = false) {
   const intro = {

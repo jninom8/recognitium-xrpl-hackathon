@@ -28,11 +28,11 @@ const badge = (label, tone = "neutral") =>
 const fact = (label, value) =>
   `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`;
 const date = (value) =>
-  new Date(value).toLocaleDateString(undefined, {
+  new Date(value).toLocaleDateString('en-GB', {
     day: "numeric",
     month: "short",
   });
-const fullTime = (value) => new Date(value).toLocaleString();
+const fullTime = (value) => new Date(value).toLocaleString('en-GB');
 const amount = (value) => drops(value) + " test XRP";
 const shortId = (value) =>
   value.startsWith("request-") ? value.slice(8, 16).toUpperCase() : value;
