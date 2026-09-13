@@ -1,0 +1,18 @@
+import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
+await mkdir('docs/demo',{recursive:true});
+let html=await readFile('web/film.html','utf8');
+html=html.replace('href="/film.css"','href="./demo/film.css"').replace('src="/film.js"','src="./demo/film.js"').replace('href="/"','href="./"');
+html=html.replace(/<a href="\/review[^>]+>Open this loan in the app<\/a>/,'<a href="./pitch/Recognitium-Pitch.html">Pitch deck</a><a href="./report/Recognitium-Personal-Developer-Report.pdf">Developer report</a><a href="./demo/loan-evidence.json" download>Download loan evidence</a>');
+html=html.replace('Playback moves no funds','GitHub Pages hosts this independent, read-only demonstration. Playback moves no funds');
+let js=await readFile('web/film.js','utf8');
+js=js.replace("fetch('/film-data.json')","fetch(new URL('./film-data.json',import.meta.url))");
+js=js.replace("$('receipt-status').textContent=c?.verified?'✓ Verified live with Recognitium':c?'Live check unavailable':'Checking receipt live…';","$('receipt-status').textContent='Real receipt · verify online';");
+js=js.replace("'Issued today for saved ledger evidence.'","'Issued on 13 September 2026 for saved ledger evidence.'");
+js=js.replace(/ fetch\('\/api\/story-proof'[\s\S]*?\n\}catch/, '\n}catch');
+await writeFile('docs/index.html',html);
+await writeFile('docs/demo/film.js',js);
+await copyFile('web/film.css','docs/demo/film.css');
+await copyFile('web/film-data.json','docs/demo/film-data.json');
+await copyFile('evidence/ai-request-1708833c.json','docs/demo/loan-evidence.json');
+await writeFile('docs/.nojekyll','');
+console.log('Built independent Pages replay, without backend API calls.');

@@ -621,3 +621,5 @@ Pitch v9: founder-authorized logo-only reuse from the Recognitium repository. Ex
 Pitch v10: curved black oval panel behind the opening logo only; green text area preserved. Nine-slide package/layout checks pass, opening slide visually checked.
 
 Live workspace outage: Vercel private Blob store recognitium-xrpl-intake visibly reports Limits Exceeded. Direct Blob read HTTP 403; public state/intake/runner APIs HTTP 503. Devnet and /api/story-proof still HTTP 200. Idle execution worker stopped to prevent continued polling/heartbeat traffic. Browser polling and worker design contribute to quota usage; exact exhausted quota not yet established. No paid upgrade, data deletion or replacement performed. Restart requires checking the worker lock after confirmed process exit.
+
+GitHub Pages alternative: independent static completed-loan replay under docs/index.html, with five real receipt IDs and official verifier links, downloadable public synthetic evidence, pitch and participant report. No Vercel API dependency, new loan execution or automatic live verification claim. Rebuild with node scripts/build-pages.mjs.
