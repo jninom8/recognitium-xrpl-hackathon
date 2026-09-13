@@ -61,7 +61,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
       return res.end(await readFile(path === '/operator' ? 'web/operator.html' : 'web/index.html'));
     }
-    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs','/assistant.js','/conversation.css'].includes(path)) {
+    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs','/assistant.js','/conversation.css','/market.js'].includes(path)) {
       res.writeHead(200, { 'Content-Type': path.endsWith('.css') ? 'text/css' : 'text/javascript', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(await readFile('web' + path));
     }

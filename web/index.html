@@ -28,8 +28,17 @@
           Space to grow your business. Start with a request,<br class="desktop-break" />
           approve the exact terms, and follow what happens.
         </p>
-        <div class="welcome-pills" aria-label="Demo features"><span>✦ Simple requests</span><span>✓ Human review</span><span>↗ Payment records</span></div>
+        <p class="track-banner" translate="no">TRACK 1 · OPEN-ENDED · VANILLA <span>XLS-65 Vaults &amp; shares · XLS-66 Loans &amp; interest</span></p><div class="welcome-pills" aria-label="Demo features"><span>✦ Simple requests</span><span>✓ Human review</span><span>↗ Payment records</span></div>
         <div class="goal-grid">
+          <button class="goal-card" data-enter="lender">
+            <span class="goal-icon" aria-hidden="true">＋</span
+            ><strong>Offer availability</strong
+            ><span
+              >Share what you could lend.<br />Review a match before committing.</span
+            ><span class="goal-action"
+              >Share availability <span aria-hidden="true">→</span></span
+            >
+          </button>
           <button class="goal-card" data-enter="borrower">
             <span class="goal-icon" aria-hidden="true">↗</span
             ><strong>Request funding</strong
@@ -37,16 +46,6 @@
               >Tell us what your business needs.<br />Follow its review, one step at a time.</span
             ><span class="goal-action"
               >Get started <span aria-hidden="true">→</span></span
-            >
-          </button>
-          <button class="goal-card" data-enter="lender">
-            <span class="goal-icon" aria-hidden="true">＋</span
-            ><strong>Explore lending</strong
-            ><span
-              >Understand how lending works,<br />including the return and the
-              risks.</span
-            ><span class="goal-action"
-              >Learn how it works <span aria-hidden="true">→</span></span
             >
           </button>
           <button class="goal-card" data-enter="broker"><span class="goal-icon" aria-hidden="true">✓</span><strong>Admin</strong><span>Understand the evidence.<br />Make the next decision.</span><span class="goal-action">Open review →</span></button>
@@ -92,7 +91,8 @@
       </div>
     </aside>
     <div class="app-shell">
-      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="borrower">Borrower</button><button data-intention="lender">Lender</button><button data-intention="broker">Admin</button></nav>
+      <p class="track-banner" translate="no">TRACK 1 · OPEN-ENDED · VANILLA <span>XLS-65 Vaults &amp; shares · XLS-66 Loans &amp; interest</span></p>
+      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="lender">Lender</button><button data-intention="borrower">Borrower</button><button data-intention="broker">Admin</button></nav>
       <header class="topbar">
         <span class="workspace-name" id="workspace-name"
           >Your funding request</span
@@ -112,11 +112,7 @@
       <main>
         <div class="source-bar">
           <p id="source-note">Demo · test money</p>
-          <label hidden for="source">Data source</label
-          ><select id="source" aria-label="Live workspace or completed example">
-            <option value="recorded">Completed demo</option>
-            <option value="live">Live workspace</option>
-          </select>
+          <input type="hidden" id="source" value="live"><button class="account-button" id="restart-demo" type="button" title="Start a fresh draft; keep all saved receipts and ledger history">Reset</button>
         </div>
         <p id="notice" class="notice" role="status" hidden></p>
         <div id="request-context" class="context-bar"></div>
@@ -144,7 +140,7 @@
           <div id="activity-content"></div>
         </section>
         <footer class="footer">
-          <nav class="workspace-toolbar" aria-label="Records and tools"><button class="text-button" id="restart-demo" type="button">Restart demo</button><button class="text-button" data-page="overview">Overview</button><button class="text-button" data-page="requests">Saved requests</button><button class="text-button" data-page="activity">Loan history</button><a href="/operator" id="advanced-link">Advanced tools & health ↗</a></nav>
+          <nav class="workspace-toolbar" aria-label="Records and tools"><button class="text-button" data-page="overview">Overview</button><button class="text-button" data-page="requests">Saved requests</button><button class="text-button" data-page="activity">Loan history</button><a href="/operator" id="advanced-link">Advanced tools & health ↗</a></nav>
           <span>Demo · test money · Made-up business details only</span
           ><span id="sync-note" role="status">Connecting…</span>
         </footer>

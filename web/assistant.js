@@ -16,9 +16,10 @@ export function createConversation(root, actions) {
   function paintDraft(){
     $('chat-draft').hidden=ctx?.role==='broker'||(!draft.amount&&!draft.days&&!draft.purpose);
     $('chat-draft').textContent='Draft only · '+[draft.amount&&draft.amount+' test XRP',draft.days&&draft.days+' days',draft.purpose&&draft.purpose.replaceAll('-',' ')].filter(Boolean).join(' · ');
-    $('chat-review').hidden=ctx?.role!=='borrower'||ctx?.mode==='recorded'||Boolean(ctx?.id)||!draft.amount||!draft.days||!draft.purpose;
+    $('chat-review').hidden=ctx?.role==='broker'||ctx?.mode==='recorded'||Boolean(ctx?.id)||!draft.amount||!draft.days||(ctx?.role==='borrower'&&!draft.purpose);
   }
   function intro(){
+    $('chat-review').textContent=ctx.role==='lender'?'Review availability →':'Review request →';
     $('chat-messages').replaceChildren();messages=[];draft=blank();
     $('chat-provider').textContent='Ready to help';$('chat-status').textContent='';
     const recorded=ctx.mode==='recorded';

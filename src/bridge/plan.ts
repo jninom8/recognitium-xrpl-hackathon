@@ -1,3 +1,4 @@
+import type {MatchProposal} from '../requests/matching.js';
 import type { FinancingRequest } from '../shared/intake.js';
 import { financingInput } from '../requests/intake.js';
 import { digest } from '../shared/canonical.js';
@@ -9,4 +10,10 @@ export function bridgePlan(request: FinancingRequest, interval: number) {
 }
 export function assertSamePlan(saved: ReturnType<typeof bridgePlan>, current: FinancingRequest) {
  if(digest(saved.request)!==digest(current)) throw Error('Intake changed since run preparation; refuse new approval or funding');
+}
+
+export function matchedBridgePlan(request:FinancingRequest,interval:number,match:MatchProposal,now=Date.now()){
+ const base=bridgePlan(request,interval);
+ if(match.amountDrops!==request.requestedDrops||match.days!==request.requestedDays||match.availability.networkId!==4001||match.requestId!==request.clientRequestId||match.requestDigest!==request.requestDigest||match.decision!=='accepted'||match.approvals.length!==2||!match.sealHash||match.receipt?.commitmentHash!==match.sealHash||!match.receipt.authorityCheckedAt||Date.parse(match.expiresAt)<=now)throw Error('Current accepted, receipted match required');
+ return {...base,depositDrops:match.amountDrops,match:structuredClone(match)};
 }

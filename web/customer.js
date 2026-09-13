@@ -1,3 +1,4 @@
+import { mountMarket, prepareAvailability } from '/market.js';
 import { financingJourney, exactApproval, duration } from '/journey-model.mjs';
 import { journeyPanel, proofCards, operationHistory, setupSummary, authorizationGuide, trackOneEvidence, simpleProofs } from '/journey-view.mjs';
 import { WalletReadings, walletPanel } from '/wallet-panel.mjs';
@@ -52,13 +53,14 @@ let selectedLoanId = new URL(location.href).searchParams.get('request') || undef
 const pendingKey = "recognitium.synthetic-intake.pending.v1";
 const conversation=createConversation($('assistant-panel'),{
   reviewDraft: fields=>{
+    if(role()==='lender'&&state?.mode==='live'){prepareAvailability(fields);return;}
     if(pending){openRequest();return;}
     if(role()!=='borrower'||state?.mode!=='live')return;
     amountToDrops(fields.amount);openRequest();
     draft={clientRequestId:'request-'+crypto.randomUUID(),requestedDrops:amountToDrops(fields.amount),requestedDays:fields.days,purpose:fields.purpose,synthetic:true};
     showDraftReview();
   },
-  fallback: context=>{if(context.role==='borrower'&&context.mode==='live'){if(context.id){if(selected())openLoan();else openIntake(context.id);}else openRequest();}else if(context.role==='broker'){const r=activeIntake();if(r)openIntake(r.clientRequestId);else setPage('requests');}else setPage('activity');}
+  fallback: context=>{if(context.role==='lender'&&context.mode==='live'&&!context.id){prepareAvailability();return;}if(context.role==='borrower'&&context.mode==='live'){if(context.id){if(selected())openLoan();else openIntake(context.id);}else openRequest();}else if(context.role==='broker'){const r=activeIntake();if(r)openIntake(r.clientRequestId);else setPage('requests');}else setPage('activity');}
 });
 try {
   const value = JSON.parse(localStorage.getItem(pendingKey));
@@ -113,7 +115,7 @@ function activeIntake() {
   return undefined; // A new visitor must explicitly select a shared request.
 }
 function activeId() {
-  return selectedLoanId ?? activeIntake()?.clientRequestId ?? (role() === 'lender' && new URL(location.href).searchParams.get('new')!=='1' ? state?.cycle?.requestId : undefined);
+  return selectedLoanId ?? activeIntake()?.clientRequestId;
 }
 function selected() {
   if (state?.mode === 'recorded') return customerLoan(state, [], true);
@@ -191,7 +193,7 @@ function render() {
   $('role-switch').textContent = recorded ? lender ? 'Open borrower example ↗' : 'Open liquidity example ↗' : role() === 'broker' ? 'Open borrower view ↗' : 'Open reviewer view ↗';
   $('profile-label').hidden = !recorded;
   $('profile').querySelector('option[value="broker"]').hidden = recorded;
-  $('workspace-name').textContent = recorded ? 'Completed test loan' : lender ? 'Lender · Follow your capital' : borrower ? 'Borrower · Request and track' : 'Admin';
+  $('workspace-name').textContent = recorded ? 'Completed test loan' : lender ? 'Lender · Offer availability' : borrower ? 'Borrower · Request and track' : 'Admin';
   $('source-note').textContent = r?.mode === 'fixture' ? 'Simulated fixture · No live ledger result claimed' : recorded ? 'Recorded example · Real test-network transactions · Read-only' : state.hosting?.openDemo ? 'Shared demo · Test money only' : 'Local demo · Synthetic requests · Test XRP only';
   $('operator-link').href = relatedUrl('/operator',id);
   $('access-button').textContent = hasAccess() ? 'Lock workspace' : role() === 'broker' ? 'Open review inbox' : 'Open my requests';
@@ -223,6 +225,7 @@ function render() {
   $('activity-content').innerHTML = activity(r,c);
   $('advanced-link').href=relatedUrl('/operator',id);
   document.querySelectorAll('[data-intention]').forEach(b=>{if(b.dataset.intention===role())b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  let protocol=document.getElementById('section-protocol');if(!protocol){protocol=document.createElement('p');protocol.id='section-protocol';protocol.className='section-protocol';$('page-title').before(protocol);}protocol.textContent=lender?'XLS-65 · Vaults & shares':borrower?'XLS-66 · Loans & interest':'XLS-65 + XLS-66 · Review before execution';
   $('page-title').textContent=page==='overview'?(borrower?(r?'Your loan':selectedIntake?'Your request':'What do you need?'):lender?'Your lending':'Admin · Review requests'):$('page-title').textContent;
   if(role()==='broker'){
     const identity=document.createElement('section');identity.className='identity-card';
@@ -240,7 +243,7 @@ function render() {
     const explanation=panel.querySelector('.journey-lead > div > p:not(.eyebrow)');
     const progress=panel.querySelector('.lifecycle');
     const next=panel.querySelector('.next-action > div');
-    for(const node of [explanation,progress,next])if(node)details.append(node);
+    for(const node of [explanation,next])if(node)details.append(node);
     if(r){const action=panel.querySelector('.next-action');if(action)details.append(action);}
     if(story.withdrawn)panel.querySelector('h2').textContent='All done. Your loan is repaid.';
     else if(story.repaid)panel.querySelector('h2').textContent='Loan repaid.';
@@ -251,6 +254,7 @@ function render() {
   if(chatWrap.dataset.context!==chatKey){chatWrap.dataset.context=chatKey;chatWrap.open=!id;}
   document.querySelector('.conversation-layout').dataset.hasRecord=String(Boolean(id));
 
+  mountMarket(role(),state.mode,id,Boolean(r));
   conversation.update({role:role(),mode:state.mode,id,revision:selectedIntake?.revision,instanceId:state.instanceId});
   if (pending && !$('request-dialog').open) notice('A submission still needs confirmation. Open Request funding to recover the same request.',true);
   document.querySelectorAll('details:not(#assistant-wrap)').forEach(d=>{if(openDetails.has(d.querySelector('summary')?.textContent))d.open=true;});
@@ -275,8 +279,7 @@ function journeyCard(r) {
 function renderLender(r, c) {
   const { deposited, redeemed } = lenderOutcome(c);
   if (!deposited) {
-    $("overview-content").innerHTML =
-      `<section class='card next-step-card'><p class='eyebrow'>THE IDEA</p><h2>You provide money. A business borrows it.</h2><p class='subtitle'>If the business repays as agreed, you receive your contribution back plus interest. Interest is the amount paid for borrowing.</p><div class='risk-grid'><div><h3>The return is not guaranteed</h3><p>A borrower might pay late or fail to repay. You could lose money.</p></div><div><h3>Your money may be unavailable</h3><p>Money that has been lent out cannot always be withdrawn when you want it.</p></div></div><p class='plain-note'>You cannot add money through this customer demo yet. You can explore the completed test loan to see a deposit, repayment and withdrawal.</p><a class='primary button-link' href='/?mode=recorded&view=lend'>Explore the lender example →</a></section>`;
+    $("overview-content").innerHTML = '<details class="card"><summary>See a completed loan</summary><p>The recorded example shows a real test-network deposit, repayment and withdrawal.</p><a href="/lend?mode=recorded">Open evidence example →</a></details>';
     return;
   }
   $("overview-content").innerHTML =

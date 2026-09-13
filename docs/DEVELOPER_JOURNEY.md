@@ -632,3 +632,46 @@ preview has no visible chatbot; Recognitium's name is protected from automatic
 browser translation. 61 tests pass, including rejection persistence, no funding
 plan for declined intake, safe retries and uncertain-submission restart blocking.
 No new loan, receipt or real KYC assertion was created by these changes.
+
+### September 13: availability matching and readiness checklist
+
+Lender now opens with availability, not another customer's historical balance.
+Borrower can propose a match to a shared synthetic availability. The service checks
+an actual validated event ledger balance, amount and duration. Both demo roles
+approve the immutable match fingerprint; their recorded tap times are sealed in a
+second commitment. Admin has a backend-derived checklist and manual proposal
+accept/decline. Acceptance requires both approvals and a verified receipt. A
+seven-step progress bar separates matching, approvals, seal, admin, funding,
+repayment and return. KYC remains explicitly absent, not inferred from a wallet.
+
+Actual IVM search for XRP returned zero live signals. Founder approved the exact
+public demand (1 tick, 1800 seconds); publication DG-572bb9f7ec7e41b888b3900147584189
+succeeded at 09:39:48 UTC, expires 10:09:48 UTC. This is publication proof, not a
+live lender match. The shared availability is labelled local-demo. Discovery and
+receipt issuance currently use the operator's real Recognitium MCP, not browser
+Mistral tool calls. No unsupported direct IVM API was invented.
+
+Request 131184CE was matched to 100 test XRP availability for 30 days. Network
+4001 balance observed at ledger 90875: 999999984 drops. Founder approved both
+matching roles. Match receipt DG-208fc3251c6c4a64923cb035432c35b3 was issued (1 tick)
+and independently recovered by official authority lookup. Evidence is in
+[evidence/matching-131184ce.json](../evidence/matching-131184ce.json).
+The match is awaiting the admin decision. This receipt does not fund a loan.
+
+Backend review found and fixed repeated allocation of the same availability,
+multiple proposals for one request, old native requests being eligible for new
+matching, substituted lender risk in preparation, and duplicate/contradictory UI
+status. Matched bridge preparation uses the actual controlled test lender wallet,
+preserves the matched deposit amount and binds the match into the loan document.
+It checks receipt and expiry before new approvals/signing. Already signed
+transaction recovery retains the original evidence and does not re-sign.
+The new matched-loan bridge path has unit coverage, but has not yet been run end
+to end against the ledger. Existing two completed native cycles remain intact.
+
+65 automated tests pass. Chrome preview checked lender availability entry, no
+inherited loan balance, admin without chatbot, progress 3/7 and six backend
+checks. New market assets are allowed explicitly in hosted build, preview and
+local static server. The full local operator server does not expose shared market
+mutations; use the hosted-boundary preview with its authorized Blob environment.
+No Track 2 schedule refusal is claimed; the Track 1 native refusal remains the
+actual recorded tecINSUFFICIENT_FUNDS case. The manual report remains participant-written.

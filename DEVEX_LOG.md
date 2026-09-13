@@ -1013,3 +1013,9 @@ preview has no visible chatbot; Recognitium's name is protected from automatic
 browser translation. 61 tests pass, including rejection persistence, no funding
 plan for declined intake, safe retries and uncertain-submission restart blocking.
 No new loan, receipt or real KYC assertion was created by these changes.
+
+### 2026-09-13 09:51 UTC: real matching evidence and UI review
+
+IVM search XRP: zero signals. Authorized public demand DG-572bb9f7ec7e41b888b3900147584189 issued 09:39:48 UTC, expires 10:09:48 UTC, 1 tick. New local-demo availability matched request 131184CE; actual account_info at validated network 4001 ledger 90875 returned 999999984 drops. Human approved both matching roles; real seal DG-208fc3251c6c4a64923cb035432c35b3 issued and recovered by official authority lookup (1 tick). No new loan signed or funded.
+
+65 tests passed before final frontend asset/evidence tests. Browser inspection caught a new asset missing from the preview allowlist and a JS edit syntax error; both fixed before deployment. Checked Admin without chatbot, 3/7 progress, six readiness checks and manual buttons; removed contradictory waiting-for-both status after both approved. Hook explicit reflection accepted HTTP 200 at 09:51:58.806 UTC, 634 sent (625 historical hook events, 9 reflections), zero buffered. Current automatic capture remains unconfirmed in this projectless task. No manual participant report was generated.

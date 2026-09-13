@@ -1,3 +1,5 @@
+import {matchChecklist} from '../requests/matching.js';
+import { market } from './market.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -22,6 +24,32 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     checkHostedOrigin(req.headers.origin, req.headers.host);
     const url = new URL(req.url ?? '/', 'https://hosted.invalid');
     const path = url.pathname;
+    if(path==='/api/market' && (req.method==='GET'||req.method==='POST')) {
+      let command:Record<string,unknown>|undefined;
+      if(req.method==='POST'){
+        if(req.headers['content-type']!=='application/json')return reply(res,400,{error:'application/json required'});
+        try {let raw=req.body;if(raw===undefined){let wire='';for await(const chunk of req){wire+=String(chunk);if(wire.length>3000)throw Error();}raw=JSON.parse(wire);}
+          if(!raw||typeof raw!=='object'||Array.isArray(raw)||JSON.stringify(raw).length>3000)throw Error();command=raw as Record<string,unknown>;
+        }catch{return reply(res,400,{error:'Invalid market request'});}
+      }
+      try{
+        const all=await intake.list();
+        const runs=await readPublicRuns();
+        const eligible=all.filter(r=>!runs.runs.some(run=>run.requestId===r.clientRequestId));
+        if(command?.action==='match'&&!eligible.some(r=>r.clientRequestId===command!.requestId))throw Error('This request already has a native run; create a new request for matching');
+        const result=await market(command,all);
+        if(command?.action==='decision'&&command.decision==='accepted'){
+          const match=result.matches.find(m=>m.id===command!.matchId);
+          let request=(await intake.list()).find(r=>r.clientRequestId===match?.requestId);
+          if(!match||!request||request.requestDigest!==match.requestDigest)throw Error('Request changed during review');
+          if(request.status==='AWAITING_REVIEW')request=await intake.mutate(request.clientRequestId,{expectedRevision:request.revision,requestDigest:request.requestDigest,decision:'start-review'});
+          if(request.status==='UNDER_REVIEW')request=await intake.mutate(request.clientRequestId,{expectedRevision:request.revision,requestDigest:request.requestDigest,decision:'finish-review'});
+          if(request.status!=='REVIEWED')throw Error('Match saved but intake not accepted; operator must reconcile');
+        }
+        return reply(res,200,{...result,eligibleRequests:eligible,checks:Object.fromEntries(result.matches.map(m=>[m.id,matchChecklist(m,all.find(r=>r.clientRequestId===m.requestId))])),progress:Object.fromEntries(runs.runs.map(r=>[r.requestId,{funded:r.request?.funding.status==='funded',repaid:r.cycle?.steps.repay?.resultCode==='tesSUCCESS'||r.cycle?.steps['repay-late']?.resultCode==='tesSUCCESS',withdrawn:Boolean(r.cycle?.yield)}]))});
+      }
+      catch(error){return reply(res,409,{error:error instanceof Error?error.message:'Market unavailable'});}
+    }
     if(req.method==='POST' && path==='/api/assistant') {
       if(req.headers['content-type']!=='application/json')return reply(res,400,{error:'application/json required'});
       let input;

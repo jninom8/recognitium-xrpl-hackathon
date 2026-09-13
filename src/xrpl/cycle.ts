@@ -1,3 +1,4 @@
+import type {MatchProposal} from '../requests/matching.js';
 import { Wallet, type SubmittableTransaction } from 'xrpl';
 import { readFile, open } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -134,20 +135,21 @@ export class Cycle {
     await this.step(record, 'cover', native.cover(broker.address, record.loanBrokerId, record.coverDrops), broker);
     return record;
   }
-  async prepareRequest(intake?: FinancingRequest, paymentInterval = 60): Promise<unknown> {
+  async prepareRequest(intake?: FinancingRequest, paymentInterval = 60, match?:MatchProposal): Promise<unknown> {
     const r = await this.record();
     if (!r.vaultId || !r.loanBrokerId) throw new Error('Setup incomplete');
     const id = intake?.clientRequestId ?? 'synthetic-supplier-001';
     if (intake && intake.status !== 'REVIEWED') throw new Error('Reviewed intake required');
     if (!Number.isSafeInteger(paymentInterval) || paymentInterval < 60 || paymentInterval > 90*86400) throw new Error('Invalid payment interval');
+    if(match && (!intake||match.requestId!==id||match.requestDigest!==intake.requestDigest||match.availability.account!==r.accounts.lender||match.amountDrops!==r.depositDrops||match.decision!=='accepted'))throw Error('Matched lender, deposit and request must be preserved');
     const existing = await this.requests.read(id);
     if (existing) {
-      if (intake) { const bound=JSON.parse(Buffer.from(existing.documentBase64,'base64').toString('utf8')); if(digest(bound.intake)!==digest(intake) || existing.agreement.terms.paymentInterval!==paymentInterval)throw new Error('Existing offer differs from intake or duration'); }
+      if (intake) { const bound=JSON.parse(Buffer.from(existing.documentBase64,'base64').toString('utf8')); if(digest(bound.intake)!==digest(intake) || digest(bound.match??null)!==digest(match??null) || existing.agreement.terms.paymentInterval!==paymentInterval)throw new Error('Existing offer differs from intake or duration'); }
       if (r.requestId && r.requestId !== id) throw new Error('Run already bound to another request');
       r.requestId = id; await this.cycles.write('native', r);
       return this.service.view(existing);
     }
-    const document = Buffer.from(intake ? canonical({schema:'recognitium.intake-agreement.v1',synthetic:true,intake,offer:{principalDrops:intake.requestedDrops,paymentInterval,interestRate:10000,notice:paymentInterval === intake.requestedDays*86400 ? 'Requested duration preserved' : 'Explicit counter-offer: accelerated test repayment; requested duration preserved in intake'}}) : 'SYNTHETIC DEMO: a supplier requests 100 test XRP for inventory. No real invoice, business, collateral or credit decision.');
+    const document = Buffer.from(intake ? canonical({schema:'recognitium.intake-agreement.v1',synthetic:true,intake,...(match?{match}:{}),offer:{principalDrops:intake.requestedDrops,paymentInterval,interestRate:10000,notice:paymentInterval === intake.requestedDays*86400 ? 'Requested duration preserved' : 'Explicit counter-offer: accelerated test repayment; requested duration preserved in intake'}}) : 'SYNTHETIC DEMO: a supplier requests 100 test XRP for inventory. No real invoice, business, collateral or credit decision.');
     const commitment = documentCommitment(document);
     const agreement: Agreement = { schema: CONTRACT_VERSION, requestId: id, documentVersion: 1, documentCommitment: commitment.hash,
       synthetic: true, network: r.network, accounts: r.accounts, vaultId: r.vaultId, loanBrokerId: r.loanBrokerId, asset: 'XRP',

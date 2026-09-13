@@ -1,0 +1,56 @@
+{
+  "schema": "recognitium.match-demo-evidence.v1",
+  "synthetic": true,
+  "description": "Real event-ledger balance observation and real Recognitium receipt. Human-authorized demo role taps, not authenticated identity signatures. Local availability, not a discovered IVM offer. No new loan funded in this evidence.",
+  "match": {
+    "balance": {
+      "requestId": "request-131184ce-3d73-4558-bdcb-7d7347cd84a1",
+      "account": "r948D7CpTuzAAEtrVUShTTYYtYkCRvPiqh",
+      "networkId": 4001,
+      "serverBuild": "3.4.0-rc1",
+      "ledgerIndex": 90875,
+      "ledgerHash": "84B8920C2EB463BBD7BB495EFD2EE3A50FB7DD057EE0640211C63EFB6E1A257B",
+      "balanceDrops": "999999984",
+      "checkedAt": "2026-09-13T09:45:43.354Z"
+    },
+    "requestId": "request-131184ce-3d73-4558-bdcb-7d7347cd84a1",
+    "requestDigest": "300c2f56b6023f0299d15365139089f725672af2b557d89cffbe755c875cfcec",
+    "availability": {
+      "account": "r948D7CpTuzAAEtrVUShTTYYtYkCRvPiqh",
+      "amountDrops": "100000000",
+      "maxDays": 30,
+      "expiresAt": "2026-09-13T10:14:52.177Z",
+      "source": "local-demo",
+      "networkId": 4001,
+      "synthetic": true,
+      "id": "e845b4b876c6a24f1144f4398f919a58ee0dc17718f61b117064cb2bc0821963"
+    },
+    "amountDrops": "100000000",
+    "days": 30,
+    "expiresAt": "2026-09-13T10:14:52.177Z",
+    "id": "b20a389ffb7cc96ef7a79daf5aba63beb1207e0dd3638a4b8cdf4226e8fce814",
+    "approvals": [
+      "borrower",
+      "lender"
+    ],
+    "approvalTimes": {
+      "borrower": "2026-09-13T09:46:19.136Z",
+      "lender": "2026-09-13T09:46:19.931Z"
+    },
+    "decision": "pending",
+    "sealHash": "fdcdf0be595aa125ff33897de22e593251b67dfb2fc6a1671ba199887e9a6e0e",
+    "receipt": {
+      "receiptId": "DG-208fc3251c6c4a64923cb035432c35b3",
+      "commitmentHash": "fdcdf0be595aa125ff33897de22e593251b67dfb2fc6a1671ba199887e9a6e0e",
+      "authorityCheckedAt": "2026-09-13T09:46:35.179Z"
+    }
+  },
+  "receiptVerificationWire": "{\"verified\":true,\"checks\":{\"field_presence\":{\"passed\":true,\"detail\":\"All required fields present\"},\"hex_format\":{\"passed\":true,\"detail\":\"All hex fields are valid 64-character strings\"},\"timestamp\":{\"passed\":true,\"detail\":\"Nanosecond timestamp: 1789292785404731777\"},\"chain_hash\":{\"passed\":true,\"detail\":\"SHA-256(prev_tip || fingerprint || payload_hash || timestamp_ns) matches new_tip\"},\"chain_seal\":{\"passed\":true,\"code\":\"chain_seal_ok\",\"detail\":\"Chain seal verified — the fingerprint is bound into this tip by the chain formula. This is a SHA-256 chain check, not a digital signature; authenticity of the authority comes from chain lineage, not from a key.\"},\"authority_signature\":{\"passed\":true,\"code\":\"chain_seal_ok\",\"detail\":\"Chain seal verified — the fingerprint is bound into this tip by the chain formula. This is a SHA-256 chain check, not a digital signature; authenticity of the authority comes from chain lineage, not from a key.\",\"deprecated\":\"renamed to `chain_seal`; branch on `code`, never on `detail`\"},\"tier_binding\":{\"passed\":true,\"detail\":\"entropy_tier 'csprng-512' is sealed into payload_hash (BHB-TIER-BIND-v1)\"},\"chain_continuity\":{\"passed\":true,\"detail\":\"Receipt chain link is internally consistent\"}},\"formula\":\"SHA-256(prev_tip || fingerprint || payload_hash || timestamp_ns)\",\"verification_timestamp_iso\":\"2026-09-13T09:51:57Z\",\"receipt_id\":\"DG-208fc3251c6c4a64923cb035432c35b3\",\"receipt\":{\"receipt_id\":\"DG-208fc3251c6c4a64923cb035432c35b3\",\"sequence_number\":168997,\"prev_tip\":\"e5bbc3c9e3d27b7ffd011c87c492867a98a172cf1da016f043f46739df302efd\",\"new_tip\":\"269657d4becf87c55640a39eb06d66c5b2746b1b9f850fd557fa6defe7b0da4b\",\"fingerprint\":\"462c185e830f680454c971b0ac7bdcda6ccae1cdfe79c83e1a7d361298c18be4\",\"payload_hash\":\"49a325483531a5abcea5777f7fefb533d35fd6d85301fb71e8899ef231104bd2\",\"key_id\":\"key_6611323a4860\",\"timestamp_ns\":\"1789292785404731777\",\"timestamp\":\"2026-09-13T09:46:25Z\",\"entropy_tier\":\"csprng-512\",\"content_hash\":\"fdcdf0be595aa125ff33897de22e593251b67dfb2fc6a1671ba199887e9a6e0e\",\"binding\":\"BHB-TIER-BIND-v1\"}}",
+  "ivmDemand": {
+    "receiptId": "DG-572bb9f7ec7e41b888b3900147584189",
+    "publishedAt": "2026-09-13T09:39:48Z",
+    "expiresAt": "2026-09-13T10:09:48Z",
+    "kind": "demand",
+    "costTicks": 1
+  }
+}
