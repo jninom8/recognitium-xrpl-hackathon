@@ -10,12 +10,13 @@ export interface FinancingInput {
 export type ReviewDecision =
   | "start-review"
   | "request-revision"
-  | "finish-review";
+  | "finish-review"
+  | "reject-request";
 export interface FinancingRequest extends FinancingInput {
   schema: "recognitium.intake.v1";
   requestDigest: string;
   revision: number;
-  status: "AWAITING_REVIEW" | "UNDER_REVIEW" | "NEEDS_REVISION" | "REVIEWED";
+  status: "AWAITING_REVIEW" | "UNDER_REVIEW" | "NEEDS_REVISION" | "REVIEWED" | "REJECTED";
   createdAt: string;
   updatedAt: string;
   history: {

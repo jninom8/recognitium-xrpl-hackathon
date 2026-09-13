@@ -7,7 +7,17 @@ import {
   intakeReviewMatches,
   intakeStates,
   customerLoan,
+  restartDemoUrl,
 } from "../web/customer-model.mjs";
+test('restart clears selection only and refuses to abandon uncertain or active submissions',()=>{
+  const current='https://demo.invalid/lend?mode=recorded&request=saved&view=lend';
+  const reset=new URL(restartDemoUrl(current));
+  assert.equal(reset.origin,'https://demo.invalid');assert.equal(reset.pathname,'/lend');
+  assert.equal(reset.searchParams.get('mode'),'live');assert.equal(reset.searchParams.get('new'),'1');
+  assert.equal(reset.searchParams.has('request'),false);
+  assert.throws(()=>restartDemoUrl(current,true),/submission/);
+  assert.throws(()=>restartDemoUrl(current,false,true),/submission/);
+});
 
 test("customer amounts remain exact and pending receipts do not hide received funds", () => {
   assert.equal(amountToDrops("100.000001"), "100000001");

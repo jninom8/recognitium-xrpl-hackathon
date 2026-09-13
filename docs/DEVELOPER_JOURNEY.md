@@ -613,3 +613,22 @@ endpoints; both returned HTTP 200 during this check. The cards distinguish saved
 XRPL confirmation from receipt authority, including failed and pending states.
 Nine presentation tests passed and the hosted build passed. No loan, signature
 or new receipt was created in this UI change.
+
+### September 13: admin review, friendly colours and clean restart
+
+Navigation is Borrower / Lender / Admin. Admin has no chatbot and keeps the
+wallet/identity card visible beside the separate receipt and XRPL proofs. The
+actual KYC commitment remains not provided: no KYC provider was added. Intake
+can be accepted for offer preparation, returned for revision, or declined.
+Decline is a durable REJECTED state; retry is idempotent and bridge preparation
+refuses it. This application decline is not the native refusal used for Track 1.
+
+Borrower uses a quiet peach accent and lender uses lavender. Restart demo clears
+the selection and conversation through a fresh page, retaining all saved records
+and session AI limits. It refuses to abandon a pending or active submission.
+Chrome checked lender restart: no selected loan, chat open, and both existing
+native records still selectable. Fixed old-loan fallback after restart. Admin
+preview has no visible chatbot; Recognitium's name is protected from automatic
+browser translation. 61 tests pass, including rejection persistence, no funding
+plan for declined intake, safe retries and uncertain-submission restart blocking.
+No new loan, receipt or real KYC assertion was created by these changes.

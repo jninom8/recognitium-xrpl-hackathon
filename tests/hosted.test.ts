@@ -18,6 +18,18 @@ class Database implements IntakeDatabase {
   }
 }
 const example = () => ({clientRequestId:'request-'+randomUUID(),requestedDrops:'100000001',requestedDays:30,purpose:'inventory',synthetic:true});
+test('declined intake persists, retries safely, and cannot become a loan plan',async()=>{
+  const {bridgePlan}=await import('../src/bridge/plan.js');
+  const db=new Database(),service=new HostedIntake(db);
+  let r=await service.mutate(undefined,example());
+  r=await service.mutate(r.clientRequestId,{expectedRevision:r.revision,requestDigest:r.requestDigest,decision:'start-review'});
+  const decision={expectedRevision:r.revision,requestDigest:r.requestDigest,decision:'reject-request'};
+  r=await service.mutate(r.clientRequestId,decision);
+  assert.equal(r.status,'REJECTED');assert.equal(r.history.at(-1)?.event,'reject-request');
+  const writes=db.writes;assert.equal((await service.mutate(r.clientRequestId,decision)).status,'REJECTED');assert.equal(db.writes,writes);
+  assert.throws(()=>bridgePlan(r,60),/Reviewed/);
+  await assert.rejects(service.mutate(r.clientRequestId,{expectedRevision:r.revision,requestDigest:r.requestDigest,decision:'finish-review'}),/no longer available/);
+});
 test('hosted CAS reconciles concurrent requests and a committed write with a lost response', async () => {
   const db = new Database(), a = new HostedIntake(db), b = new HostedIntake(db);
   const first = example(), second = example();

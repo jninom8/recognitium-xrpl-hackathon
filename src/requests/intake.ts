@@ -93,7 +93,7 @@ export class IntakeService {
       !Number.isSafeInteger(raw.expectedRevision) ||
       typeof raw.requestDigest !== "string" ||
       typeof raw.decision !== "string" ||
-      !["start-review", "request-revision", "finish-review"].includes(
+      !["start-review", "request-revision", "finish-review", "reject-request"].includes(
         raw.decision,
       )
     )
@@ -119,7 +119,7 @@ export class IntakeService {
         ? "UNDER_REVIEW"
         : decision === "request-revision"
           ? "NEEDS_REVISION"
-          : "REVIEWED";
+          : decision === "reject-request" ? "REJECTED" : "REVIEWED";
     request.revision++;
     request.updatedAt = new Date().toISOString();
     request.lastReviewDigest = reviewDigest;

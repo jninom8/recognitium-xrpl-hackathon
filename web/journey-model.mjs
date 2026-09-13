@@ -56,6 +56,8 @@ export function financingJourney({ request: r, intake, cycle, bridge, mode = 'li
     title = 'Review complete. Offer comes next.'; focus = 2;
     description = 'The business request has been reviewed. No loan has been funded from this request.';
     next = 'The local operator prepares an offer from this reviewed request. Both roles then approve its exact terms.'; owner = 'Local operator';
+  } else if (intake?.status === 'REJECTED') {
+    title='Request declined.';description='The admin declined this request. No loan was created.';next='You can make a new request.';owner='Borrower';focus=1;tone='amber';
   } else if (intake?.status === 'NEEDS_REVISION') {
     title = 'A revised request is needed.'; focus = 1; tone = 'amber';
     description = 'The reviewer asked for different details. The original request remains saved.';

@@ -22,6 +22,7 @@ export const intakeStates = {
       "The review team needs a different request. You can send a new request with updated details; it will be reviewed separately.",
     tone: "amber",
   },
+  REJECTED: {label:"Request declined",description:"The admin declined this request. No loan was created.",tone:"amber"},
   REVIEWED: {
     label: "Review complete",
     description:
@@ -146,4 +147,10 @@ export function customerLoan(snapshot, requests, example = false) {
 /** Only the latest inbox response for the current role and mode may be applied. */
 export function currentInboxResponse(ticket, latest, session, active, mode) {
   return ticket === latest && session === active && mode === "live";
+}
+
+/** Reset only browser navigation. Never abandon an uncertain intake. */
+export function restartDemoUrl(currentUrl,pending=false,sending=false){
+  if(pending||sending)throw Error('A submission needs checking first. Open Borrower to recover it.');
+  const url=new URL(currentUrl);url.searchParams.delete('request');url.searchParams.delete('view');url.searchParams.set('mode','live');url.searchParams.set('new','1');return url.href;
 }
