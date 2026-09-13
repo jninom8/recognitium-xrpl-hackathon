@@ -784,3 +784,18 @@ transactions. No metered receipt issuance. Hook flush 02:53:39.611 UTC: HTTP 200
 26 accepted, 617 cumulative, zero remaining. No raw logs or identity/invite exposed.
 These are author-operated observations, not independent reproduction or the manual
 participant report. Fresh 600-XRP offer remains expired, unsigned and unfunded.
+
+## September 13, 07:06 UTC: offline verification and retention proposal
+
+`node dist/scripts/verify-bundle.js evidence/synthetic-supplier-001.json` passed
+contentHash consistent, signatures both-valid and receiptChainHash consistent;
+receiptAuthority and xrplValidation both require online lookup. No reset simulated
+or observed. Reviewed XLS-41/XPOP and XLS-66, and recorded evidence-retention and
+broker-gate boundaries in docs/DEVNET_EVIDENCE_RETENTION.md. No ledger write,
+receipt issuance or protocol implementation change.
+
+Privacy-filtered hook status at 07:06:07.258 UTC: version 2.4.0, registered,
+625 cumulative sent, zero buffered. Flush sent zero events (status 0 means no
+HTTP delivery was needed). Last lifecycle delivery remained 02:58:15.849 UTC,
+eight accepted. This checkpoint does not prove new capture from the current
+projectless working context. The participant report remains unwritten by the agent.

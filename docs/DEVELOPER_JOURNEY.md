@@ -418,3 +418,14 @@ Hook 2.4.0 accepted 26 actual captured events at 02:53:39 UTC with HTTP 200;
 617 cumulative, zero buffered at that checkpoint. This is implementation evidence,
 not the official participant-written report. No new signing, receipt issuance,
 loan transfer or public signal occurred during this UI milestone.
+
+## September 13, 09:06 Paris: what survives a devnet reset
+
+Re-ran the original bundle verifier offline: document/signatures/receipt consistency
+passed, while receipt authority and XRPL validation explicitly require online
+checks. No event-network reset was observed. Reviewed the organiser archive idea
+and found XLS-41 (XPOP), which specifies stronger offline ledger proofs than our
+saved JSON currently supplies. Also corrected the proposed private-vault credential
+gate: depositor access does not automatically enforce an exact sealed borrower
+agreement. See [DEVNET_EVIDENCE_RETENTION.md](DEVNET_EVIDENCE_RETENTION.md).
+This is research and a proposal, not a new implementation or the manual report.
