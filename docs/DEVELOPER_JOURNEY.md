@@ -695,3 +695,9 @@ The interface audit removed the obsolete operator-console links and duplicate fo
 The two earlier native cycles remain demonstrable as saved evidence. A fresh matched cycle is still pending environment resolution and the local operator bridge. Browser-only execution, automated IVM discovery and actual KYC remain gaps. The UI should never imply those capabilities by hiding the operator step.
 
 Synthetic identity example added after the founder asked how KYC relates to the agreement. The fixture demonstrates a request-and-wallet-bound commitment, not KYC truth. New native agreement preparation includes that commitment; historical signed loans are untouched. Read-only preview was checked in Chrome. Changed profile/request/wallet tests reject the original binding. No additional ledger transaction or receipt issuance occurred.
+
+## Security observation and coordination boundaries
+
+Our limited hackathon tests did not identify a break in XRPL cryptography. This is not an independent cryptographic or security audit, and absence of a discovered flaw is not evidence of absence. The failures we actually observed concerned integration, coordination and state recovery: conflicting environment assumptions, deployment dependencies, exact-version approval and recovery after uncertain outcomes. Our application must preserve the link between the approved information and validated execution. A final ledger transaction does not make an off-ledger claim true or establish legal finality.
+
+We do not claim that quantum computing is the only remaining risk, that key protection alone ensures application security, or that Recognitium increases XRPL consensus throughput. The design goal is to keep application-specific documents and negotiation history outside the public settlement path while retaining verifiable commitments.
