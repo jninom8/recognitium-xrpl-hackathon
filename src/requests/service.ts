@@ -1,4 +1,5 @@
 import { decode, type LoanSet, type Wallet } from 'xrpl';
+import {assertIdentityBinding} from '../shared/identity-fixture.js';
 import { CONTRACT_VERSION, type Agreement, type Approval, type ReceiptEvidence, type RequestView, type Role } from '../shared/contract.js';
 import { assertAgreement, canonical, digest, documentCommitment } from './commitment.js';
 import { Store } from './store.js';
@@ -24,6 +25,7 @@ export class LendingService {
   }
   async create(agreement: Agreement, document: Uint8Array, salt: string, prepare: (tx: LoanSet) => Promise<LoanSet>): Promise<RequestView> {
     assertAgreement(agreement);
+    assertIdentityBinding(agreement.identity,document,agreement.requestId,agreement.accounts.borrower);
     if (await this.store.read(agreement.requestId)) throw new Error('Request already exists; use a new request ID for a revision');
     if (documentCommitment(document, salt).hash !== agreement.documentCommitment) throw new Error('Document commitment mismatch');
     const agreementHash = digest(agreement);
@@ -38,6 +40,7 @@ export class LendingService {
     await this.store.write(agreement.requestId, r); return this.view(r);
   }
   private assertContent(r: PrivateRequest, requireUnexpired = true): void {
+    assertIdentityBinding(r.agreement.identity,Buffer.from(r.documentBase64,'base64'),r.agreement.requestId,r.agreement.accounts.borrower);
     if (requireUnexpired) assertAgreement(r.agreement);
     if (digest(r.agreement) !== r.agreementHash || digest(r.preparedTransaction) !== r.transactionDigest) throw new Error('Changed agreement or transaction');
     if (documentCommitment(Buffer.from(r.documentBase64, 'base64'), r.documentSalt).hash !== r.agreement.documentCommitment) throw new Error('Changed document');

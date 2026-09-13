@@ -40,6 +40,7 @@ export interface Agreement {
   requestId: string;
   documentVersion: number;
   documentCommitment: string;
+  identity?: {commitment:string;wallet:string;synthetic:true};
   synthetic: boolean;
   network: NetworkIdentity;
   accounts: { lender: string; broker: string; borrower: string };

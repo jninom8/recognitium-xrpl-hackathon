@@ -1,4 +1,5 @@
 import {readTrackEnvironment} from './environment.js';
+import {previewIdentityFixture} from '../shared/identity-fixture.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { timingSafeEqual } from 'node:crypto';
@@ -49,6 +50,7 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
+    if(req.method==='GET'&&path==='/api/identity-fixture')return respond(res,200,previewIdentityFixture());
     if(req.method==='GET'&&path==='/api/environment'){try{return respond(res,200,await readTrackEnvironment());}catch{return respond(res,503,{canOriginate:false,reason:'Event configuration unavailable; new loans stay blocked'});}}
 
     if(req.method==='POST' && path==='/api/assistant') {

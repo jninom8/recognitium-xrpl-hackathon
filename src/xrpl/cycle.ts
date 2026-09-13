@@ -1,4 +1,5 @@
 import type {MatchProposal} from '../requests/matching.js';
+import {identityFixture} from '../shared/identity-fixture.js';
 import { Wallet, type SubmittableTransaction } from 'xrpl';
 import { readFile, open } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -151,14 +152,17 @@ export class Cycle {
       return this.service.view(existing);
     }
     const document = Buffer.from(intake ? canonical({schema:'recognitium.intake-agreement.v1',synthetic:true,intake,...(match?{match}:{}),offer:{principalDrops:intake.requestedDrops,paymentInterval,interestRate:10000,notice:paymentInterval === intake.requestedDays*86400 ? 'Requested duration preserved' : 'Explicit counter-offer: accelerated test repayment; requested duration preserved in intake'}}) : 'SYNTHETIC DEMO: a supplier requests 100 test XRP for inventory. No real invoice, business, collateral or credit decision.');
-    const commitment = documentCommitment(document);
+    const identity = identityFixture(id,r.accounts.borrower);
+    const boundDocument = Buffer.from(canonical({schema:'recognitium.identity-agreement.v1',identity,agreementDocument:document.toString('utf8'),...(intake?{intake}:{}),...(match?{match}:{})}));
+    const commitment = documentCommitment(boundDocument);
     const agreement: Agreement = { schema: CONTRACT_VERSION, requestId: id, documentVersion: 1, documentCommitment: commitment.hash,
+      identity:{commitment:identity.commitment,wallet:r.accounts.borrower,synthetic:true},
       synthetic: true, network: r.network, accounts: r.accounts, vaultId: r.vaultId, loanBrokerId: r.loanBrokerId, asset: 'XRP',
       terms: { principalDrops: intake?.requestedDrops ?? '100000000', interestRate: 10000, paymentTotal: 1, paymentInterval, gracePeriod: 60,
         originationFeeDrops: '0', serviceFeeDrops: '0', latePaymentFeeDrops: '0', closePaymentFeeDrops: '0',
         overpaymentFee: 0, lateInterestRate: 0, closeInterestRate: 0, overpaymentInterestRate: 0, flags: 0 },
       expiresAt: new Date(Date.now() + 3600000).toISOString(), policyVersion: 'human-exact-approval.v1' };
-    const view = await this.service.create(agreement, document, commitment.salt, async tx => {
+    const view = await this.service.create(agreement, boundDocument, commitment.salt, async tx => {
       const prepared = await this.adapter.prepareLoan(tx);
       // Review window is 200 ledgers; the exact bound is part of human approval.
       prepared.LastLedgerSequence = (await this.adapter.ledgerIndex()) + 200;
