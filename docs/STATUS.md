@@ -587,3 +587,5 @@ Simplified demo screens: removed generic Details and Ask a question panels from 
 Removed the Saved rounds selector for the sequential demo. Current request stays selected across roles; Transactions & evidence and Reset remain available. Hosted build passed.
 
 Pitch v5: added eighth closing slide inspired by Kocherlakota, Money is Memory (1996 / JET 1998), verified against the Minneapolis Fed abstract. Distinguishes the model theorem from the application analogy and avoids claims of perfect or unerasable memory. Eight-slide package/layout passed; closing slide visually inspected.
+
+Sequential matching UI: borrower now displays only its selected request and automatically uses the saved demo lender availability, preferring the offer saved in this browser. Removed both dropdowns. Expired or already-matched offers are excluded; incompatible amounts/durations disable proposal. Unsaved defaults never count as a real offer. Hosted build and JavaScript parse check passed.
