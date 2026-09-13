@@ -1,4 +1,5 @@
 import {Wallet} from 'xrpl';
+import {advanceAutomaticRound} from '../src/xrpl/automatic-round.js';
 import type {MatchProposal} from '../src/requests/matching.js';
 import {digest} from '../src/shared/canonical.js';
 import { join } from 'node:path';
@@ -11,7 +12,7 @@ import { requestView, cycleView } from '../src/server/dashboard.js';
 import { publishRun } from '../src/hosted/runs.js';
 const [action,id,...args]=process.argv.slice(2);
 if(!id || !/^request-[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(id))throw Error('Usage: bridge ACTION exact-request-UUID [arguments]');
-const allowed=['prepare','view','receipt-intent','approve','recover','sign','submit','repay','withdraw','refusal','publish'];
+const allowed=['prepare','view','receipt-intent','approve','recover','sign','submit','repay','withdraw','refusal','publish','automatic'];
 if(!action || !allowed.includes(action))throw Error('Unsupported bridge action');
 const root=join('data','runs',id), plans=new Store<ReturnType<typeof bridgePlan>&{match?:MatchProposal}>(root);
 const release=await processLock(root), adapter=new NativeAdapter(true);adapter.client.on('error',()=>{});
@@ -52,6 +53,11 @@ try {
   // Never let changed public intake authorize a new approval/signature/send.
   // Recovery of an already-signed transaction remains possible after change.
   const stored=await cycle.requests.read(id);
+  if(action==='automatic'){
+   if(!stored||args[0]!==stored.agreementHash||args[1]!==stored.transactionDigest)throw Error('Queue does not match local agreement');
+   if(!stored.signed){assertSamePlan(plan,await current());if(plan.match){const matches=(await currentMatch()).filter(m=>m.decision!=='declined');if(matches.length!==1||digest(matches[0])!==digest(plan.match)||Date.parse(plan.match.expiresAt)<=Date.now())throw Error('Match changed or expired');await cycle.receipts.recover(plan.match.receipt!.receiptId,plan.match.sealHash!);}}
+   await adapter.connect();console.log('AUTOMATIC_STAGE '+await advanceAutomaticRound(cycle));
+  }
   if(['approve','sign'].includes(action)||(action==='submit'&&stored?.phase==='SIGNED')){
    assertSamePlan(plan,await current());
    if(plan.match&&action!=='submit'){const currentMatches=(await currentMatch()).filter(m=>m.decision!=='declined');if(currentMatches.length!==1||digest(currentMatches[0])!==digest(plan.match)||Date.parse(plan.match.expiresAt)<=Date.now())throw Error('Match changed or expired before new funding');await cycle.receipts.recover(plan.match.receipt!.receiptId,plan.match.sealHash!);}

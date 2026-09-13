@@ -1,5 +1,6 @@
 import {receiptRegister} from './receipt-register.js';
 import {storyProof} from './story-proof.js';
+import {enqueue,runnerStatus} from './execution-queue.js';
 import {previewIdentityFixture} from '../shared/identity-fixture.js';
 import {readTrackEnvironment} from '../server/environment.js';
 import {matchChecklist} from '../requests/matching.js';
@@ -28,6 +29,19 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     checkHostedOrigin(req.headers.origin, req.headers.host);
     const url = new URL(req.url ?? '/', 'https://hosted.invalid');
     const path = url.pathname;
+    if(req.method==='GET'&&path==='/api/runner')return reply(res,200,await runnerStatus());
+    const execution=/^\/api\/requests\/(request-[a-f0-9-]{36})\/run$/.exec(path);
+    if(req.method==='POST'&&execution){
+      if(req.headers['content-type']!=='application/json')throw Error('application/json required');
+      let input=req.body;if(input===undefined){let wire='';for await(const chunk of req){wire+=String(chunk);if(wire.length>2000)throw Error('Request too large');}input=JSON.parse(wire);}
+      const body=input as {agreementHash?:string;transactionDigest?:string};
+      const run=(await readPublicRuns()).runs.find(r=>r.requestId===execution[1]);const r=run?.request;
+      if(!r||body.agreementHash!==r.agreementHash||body.transactionDigest!==r.transactionDigest)return reply(res,409,{error:'Exact prepared loan required'});
+      if(!['broker','borrower'].every(role=>r.approvals.some(a=>a.role===role&&a.agreementHash===r.agreementHash&&a.transactionDigest===r.transactionDigest)))return reply(res,409,{error:'Both exact loan approvals required'});
+      if(!r.transaction&&Date.parse(r.agreement.expiresAt)<=Date.now())return reply(res,409,{error:'Exact approvals expired'});
+      if(!(await runnerStatus()).connected)return reply(res,503,{error:'Local runner is offline'});
+      return reply(res,202,await enqueue({requestId:execution[1]!,agreementHash:r.agreementHash,transactionDigest:r.transactionDigest,status:'queued',updatedAt:new Date().toISOString()}));
+    }
     if(req.method==='GET'&&path==='/api/story-proof')return reply(res,200,await storyProof());
     if(req.method==='GET'&&path==='/api/identity-fixture')return reply(res,200,previewIdentityFixture());
     if(req.method==='GET'&&path==='/api/receipts'){try{return reply(res,200,await receiptRegister());}catch{return reply(res,503,{error:'Receipt index unavailable; saved evidence is retained'});}}

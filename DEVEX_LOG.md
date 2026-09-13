@@ -1061,3 +1061,5 @@ Automatic local runner implementation: 73 tests pass; build:hosted and customer.
 Automatic story replay deployed: read-only /api/story-proof verifies exact agreement and execution receipt hashes. Both authority checks passed online. No new loan or receipt issued by playback. Pitch v7 closing links verified visually; 73 tests pass.
 
 Admin execution button wired to local authenticated request/run endpoint. Public hosting limitation is visible, not simulated success. No fresh ledger execution claimed.
+
+Public-to-local round-trip check passed: /api/runner connected=true; completed loan 1708833C queued through public API, consumed locally, status complete. Chrome confirms runner connection. No new loan or receipt issued. 73 tests/build pass. Outbound queue keeps signing seeds off Vercel.

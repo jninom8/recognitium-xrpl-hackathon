@@ -265,7 +265,7 @@ function render() {
   if(role()==='broker' && state.mode==='live' && (r || selectedIntake?.status==='REVIEWED')) {
     const ready=r && exactApproval(r,'broker') && exactApproval(r,'borrower');
     const complete=Boolean(c?.yield);
-    const reason=complete?'This round is complete. Its receipts remain verifiable.':state.hosting?'The public site is not connected to the local execution runner.':!r?'Prepare the exact loan offer first.':!ready?'Borrower and broker must approve the exact loan terms first.':'One click runs the remaining steps for this approved round.';
+    const reason=complete?'This round is complete. Its receipts remain verifiable.':state.hosting?'Checking the local execution runner…':!r?'Prepare the exact loan offer first.':!ready?'Borrower and broker must approve the exact loan terms first.':'One click runs the remaining steps for this approved round.';
     const box=document.createElement('section');box.className='card';
     box.innerHTML='<h2>Finish this loan</h2><p>'+esc(reason)+'</p><ol>'+[
       [Boolean(r?.agreementReceipt),'Seal the approved agreement'],
@@ -276,6 +276,7 @@ function render() {
       [complete,'Return capital and realised yield to the lender']
     ].map(([done,label])=>'<li>'+(done?'✓ ':'○ ')+label+'</li>').join('')+'</ol><button class="primary" id="run-approved-loan" '+(!ready||state.hosting||complete?'disabled':'')+'>Run approved loan</button><p id="run-approved-status" aria-live="polite"></p>'+[r?.agreementReceipt,r?.executionReceipt].filter(Boolean).map(p=>'<p><a target="_blank" rel="noopener" href="https://www.recognitium.com/verify?id='+encodeURIComponent(p.receiptId)+'">Verify receipt '+esc(p.receiptId)+' ↗</a></p>').join('');
     $('overview-content').append(box);
+    if(state.hosting)void fetch('/api/runner').then(x=>x.ok?x.json():null).then(x=>{if(!box.isConnected)return;box.querySelector('p').textContent=x?.connected?'Local runner connected. Exact approvals are checked again before execution.':'Local runner offline. Keep the operator computer running.';box.querySelector('button').disabled=!x?.connected||!ready||complete;}).catch(()=>{box.querySelector('p').textContent='Runner connection unavailable.';});
     box.querySelector('button').onclick=async()=>{
       const button=box.querySelector('button'),status=box.querySelector('#run-approved-status');button.disabled=true;
       try{const response=await fetch('/api/requests/'+encodeURIComponent(id)+'/run',{method:'POST',headers:{'Content-Type':'application/json',...(access.token?{Authorization:'Bearer '+access.token}:{})},body:JSON.stringify({agreementHash:r.agreementHash,transactionDigest:r.transactionDigest}),signal:AbortSignal.timeout(15000)});
