@@ -59,8 +59,20 @@ test('real published backend projection passes through the same presentation use
   const view=financingJourney({request:r,cycle:s.cycle,mode:s.mode,now});
   assert.equal(view.withdrawn,true);assert.equal(view.receiptPending,false);
   const html=journeyPanel({request:r,cycle:s.cycle,mode:s.mode,now});assert.match(html,/Loan complete/);
+  const proof=proofCards(r,s.mode,'/operator');
+  assert.match(proof,/Funding confirmed/);assert.match(proof,/offline hash match is not enough/);
+  assert.match(proof,/Offline consistency does not independently prove ledger inclusion/);
   const history=ledgerHistory(r,s.cycle);assert.ok(history.some(e=>e.id==='cover'));assert.ok(history.some(e=>e.id==='refusal'));
   assert.equal(s.cycle.yield.realisedYieldDrops,'20');
   const wire=JSON.stringify(s);for(const privateField of ['"seed"','"documentBase64"','"documentSalt"','"signedBlob"'])assert.equal(wire.includes(privateField),false);
   for(const file of ['journey-model.mjs','journey-view.mjs','journey.css'])assert.match(await readFile('scripts/build-hosted.mjs','utf8'),new RegExp(file.replaceAll('.','\\.')));
+});
+test('a receipt without a valid authority observation never becomes an authenticated source in the UI',()=>{
+  const r=request();r.funding.status='funded';
+  for(const authorityCheckedAt of [undefined,'','not-a-time']) {
+    r.executionReceipt={receiptId:'explicit-fixture',authorityCheckedAt};
+    const html=proofCards(r,'recorded','/operator');
+    assert.match(html,/Authority check pending/);assert.doesNotMatch(html,/Authority check recorded/);
+    assert.match(html,/Funding confirmed/);assert.doesNotMatch(html,/Invalid Date/);
+  }
 });

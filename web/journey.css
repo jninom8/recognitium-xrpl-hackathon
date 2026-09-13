@@ -52,6 +52,29 @@
 .queue-metrics strong { font-size:24px; color:#584271; margin-right:9px; }
 .queue-metrics span { font-size:12px; color:#625c6d; }
 .shared-route { font-size:12px; color:#53685b; line-height:1.6; margin:16px 0; }
+.authorization-guide { padding:24px; margin:26px 0; border:1px solid #dce6df; border-radius:20px; background:#fff; }
+.authorization-guide .section-heading { margin:0 0 12px; align-items:center; gap:12px; }
+.authorization-guide h2 { margin:0; font-size:23px; }
+.authorization-guide .eyebrow { font-size:10px; margin:0 0 8px; }
+.guide-label { background:#eef5ef; color:#326651; padding:7px 10px; border-radius:20px; font-size:11px; white-space:nowrap; }
+.guide-intro { color:#59675f; font-size:13px; line-height:1.7; margin:0 0 18px; }
+.authority-flow { list-style:none; padding:0; margin:0 0 20px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.authority-flow li { display:flex; gap:10px; background:#f1f7f3; padding:17px 13px; border-radius:14px; }
+.authority-flow li:nth-child(2) { background:#f2eef8; }
+.authority-flow li:nth-child(3) { background:#edf4fb; }
+.authority-flow li>span { flex:0 0 23px; width:23px; height:23px; border-radius:50%; background:#ffffffc9; text-align:center; line-height:23px; color:#4a5a52; font-size:11px; }
+.authority-flow h3 { font-size:13px; margin:3px 0 8px; }
+.authority-flow p { font-size:12px; line-height:1.65; margin:0; color:#59675f; }
+.authorization-guide details,.evidence-limits { font-size:12px; line-height:1.75; color:#53635b; }
+.authorization-guide summary,.evidence-limits summary { cursor:pointer; font-weight:600; color:#345b49; }
+.evidence-limits { padding:17px 20px; margin:14px 0 24px; background:#f7f8fb; border:1px solid #e3e6ef; border-radius:14px; }
+.verification-table-wrap { overflow-x:auto; }
+.evidence-limits table { border-collapse:collapse; width:100%; margin:14px 0; font-size:12px; }
+.evidence-limits caption { text-align:left; padding-bottom:10px; color:#4b5b64; font-weight:600; }
+.evidence-limits th,.evidence-limits td { text-align:left; padding:11px; border-bottom:1px solid #dde3e9; vertical-align:top; }
+.evidence-limits tbody th { width:45%; font-weight:500; }
+@media(max-width:850px) { .authority-flow { grid-template-columns:1fr; } }
+@media(max-width:600px) { .authorization-guide { padding:20px 18px; } .authorization-guide .section-heading { align-items:flex-start; flex-direction:column; } .evidence-limits { padding:15px; } }
 .wallet-panel { border:1px solid #dce5ed; border-radius:22px; padding:24px; margin:26px 0; background:linear-gradient(120deg,#edf4fb,#fff); }
 .wallet-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .wallet-heading h2 { font-size:24px; margin:0; }

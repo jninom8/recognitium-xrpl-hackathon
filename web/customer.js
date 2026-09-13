@@ -1,5 +1,5 @@
 import { financingJourney, exactApproval, duration } from '/journey-model.mjs';
-import { journeyPanel, proofCards, operationHistory, setupSummary } from '/journey-view.mjs';
+import { journeyPanel, proofCards, operationHistory, setupSummary, authorizationGuide } from '/journey-view.mjs';
 import { WalletReadings, walletPanel } from '/wallet-panel.mjs';
 const walletReadings = new WalletReadings();
 import { SnapshotCursor, sameReview, drops, cycleFor, freshnessLabel } from "/state-client.mjs";
@@ -202,6 +202,8 @@ function render() {
     $('overview-content').innerHTML = journeyPanel(context,controls) + metrics + walletPanel(r,state.mode,walletReadings) + (r ? '<div class="dashboard-grid">'+loanCard(r,c,loanOutcome(r,c))+journeyCard(r,story)+'</div>'+proofCards(r,state.mode,relatedUrl('/operator',id)+'&tab=evidence') : borrower && !selectedIntake ? borrowerStart() : '') + (!recorded && (!borrower || privateRequests().length) ? '<div class="section-heading"><h2>'+(!borrower?'Review inbox':'Shared requests')+'</h2><button class="text-button" data-open-page="requests">View all →</button></div>'+requestList(true) : '');
   }
   $('requests-content').innerHTML = requestList(false);
+  $('overview-content').insertAdjacentHTML('beforeend',authorizationGuide(role(),Boolean(state.hosting)));
+  if(lender && r) $('overview-content').insertAdjacentHTML('beforeend',proofCards(r,state.mode,relatedUrl('/operator',r.agreement.requestId)+'&tab=evidence'));
   $('activity-content').innerHTML = activity(r,c);
   if (pending && !$('request-dialog').open) notice('A submission still needs confirmation. Open Request funding to recover the same request.',true);
   document.querySelectorAll('details').forEach(d=>{if(openDetails.has(d.querySelector('summary')?.textContent))d.open=true;});

@@ -1,5 +1,5 @@
 export const purposes = {
-  inventory: "Buy stock or materials",
+  inventory: "Buy inventory or materials",
   receivables: "Wait for a customer to pay",
   "working-capital": "Cover everyday expenses",
 };
