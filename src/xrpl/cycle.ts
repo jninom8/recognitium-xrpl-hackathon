@@ -105,6 +105,7 @@ export class Cycle {
   async setup(sizing = {depositDrops:'200000000',coverDrops:'20000000'}): Promise<CycleRecord> {
     for (const value of Object.values(sizing)) if (!/^[1-9][0-9]*$/.test(value)) throw new Error('Invalid cycle sizing');
     if (!this.adapter.identity) throw new Error('Connect first');
+    await this.adapter.assertCanOriginate?.();
     // Sequential faucet and transaction operations simplify exact attribution.
     const broker = await this.fund('broker'), lender = await this.fund('lender'), borrower = await this.fund('borrower');
     let record = await this.cycles.read('native');

@@ -76,3 +76,7 @@ the hotspot. The complete native cycle passed on network 4001, server 3.4.0-rc1,
 with mentor-authorized open-ended testing despite enabled V1.1. See STATUS.
 The September 12 [SDK update comparison](SDK_UPDATE.md) explains beta.1 versus
 the stable SDK already used successfully, with an isolated compatibility check.
+
+## September 13 12:06 policy update
+
+The earlier mentor-authorized open-ended trial is historical evidence only. The founder has required V1-only configuration for new Track 1 loans. Fresh observations still show V1.1 on event network 4001. Origination gates now refuse this configuration before setup, preparation, signing and new submission; read/recovery remains possible. Do not present this endpoint as V1-only.

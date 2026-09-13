@@ -1,0 +1,15 @@
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+export async function showReceiptRegister(){
+ const host=document.getElementById('receipt-rounds');host.textContent='Loading receipt records…';
+ try{const response=await fetch('/api/receipts',{signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error();const data=await response.json();
+ const rounds=Map.groupBy(data.receipts,r=>r.round);
+ host.innerHTML='<p>Each receipt commits a specific hash. Verify it with the Recognitium authority. These records survive Reset.</p>'+[...rounds].map(([round,rows])=>'<article class="card"><h2>'+esc(round==='market-discovery'?'IVM discovery':round==='synthetic-supplier-001'?'Original completed round':'Round '+round.slice(8,16).toUpperCase())+'</h2>'+rows.map(r=>'<details><summary>'+esc(r.kind)+' · receipt available</summary><p>'+esc(r.source)+'</p><p>Receipt ID</p><code class="hash">'+esc(r.receiptId)+'</code><p>Committed SHA-256</p><code class="hash">'+esc(r.commitmentHash)+'</code><p>'+esc(r.authorityCheckedAt?'Authority checked '+new Date(r.authorityCheckedAt).toLocaleString():'Publication response saved; use Verify for a current authority check')+'</p><a target="_blank" rel="noopener" href="https://api.recognitium.com/v1/verify/receipt/'+encodeURIComponent(r.receiptId)+'">Verify receipt ↗</a></details>').join('')+'</article>').join('');
+ }catch{host.textContent='Receipt list could not be refreshed. Saved records have not been removed.';}
+}
+let checked=false;
+export async function showNetworkGate(force=false){
+ let host=document.getElementById('network-gate');if(!host){host=document.createElement('aside');host.id='network-gate';document.querySelector('.source-bar').after(host);}
+ if(checked&&!force)return;checked=true;host.textContent='Checking final Track 1 environment…';
+ try{const r=await fetch('/api/environment',{signal:AbortSignal.timeout(18000)});const e=await r.json();host.innerHTML='<details '+(!e.canOriginate?'open':'')+'><summary>'+esc(e.canOriginate?'✓ V1-only network checked':'New loans paused · network confirmation needed')+'</summary><p>'+esc(e.reason)+'</p>'+(e.ledgerIndex?'<p>Network '+e.networkId+' · ledger '+e.ledgerIndex+' · V1.1 '+(e.amendments.LendingProtocolV1_1?'enabled':'disabled')+'</p>':'')+'<button id="refresh-network">Check again</button></details>';host.querySelector('button').onclick=()=>void showNetworkGate(true);
+ }catch{host.textContent='Network check unavailable. New loans remain blocked; saved evidence is retained.';}
+}

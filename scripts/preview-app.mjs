@@ -2,7 +2,7 @@
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 import handler from '../dist/src/hosted/api.js';
-const assets=new Set(['index.html','customer.css','customer.js','customer-model.mjs','state-client.mjs','operator.html','app.js','style.css','journey-model.mjs','journey-view.mjs','journey.css','wallet-panel.mjs','assistant.js','conversation.css','market.js']);
+const assets=new Set(['index.html','customer.css','customer.js','customer-model.mjs','state-client.mjs','operator.html','app.js','style.css','journey-model.mjs','journey-view.mjs','journey.css','wallet-panel.mjs','assistant.js','conversation.css','market.js','receipt-register.js']);
 const port=Number(process.env.PREVIEW_PORT??3200);
 createServer(async(req,res)=>{
   const path=new URL(req.url,'http://localhost').pathname;

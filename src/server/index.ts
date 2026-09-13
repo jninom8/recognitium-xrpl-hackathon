@@ -1,3 +1,4 @@
+import {readTrackEnvironment} from './environment.js';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { timingSafeEqual } from 'node:crypto';
@@ -48,6 +49,8 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
+    if(req.method==='GET'&&path==='/api/environment'){try{return respond(res,200,await readTrackEnvironment());}catch{return respond(res,503,{canOriginate:false,reason:'Event configuration unavailable; new loans stay blocked'});}}
+
     if(req.method==='POST' && path==='/api/assistant') {
       checkOrigin(req);
       try {
@@ -61,7 +64,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
       return res.end(await readFile(path === '/operator' ? 'web/operator.html' : 'web/index.html'));
     }
-    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs','/assistant.js','/conversation.css','/market.js'].includes(path)) {
+    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs','/assistant.js','/conversation.css','/market.js','/receipt-register.js'].includes(path)) {
       res.writeHead(200, { 'Content-Type': path.endsWith('.css') ? 'text/css' : 'text/javascript', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(await readFile('web' + path));
     }

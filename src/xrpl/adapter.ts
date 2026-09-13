@@ -1,3 +1,4 @@
+import {readTrackEnvironment} from '../server/environment.js';
 import { Client, type LoanSet, type SubmittableTransaction } from 'xrpl';
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -12,12 +13,13 @@ export interface ValidatedTransaction {
   raw: unknown;
 }
 export interface LedgerPort {
+  assertCanOriginate?():Promise<void>;
   submit(blob: string): Promise<void>;
   lookup(hash: string): Promise<ValidatedTransaction | undefined>;
   ledgerIndex(): Promise<number>;
 }
 export class NativeAdapter implements LedgerPort {
-  constructor(readonly allowV11OpenEndedTrial = false) {}
+  constructor(readonly allowV11ReadAndRecovery = false) {}
   readonly client = new Client(TRACK1.websocket, { connectionTimeout: 12000, timeout: 15000 });
   identity?: NetworkIdentity;
   async connect(): Promise<NetworkIdentity> {
@@ -37,7 +39,7 @@ export class NativeAdapter implements LedgerPort {
     await mkdir('data/environment',{recursive:true});
     await writeFile('data/environment/track1.json',JSON.stringify({observedAt:new Date().toISOString(),serverInfo:info,amendments},null,2));
     for (const name of ['SingleAssetVault','LendingProtocol']) if (!enabled.includes(half(name))) throw new Error(`Required ${name} amendment not enabled`);
-    if (enabled.includes(half('LendingProtocolV1_1')) && !(this.allowV11OpenEndedTrial && networkId === 4001)) throw new Error('Lending V1.1 detected; Track 1 requires mentor review');
+    if (enabled.includes(half('LendingProtocolV1_1')) && !(this.allowV11ReadAndRecovery && networkId === 4001)) throw new Error('Lending V1.1 detected; new Track 1 loans require a V1-only environment');
     this.identity = { track: TRACK1.track, websocket: TRACK1.websocket, networkId, serverBuild: info.build_version };
     return this.identity;
     } catch (error) {
@@ -45,9 +47,14 @@ export class NativeAdapter implements LedgerPort {
       throw error;
     }
   }
+  async assertCanOriginate():Promise<void>{
+    const environment=await readTrackEnvironment();
+    if(!this.identity||environment.networkId!==this.identity.networkId||environment.serverBuild!==this.identity.serverBuild||!environment.canOriginate)throw Error(environment.reason);
+  }
   async disconnect(): Promise<void> { await this.client.disconnect(); }
   async prepare<T extends SubmittableTransaction>(tx: T): Promise<T> {
     if (!this.identity) throw new Error('Connect and verify network first');
+    if(tx.TransactionType==='LoanSet'||tx.TransactionType==='LoanBrokerSet')await this.assertCanOriginate();
     const prepared = await this.client.autofill(tx);
     // VaultCreate charges an owner-reserve fee, unlike ordinary transactions.
     const feeCap = tx.TransactionType === 'VaultCreate' ? 10000000n : 100000n;

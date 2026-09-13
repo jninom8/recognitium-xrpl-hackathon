@@ -1,3 +1,4 @@
+import {showReceiptRegister,showNetworkGate} from '/receipt-register.js';
 import { mountMarket, prepareAvailability } from '/market.js';
 import { financingJourney, exactApproval, duration } from '/journey-model.mjs';
 import { journeyPanel, proofCards, operationHistory, setupSummary, authorizationGuide, trackOneEvidence, simpleProofs } from '/journey-view.mjs';
@@ -139,7 +140,8 @@ function role() {
 }
 function setPage(value) {
   page = value;
-  for (const name of ["overview", "requests", "activity"])
+  if(value==='receipts')void showReceiptRegister();
+  for (const name of ["overview", "requests", "activity", "receipts"])
     $(name + "-page").hidden = name !== value;
   document.querySelectorAll("[data-page]").forEach((b) => {
     if (b.dataset.page === value) b.setAttribute("aria-current", "page");
@@ -255,6 +257,8 @@ function render() {
   document.querySelector('.conversation-layout').dataset.hasRecord=String(Boolean(id));
 
   mountMarket(role(),state.mode,id,Boolean(r));
+  if(state.mode==='live')void showNetworkGate();
+  if(page==='receipts'){$('page-title').textContent='Recognitium receipts · by round';$('section-protocol').textContent='Recognitium · commitments & verification';}
   conversation.update({role:role(),mode:state.mode,id,revision:selectedIntake?.revision,instanceId:state.instanceId});
   if (pending && !$('request-dialog').open) notice('A submission still needs confirmation. Open Request funding to recover the same request.',true);
   document.querySelectorAll('details:not(#assistant-wrap)').forEach(d=>{if(openDetails.has(d.querySelector('summary')?.textContent))d.open=true;});

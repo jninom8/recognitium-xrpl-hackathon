@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-09-13T10:01:31.810Z",
+  "networkId": 4001,
+  "serverBuild": "3.4.0-rc1",
+  "ledgerIndex": 91191,
+  "ledgerHash": "7D14AF418DA61E4D56C93F4BD1A1EDFD474365E60D7F24C1C6A9C48438A9E64D",
+  "amendments": {
+    "SingleAssetVault": true,
+    "LendingProtocol": true,
+    "LendingProtocolV1_1": true
+  }
+}

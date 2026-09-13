@@ -82,6 +82,7 @@ export class LendingService {
   async sign(id: string, broker: Wallet, borrower: Wallet): Promise<RequestView> {
     const r = await this.get(id); this.assertContent(r); this.assertApprovals(r);
     if (r.signed) return this.view(r);
+    await this.ledger.assertCanOriginate?.();
     if (!r.agreementReceipt) throw new Error('Verified agreement receipt required');
     await this.receipts.verify(r.agreementReceipt, r.agreementHash);
     const prepared = r.preparedTransaction as unknown as LoanSet;
@@ -124,6 +125,7 @@ export class LendingService {
       if (r.phase === 'SIGNED' && Date.parse(r.agreement.expiresAt) <= Date.now()) throw new Error('Consent expired before submission');
       await this.receipts.verify(r.agreementReceipt, r.agreementHash);
       r.phase = 'SUBMITTED'; await this.store.write(id, r);
+      await this.ledger.assertCanOriginate?.();
       try { await this.ledger.submit(r.signed.tx_blob); } catch { /* uncertainty remains */ }
       r.phase = 'VALIDATION_UNKNOWN'; r.checks.xrplValidation = 'unknown';
     }
