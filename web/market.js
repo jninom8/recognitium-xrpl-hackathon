@@ -47,3 +47,5 @@ function brikHistory(m){
  const rows=[['1 · Lender availability',m.availability.id,'Saved · not individually sealed'],['2 · Borrower request',m.requestDigest,'Saved · not individually sealed'],['3 · Match + both approvals',m.sealHash??m.id,m.receipt?'Recognitium receipt verified':'Waiting for receipt'],['4 · Admin decision',m.decisionHash??'',m.decisionHash?'Saved · not individually sealed':'Waiting for review']];
  return '<details class="brik-history"><summary>Agreement briks · evidence history</summary><p>AI proposes. People approve. XRPL executes. A saved fingerprint becomes sealed only when its receipt is verified.</p><ol>'+rows.map(([name,hash,status])=>'<li><strong>'+name+'</strong><p>'+status+'</p>'+(hash?'<code class="hash">'+esc(hash)+'</code>':'')+'</li>').join('')+'</ol><p>The match binds the lender and borrower records. IVM publication and receipt verification remain distinct from XRPL funding.</p></details>';
 }
+
+export function isMarketBusy(){return busy;}

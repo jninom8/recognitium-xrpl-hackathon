@@ -1,5 +1,5 @@
 import {showReceiptRegister,showNetworkGate} from '/receipt-register.js';
-import { mountMarket, prepareAvailability } from '/market.js';
+import { mountMarket, prepareAvailability, isMarketBusy } from '/market.js';
 import { financingJourney, exactApproval, duration } from '/journey-model.mjs';
 import { journeyPanel, proofCards, operationHistory, setupSummary, authorizationGuide, trackOneEvidence, simpleProofs } from '/journey-view.mjs';
 import { WalletReadings, walletPanel } from '/wallet-panel.mjs';
@@ -836,7 +836,7 @@ $("profile").addEventListener("change", () => {
   setPage(page);
 });
 $('restart-demo').addEventListener('click',()=>{
-  try{location.assign(restartDemoUrl(location.href,Boolean(pending),sending));}
+  try{location.assign(restartDemoUrl(location.href,Boolean(pending),sending||isMarketBusy()));}
   catch(error){notice(error.message,true);if(role()==='borrower')openRequest();}
 });
 // Event delegation keeps controls usable as fresh backend snapshots replace cards.
