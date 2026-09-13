@@ -10,7 +10,7 @@ const success={hash:'A'.repeat(64),resultCode:'tesSUCCESS',ledgerIndex:10};
 test('simple proof cards separate receipt authority from XRPL funding and link only fixed authorities',()=>{
   const r=request();r.agreementReceipt={receiptId:'DG-'+'a'.repeat(32),authorityCheckedAt:'2026-09-13T09:00:00Z'};
   let html=simpleProofs(r);assert.match(html,/Agreement receipt checked/);assert.match(html,/Money transfer not confirmed/);
-  assert.match(html,/https:\/\/api.recognitium.com\/v1\/verify\/receipt\/DG-/);
+  assert.ok(html.includes(`href="https://www.recognitium.com/verify?id=${r.agreementReceipt.receiptId}"`));
   r.checks.receiptAuthority='failed';r.funding.status='funded';r.transaction=success;
   html=simpleProofs(r);assert.match(html,/Receipt check failed/);assert.match(html,/Money transfer confirmed/);
   r.agreementReceipt.receiptId='javascript:alert(1)';assert.doesNotMatch(simpleProofs(r),/href="javascript/);
