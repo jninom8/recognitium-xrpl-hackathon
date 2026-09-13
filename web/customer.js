@@ -197,7 +197,6 @@ function render() {
   $('profile').querySelector('option[value="broker"]').hidden = recorded;
   $('workspace-name').textContent = recorded ? 'Completed test loan' : lender ? 'Lender · Offer availability' : borrower ? 'Borrower · Request and track' : 'Admin';
   $('source-note').textContent = r?.mode === 'fixture' ? 'Simulated fixture · No live ledger result claimed' : recorded ? 'Recorded example · Real test-network transactions · Read-only' : state.hosting?.openDemo ? 'Shared demo · Test money only' : 'Local demo · Synthetic requests · Test XRP only';
-  $('operator-link').href = relatedUrl('/operator',id);
   $('access-button').textContent = hasAccess() ? 'Lock workspace' : role() === 'broker' ? 'Open review inbox' : 'Open my requests';
   $('access-button').hidden = lender || recorded || state.hosting?.openDemo;
   $('requests-label').textContent = role() === 'broker' ? 'Review inbox' : state.hosting?.openDemo ? 'Shared requests' : 'My requests';
@@ -205,27 +204,27 @@ function render() {
   $('page-eyebrow').textContent = recorded ? 'FOLLOW THE COMPLETED EXAMPLE' : borrower ? 'ROOM FOR YOUR NEXT STEP' : lender ? 'CAPITAL, WITH CLARITY' : 'A CLEAR DECISION AT EVERY STEP';
   $('page-title').textContent = page === 'activity' ? 'The story behind the loan.' : page === 'requests' ? role() === 'broker' ? 'Your review inbox.' : 'Requests, all in one place.' : recorded ? lender ? 'From contribution to return.' : 'From agreement to repayment.' : lender ? 'See where your money goes.' : borrower ? 'Your next step starts here.' : 'Help each request move forward.';
   $('page-subtitle').textContent = page === 'activity' ? 'The agreement, funding and later payments, with the evidence behind each.' : page === 'requests' ? 'Open a request to see its details, current state and next action.' : borrower ? 'Ask for what you need. Understand the offer. Follow every payment.' : lender ? 'Keep your contribution, earned interest and fees in view.' : 'Check the request, coordinate the offer, and follow execution.';
-  $('new-request').hidden = !borrower || page === 'activity' || recorded;
+  $('new-request').hidden = !borrower || page === 'activity' || page === 'receipts' || recorded;
   $('sync-note').textContent = available ? syncLabel(state) : 'Connection paused · Last recorded facts retained';
   const choices = recorded ? [] : lender ? state.requests.map(q=>({clientRequestId:q.agreement.requestId,requestedDrops:q.agreement.terms.principalDrops})) : privateRequests();
-  $('request-context').innerHTML = choices.length ? '<label>Following request <select id="customer-request-picker" aria-label="Following request">'+('<option value="" '+(!id?'selected':'')+'>'+(borrower?'New request':lender?'Choose a loan':'Choose a request')+'</option>')+choices.map(q=>'<option value="'+esc(q.clientRequestId)+'" '+(q.clientRequestId===id?'selected':'')+'>'+esc(shortId(q.clientRequestId))+' · '+esc(amount(q.requestedDrops))+'</option>').join('')+'</select></label><a href="'+esc(relatedUrl('/operator',id))+'">Open this record in admin ↗</a>' : '';
-  if(choices.length)$('request-context').innerHTML='<details><summary>Other requests</summary>'+$('request-context').innerHTML+'</details>';
+  $('request-context').innerHTML = choices.length ? '<label>Saved rounds <select id="customer-request-picker" aria-label="Saved rounds">'+('<option value="" '+(!id?'selected':'')+'>'+(borrower?'New request':lender?'Choose a loan':'Choose a request')+'</option>')+choices.map(q=>'<option value="'+esc(q.clientRequestId)+'" '+(q.clientRequestId===id?'selected':'')+'>'+esc(shortId(q.clientRequestId))+' · '+esc(amount(q.requestedDrops))+'</option>').join('')+'</select></label>' : '';
+  $('request-context').hidden = page === 'receipts';
+  if(id) $('request-context').insertAdjacentHTML('beforeend','<button class="text-button" data-open-page="activity">Transactions &amp; evidence</button>');
   if (!recorded && !lender && hasAccess() && !privateAvailable) $('overview-content').innerHTML = empty(inboxLoaded ? 'Request connection paused.' : 'Opening the shared requests…',inboxLoaded ? 'Your saved requests are retained. Reconnect before making a decision.' : 'Reading the current request and review status.');
   else if (lender) { renderLender(r,c); if(r) $('overview-content').insertAdjacentHTML('afterbegin',journeyPanel(context)); }
   else {
     const controls = r ? '<button class="primary" data-loan>View exact offer →</button>' : selectedIntake ? '<button class="primary" data-intake="'+esc(id)+'">'+(borrower?'View request':'Open review')+' →</button>' : borrower ? '<button class="primary" data-new>Request funding →</button>' : '<button class="primary" data-open-page="requests">Open requests →</button>';
     const counts = privateRequests();
     const metrics = !borrower && !recorded ? '<div class="queue-metrics"><div><strong>'+counts.filter(q=>q.status==='AWAITING_REVIEW').length+'</strong><span>Waiting for review</span></div><div><strong>'+counts.filter(q=>q.status==='UNDER_REVIEW').length+'</strong><span>Being reviewed</span></div><div><strong>'+counts.filter(q=>q.status==='REVIEWED').length+'</strong><span>Review complete</span></div></div>' : '';
-    $('overview-content').innerHTML = journeyPanel(context,controls) + metrics + walletPanel(r,state.mode,walletReadings) + (r ? '<div class="dashboard-grid">'+loanCard(r,c,loanOutcome(r,c))+journeyCard(r,story)+'</div>'+proofCards(r,state.mode,relatedUrl('/operator',id)+'&tab=evidence') : borrower && !selectedIntake ? borrowerStart() : '') + (!recorded && (!borrower || privateRequests().length) ? '<div class="section-heading"><h2>'+(!borrower?'Review inbox':'Shared requests')+'</h2><button class="text-button" data-open-page="requests">View all →</button></div>'+requestList(true) : '');
+    $('overview-content').innerHTML = journeyPanel(context,controls) + metrics + walletPanel(r,state.mode,walletReadings) + (r ? '<div class="dashboard-grid">'+loanCard(r,c,loanOutcome(r,c))+journeyCard(r,story)+'</div>'+proofCards(r,state.mode,'#receipts') : borrower && !selectedIntake ? borrowerStart() : '') + (!recorded && (!borrower || privateRequests().length) ? '<div class="section-heading"><h2>'+(!borrower?'Review inbox':'Shared requests')+'</h2><button class="text-button" data-open-page="requests">View all →</button></div>'+requestList(true) : '');
   }
   $('requests-content').innerHTML = requestList(false);
   const guide=authorizationGuide(role(),Boolean(state.hosting));
   const currentJourney=$('overview-content').querySelector('.journey-panel');
   if(currentJourney) currentJourney.insertAdjacentHTML('afterend',guide);
   else $('overview-content').insertAdjacentHTML('afterbegin',guide);
-  if(lender && r) $('overview-content').insertAdjacentHTML('beforeend',proofCards(r,state.mode,relatedUrl('/operator',r.agreement.requestId)+'&tab=evidence'));
+  if(lender && r) $('overview-content').insertAdjacentHTML('beforeend',proofCards(r,state.mode,'#receipts'));
   $('activity-content').innerHTML = activity(r,c);
-  $('advanced-link').href=relatedUrl('/operator',id);
   document.querySelectorAll('[data-intention]').forEach(b=>{if(b.dataset.intention===role())b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   let protocol=document.getElementById('section-protocol');if(!protocol){protocol=document.createElement('p');protocol.id='section-protocol';protocol.className='section-protocol';$('page-title').before(protocol);}protocol.textContent=lender?'XLS-65 · Vaults & shares':borrower?'XLS-66 · Loans & interest':'XLS-65 + XLS-66 · Review before execution';
   $('page-title').textContent=page==='overview'?(borrower?(r?'Your loan':selectedIntake?'Your request':'What do you need?'):lender?'Your lending':'Admin · Review requests'):$('page-title').textContent;
@@ -251,6 +250,7 @@ function render() {
     else if(story.repaid)panel.querySelector('h2').textContent='Loan repaid.';
     else if(story.funded)panel.querySelector('h2').textContent='Your money arrived.';
   }
+  if(role()==='broker'&&!id){const panel=$('overview-content').querySelector('.journey-panel');if(panel)panel.querySelector('h2').textContent='Choose a request to review.';}
   $('assistant-wrap').hidden=role()==='broker';
   const chatWrap=$('assistant-wrap'), chatKey=[role(),state.mode,id??'new'].join(':');
   if(chatWrap.dataset.context!==chatKey){chatWrap.dataset.context=chatKey;chatWrap.open=!id;}
@@ -355,7 +355,7 @@ function activity(r,c) {
   const intake=activeIntake(), id=r?.agreement.requestId ?? activeId();
   if (!r && !intake && !c) return empty('Your story starts with a request.','Submitted details, review decisions and later ledger events will appear here.');
   const intakeHistory = intake ? '<section class="card"><p class="eyebrow">REQUEST & REVIEW</p><h2>Decisions kept in order.</h2><ol class="operation-history">'+intake.history.map(e=>'<li><span class="operation-dot">✓</span><div><h3>'+esc({'submitted':'Request submitted','start-review':'Reviewer started checking','request-revision':'Revision requested','finish-review':'Review completed','reject-request':'Request declined'}[e.event])+'</h3><p>'+esc(fullTime(e.at))+' · '+esc(e.role)+'</p></div></li>').join('')+'</ol></section>' : '';
-  return intakeHistory + trackOneEvidence(r,c) + '<div class="section-heading"><h2>Money movement & preparation</h2></div><section class="card">'+setupSummary(c)+operationHistory(r,c,state.network.explorer)+'</section>' + (r ? proofCards(r,state.mode,relatedUrl('/operator',id)+'&tab=evidence')+'<div class="record-links"><section class="card"><h3>Exact agreement</h3><p class="hint">Version '+r.agreement.documentVersion+'. All rates, fees and signature commitments remain available.</p><button class="text-button" data-loan>View agreement →</button></section><section class="card"><h3>Keep the evidence</h3><p class="hint">'+(state.mode==='recorded'?'Download the synthetic bundle for independent checks.':'This request’s private export is prepared by the local operator. The completed example has its own separate bundle.')+'</p>'+(state.mode==='recorded'?'<a class="text-button" href="/api/evidence/published" download="synthetic-supplier-001.json">Download example evidence ↓</a>':'<a class="text-button" href="'+esc(relatedUrl('/operator',id)+'&tab=evidence')+'">Open evidence in admin ↗</a>')+'</section></div>':'') + '<p class="evidence-note">A document match, an authority receipt and a ledger result answer different questions. This history keeps them separate. Records shown here are saved observations; a page refresh is not an online verification.</p>';
+  return intakeHistory + trackOneEvidence(r,c) + '<div class="section-heading"><h2>Money movement & preparation</h2></div><section class="card">'+setupSummary(c)+operationHistory(r,c,state.network.explorer)+'</section>' + (r ? proofCards(r,state.mode,'#receipts')+'<div class="record-links"><section class="card"><h3>Exact agreement</h3><p class="hint">Version '+r.agreement.documentVersion+'. All rates, fees and signature commitments remain available.</p><button class="text-button" data-loan>View agreement →</button></section><section class="card"><h3>Keep the evidence</h3><p class="hint">'+(state.mode==='recorded'?'Download the synthetic bundle for independent checks.':'This request’s private export is prepared by the local operator. The completed example has its own separate bundle.')+'</p>'+(state.mode==='recorded'?'<a class="text-button" href="/api/evidence/published" download="synthetic-supplier-001.json">Download example evidence ↓</a>':'<button class="text-button" data-open-page="receipts">View receipts</button>')+'</section></div>':'') + '<p class="evidence-note">A document match, an authority receipt and a ledger result answer different questions. This history keeps them separate. Records shown here are saved observations; a page refresh is not an online verification.</p>';
 }
 async function refresh() {
   const ticket = cursor.begin($("source").value);
@@ -502,13 +502,13 @@ function showDraftReview() {
   $("request-step").textContent = "YOUR REQUEST / STEP 2 OF 2";
   $("request-title").textContent = "Check your request.";
   $("request-intro").textContent =
-    "The review team will receive these details. You are not agreeing to borrow money yet.";
+    "Save these details to propose a lender match. You are not agreeing to borrow money yet.";
   $("request-summary").innerHTML =
     `<div class='summary-box'><dl>${fact("Requested amount", amount(draft.requestedDrops))}${fact("When you would like to repay", draft.requestedDays + " days")}${fact("Business purpose", purposes[draft.purpose])}${fact("What you will repay", "You will see the full cost in an offer")}</dl></div><p class='hint'>You will decide whether to accept an offer later. Sending this request does not commit you to a loan. ${pending ? "An earlier submission has an uncertain outcome. Retrying keeps the same request ID." : ""}</p>`;
   $("request-next").textContent = pending
     ? "Retry same request"
     : hasAccess()
-      ? "Send for review"
+      ? "Save request"
       : "Continue with my code";
 }
 function openRequest() {
@@ -601,14 +601,14 @@ $("request-form").addEventListener("submit", async (e) => {
     }
     const created = await response.json();
     selectedLoanId = created.clientRequestId;
-    const url = new URL(location.href); url.searchParams.set('request', selectedLoanId); history.replaceState(null, '', url);
+    const url = new URL(location.href); url.searchParams.set('request', selectedLoanId); url.searchParams.delete('new'); history.replaceState(null, '', url);
     clearPending();
     draft = undefined;
     $("request-dialog").close();
     await loadIntake();
     setPage("overview");
     notice(
-      "Request sent for review. You can follow the broker’s response here. No funds have moved.",
+      "Request saved. Propose a lender match below, then approve it for review. No money moved.",
     );
   } catch (error) {
     requestError(

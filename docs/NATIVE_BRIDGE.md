@@ -4,6 +4,17 @@ The public website stores synthetic intake. A local operator bridge imports an e
 
 ## Start a run
 
+Current status, September 13: the connected native run 1708833C completed before
+availability matching was added. A fresh matched cycle remains untested on the
+ledger. The V1-only origination gate currently blocks the advertised V1.1 endpoint.
+Existing validated evidence and recovery remain available.
+
+For matching, obtain both match approvals, attach its verified receipt and accept
+it in Admin. Append the controlled lender SOURCE_RUN_ID to the prepare command
+below. This path deposits the matched amount, not twice the principal, and checks
+that the source wallet matches the approved availability. The match must remain
+unexpired. Match approval does not replace exact loan approval.
+
 Finish the request review first. Choose either its requested duration in seconds or an explicit 60-second demonstration counter-offer. The submitted request remains inside the private agreement document, including its original duration and digest. Principal equals the submitted amount; the proposed rate is 10% annually, one payment, grace 60 seconds, all additional loan fees/rates zero. Human approval binds the final agreement and prepared transaction, including ledger expiry and actual network fee.
 
 Run from this repository with the existing ignored environment files:
@@ -50,4 +61,4 @@ Every action publishes a filtered request/cycle snapshot. bridge publish REQUEST
 
 ## Evidence status
 
-Implementation tests include simulated ledger preparation, preservation across restart and changed-intake rejection. Existing native service tests cover signature binding, funding reconciliation and receipt recovery. These tests do not prove a fresh live bridge run. The first connected live run is pending review of the selected request and exact human approvals.
+Implementation tests include simulated ledger preparation, preservation across restart and changed-intake rejection. Existing native service tests cover signature binding, funding reconciliation and receipt recovery. The connected native run 1708833C completed; a new availability-matched run remains pending environment resolution and fresh exact human approvals. Do not substitute the earlier cycle for that remaining test.
