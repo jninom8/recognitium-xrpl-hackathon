@@ -849,3 +849,23 @@ Primary-source research on proposed agent authority is recorded in
 docs/AGENT_AUTHORITY_DIRECTION.md. KYC issuer trust is distinct from consensus;
 approval receipts do not prove human presence or AI Act compliance by themselves.
 No credentials, agent autonomy or new lending features were implemented.
+
+## September 13, 08:27 UTC: original ZIP and shared-market claim review
+
+Read all three PDFs' extracted text (10 challenge, 27 workshop, 19 lending
+introduction pages), with visual checks of relevant saved diagrams. Used .NET
+ZipFile entry streams and SHA-256 to compare each source PDF with reference/:
+all three matched. No downloaded slide content was added to git.
+
+The lending slides describe a hybrid system with off-chain underwriting. The
+challenge retains distinct phase gates/refusals for Track 2. Reviewed official
+closed-ended vault/XLS-66 documentation and RFC 3161 as a counterexample to an
+exclusive claim about off-chain timestamping. Recognitium's added value must be
+demonstrated through binding/version/recovery behavior beyond signed LoanSet Data.
+The available MCP schema uses ivm_publish(in_reply_to), not an exposed ivm_reply.
+No latency benchmark or proof of a missing real-world payment was performed.
+
+Official submit.mjs reflection followed by hook-status --flush: HTTP 200,
+08:27:21.106 UTC, one accepted, 628 cumulative, zero buffered. Counts are 625
+automatic historical events and three explicit agent reflections. No new capture
+from the projectless host context is claimed. No participant report generated.

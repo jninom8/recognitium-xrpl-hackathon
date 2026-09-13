@@ -24,6 +24,9 @@ unsigned offer; this UI milestone does not complete that remaining native run.
 The [agent authority direction](AGENT_AUTHORITY_DIRECTION.md) keeps separate
 approval receipts, repayment mandates, identity issuers and revocable autonomy
 as proposed work, not implemented capabilities or compliance claims.
+Research follow-up at 10:27 Paris reread the three original slide decks and
+checked the shared-market framing; no code or lending state changed. Hook
+accepted one more explicit reflection with HTTP 200: 628 total, zero buffered.
 Earlier checkpoints below are chronological history and may be superseded.
 
 Updated September 12, 2026, during the Nanterre hackathon. Update this document

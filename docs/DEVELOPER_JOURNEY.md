@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12–13, 2026.
-Latest UI/capture checkpoint: **September 13, 09:34 Paris time (UTC+2)**.
+Latest research/capture checkpoint: **September 13, 10:27 Paris time (UTC+2)**.
 The overview below is current; dated entries preserve earlier observations.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
@@ -20,7 +20,7 @@ The overview below is current; dated entries preserve earlier observations.
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Borrower, reviewer, lender and admin share one six-step narrative; full operation history, separate evidence checks and live borrower balance |
 | Tests | 52 passing local tests; deployed role views, request/review and wallet checks; failures explicitly distinguish simulated external systems |
-| Developer capture | Team **Recognitium**; 627 events accepted at 09:34 Paris on September 13, including two explicit agent reflections; current projectless automatic capture is not proven |
+| Developer capture | Team **Recognitium**; 628 events accepted at 10:27 Paris on September 13, including three explicit agent reflections; current projectless automatic capture is not proven |
 | Last connection checkpoint | Vercel read both borrower accounts at validated event ledger 82625; HTTP 200, 273/267 ms |
 | Still to finish | Resolve the expired unsigned 600-XRP offer, obtain fresh exact approval and complete that connected native run; independent reproduction and participant-written final report |
 
@@ -467,3 +467,24 @@ The founder's proposed agent direction is documented separately in
 receipt, bounded repayment mandates and revocable permissions remain future work.
 Validator trust, KYC issuer trust and the broker's lending decision stay distinct.
 This journal supports the participants; it is not their official manual report.
+
+## September 13, 10:27 Paris: check the shared-market framing against the slides
+
+The three PDFs in the founder's new transfer ZIP match our ignored reference
+PDFs by SHA-256. Reread all 56 pages of extracted text and inspected the relevant
+track, role, lifecycle and judging diagrams. The lending introduction explicitly
+puts underwriting and supporting documents off-chain. A shared information and
+evidence interface could serve either vault lifecycle, but does not implement
+Track 2's phase restrictions or required refused transactions.
+
+The useful Recognitium claim is the link between a private approved version and
+actual execution, with recoverable evidence. A receipt is not a marketplace match,
+proof of document truth, or unconditional off-chain finality. Public IVM signals
+remain distinct from private documents. No end-to-end receipt speed benchmark,
+new loan, credential or general negotiation history was demonstrated in this
+review. The existing [contract history review](CONTRACT_HISTORY_FACT_CHECK.md)
+and [agent authority direction](AGENT_AUTHORITY_DIRECTION.md) retain these limits.
+
+The official hook accepted the actual research reflection at 08:27:21.106 UTC:
+HTTP 200, 628 cumulative, zero buffered. It is agent reflection, not automatic
+capture from this projectless context or the participant-written final report.
