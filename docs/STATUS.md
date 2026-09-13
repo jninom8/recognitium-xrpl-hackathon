@@ -591,3 +591,5 @@ Pitch v5: added eighth closing slide inspired by Kocherlakota, Money is Memory (
 Sequential matching UI: borrower now displays only its selected request and automatically uses the saved demo lender availability, preferring the offer saved in this browser. Removed both dropdowns. Expired or already-matched offers are excluded; incompatible amounts/durations disable proposal. Unsaved defaults never count as a real offer. Hosted build and JavaScript parse check passed.
 
 Sequential Admin/Receipts: receipt display filters to current request with a clear not-yet-issued state, rather than showing another round. Admin match list and request list are scoped to the selected example; a visible example ID makes context explicit. Missing matches are explained. All 70 tests passed before the final display wording change; hosted build passed after it. No new loan or receipt issued. Local pitch server restarted and verified HTTP 200 with eight slides.
+
+Pitch v6: final slide adds privacy, verifiable commitments, rail-independent evidence and machine coordination framing. Eight-slide package/layout checks passed and final slide visually inspected.
