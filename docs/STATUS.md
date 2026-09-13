@@ -617,3 +617,5 @@ Cinematic evidence sequence: /film.html presents agreement, funding, native refu
 Pitch v8 prepends opening slide 0 with founder quote and italic positioning line (milliseconds spelling corrected). Nine-slide package/layout checks passed; opening slide visually checked. Browser deck updated.
 
 Pitch v9: founder-authorized logo-only reuse from the Recognitium repository. Existing transparent PNG placed on slide 0 without a black background. Original source left unchanged; nine-slide package/layout checks and opening-slide visual inspection passed.
+
+Pitch v10: curved black oval panel behind the opening logo only; green text area preserved. Nine-slide package/layout checks pass, opening slide visually checked.
