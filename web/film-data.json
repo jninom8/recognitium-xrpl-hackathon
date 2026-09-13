@@ -1,0 +1,63 @@
+{
+  "requestId": "request-1708833c-9d9e-4a49-9fe2-6b9284842ecc",
+  "networkId": 4001,
+  "setup": "Before this agreement: an open-ended vault, 200 XRP lender deposit, loan broker and 20 XRP first-loss cover.",
+  "scenes": [
+    {
+      "title": "Agree before moving money",
+      "amount": "100 XRP",
+      "copy": "Exact loan terms are fixed. Both parties approve the transaction. The agreement fingerprint is sealed before signing.",
+      "receiptId": "DG-e2d41354140a451c855050f148b55da1",
+      "commitmentHash": "6a5a64dc5875f12176159b7b8f27d4e8212aacf509703185a7bfd2176990909f",
+      "retrospective": false
+    },
+    {
+      "title": "The borrower receives the loan",
+      "amount": "100 XRP",
+      "copy": "The co-signed LoanSet funds the borrower. Its execution receipt links this ledger result to the agreed terms.",
+      "receiptId": "DG-67bd66978e854f4e8d79d21862723ee4",
+      "commitmentHash": "e157f6a6992cb0592be040819e51dc2f797727a3cabf4f948c15f92e0c588084",
+      "retrospective": false,
+      "transactionHash": "CABC51612A0478F935D0C82DF3102124FC2DDC7E7CAACD665BCF37FD836F08FD",
+      "ledgerIndex": 90068,
+      "resultCode": "tesSUCCESS",
+      "feeDrops": "24"
+    },
+    {
+      "title": "The ledger enforces a boundary",
+      "amount": "0 XRP moved",
+      "copy": "A 200 XRP withdrawal is refused for insufficient liquidity. The vault stays unchanged; the 12-drop transaction fee still applies.",
+      "receiptId": "DG-56005abb14c642df96608bafbadc955a",
+      "commitmentHash": "91abd492d59d588d83d72b96934b09ae4a25e229f672ac84613d9729e79efd65",
+      "retrospective": true,
+      "transactionHash": "5925949AFB39BF0C0C83742ABB826D82685C4CBCC98EDDCFE6CD154AB56FD5C2",
+      "ledgerIndex": 90079,
+      "resultCode": "tecINSUFFICIENT_FUNDS",
+      "feeDrops": "12"
+    },
+    {
+      "title": "The borrower repays",
+      "amount": "100.000020 XRP",
+      "copy": "LoanPay returns the principal and the scheduled interest to the vault.",
+      "receiptId": "DG-20c2a22b1d18494b8407cbb08e7da6ad",
+      "commitmentHash": "b4da674eb731724ccaa7c552e4d331366de3ffa5fc70f95ae64791d8675d1612",
+      "retrospective": true,
+      "transactionHash": "6AFE173F17AB81879E4A6003266734E0F9D430E148715E0963747BFF7429843F",
+      "ledgerIndex": 90086,
+      "resultCode": "tesSUCCESS",
+      "feeDrops": "12"
+    },
+    {
+      "title": "The lender receives capital + yield",
+      "amount": "200.000020 XRP",
+      "copy": "The lender withdraws the original 200 XRP plus 20 drops of gross realised yield. Network fees are separate.",
+      "receiptId": "DG-12590756f43b4b1e98d821a8dfa9ad5f",
+      "commitmentHash": "2114328aa110a26d86b850c4e797d515249e5af4a62a3f2af7cd5dd5217c79b3",
+      "retrospective": true,
+      "transactionHash": "520189B74931E44F45D6986526B19942B757CBC1DF25F8BC33B75B09C58C158E",
+      "ledgerIndex": 90092,
+      "resultCode": "tesSUCCESS",
+      "feeDrops": "12"
+    }
+  ]
+}

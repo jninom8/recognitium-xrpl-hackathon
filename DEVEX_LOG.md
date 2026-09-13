@@ -1065,3 +1065,5 @@ Admin execution button wired to local authenticated request/run endpoint. Public
 Public-to-local round-trip check passed: /api/runner connected=true; completed loan 1708833C queued through public API, consumed locally, status complete. Chrome confirms runner connection. No new loan or receipt issued. 73 tests/build pass. Outbound queue keeps signing seeds off Vercel.
 
 14:26-14:27 Paris: fresh synthetic receipt issuance probe through configured RecognitiumClient returned HTTP 403; no confirmed receipt, no blind retry. 73 tests passed. verify-bundle online passed content/both signatures/authority/XRPL. /api/environment network 4001 ledger 94108, /api/story-proof both verified. Unprepared run POST HTTP 409. Current 467AD12F remains REVIEWED without match/offer.
+
+Fresh MCP issuance succeeded for three explicitly retrospective transition manifests at 12:49:38, 12:49:44 and 12:49:49 UTC, costing 3 ticks total. Official authority lookups and chain/content checks passed for each. This proves MCP issuance works; it does not resolve configured REST issuance HTTP 403. Cinematic replay shows both original and retrospective receipt timing distinctly.
