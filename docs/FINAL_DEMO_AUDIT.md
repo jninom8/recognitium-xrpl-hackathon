@@ -22,3 +22,5 @@ The deck has eight slides. The participant-dictated report is one page, within t
 ## Hook
 
 Final factual tooling reflection submitted through the installed hook. Status increased from 637 to 638 sent events, including 13 reflections, with zero buffered. Historical automatic events: 625. Continuous automatic capture in this projectless chat is not established; no setup or identity replacement was performed.
+
+Deployment: main-site verification links published successfully, Vercel dpl_AcEAm5qr5iJ9FazstBdw3sRQXdXd READY. Binary Git attributes preserve PDF and PowerPoint bytes across Windows clones.
