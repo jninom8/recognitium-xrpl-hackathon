@@ -559,3 +559,4 @@ Added an explicitly synthetic identity-to-wallet example in Admin. The read-only
 
 ### Pitch deck prepared
 Seven-slide editable presentation and timed speaker notes saved in docs/pitch. It covers the synthetic supplier use case, receipt/ledger architecture, observed native evidence, AI approval boundary and three concrete developer findings with proposed fixes. The deck distinguishes completed native cycles from the pending fresh matched flow, and keeps cryptographic content checks, receipt authority and ledger validation separate. No event submission or participant manual report was generated.
+Pitch layout revision: enlarged architecture boxes, checked the corrected slide in Chrome, and added a standalone browser presentation with keyboard navigation. Updated editable file: docs/pitch/Recognitium-Pitch-v2.pptx. Browser file: docs/pitch/Recognitium-Pitch.html. Personal developer report awaits participant-authored text.
