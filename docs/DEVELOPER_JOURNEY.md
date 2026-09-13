@@ -536,3 +536,18 @@ expired and unfunded; the new AI intake has no prepared offer. Native execution
 requires the local operator, fresh exact role approvals and real receipt recovery.
 No browser wallet or actual KYC issuer was added; lender chat is non-binding and
 cannot make a deposit. The original real 100-XRP test cycle remains distinct.
+
+### 11:00 Paris deployment and fresh verification
+
+Commit 52b59ab deployed READY on Vercel (xtcoAeiSBYezdzPwKQKoSXSLJqGz).
+The deployed assistant reached Mistral successfully. Its first reply unnecessarily
+asked about precision and mentioned the wrong unit, while leaving amount unset;
+no request was submitted from that incomplete draft. Added an explicit whole-XRP
+rule and a structured extraction example. The same actual inference then returned
+100 XRP / 30 days / inventory. This is a model reliability finding, not an XRPL bug.
+
+Fresh Track 1 probe at 08:58:57 UTC succeeded over HTTP, WebSocket and xrpl.js 5.2.0.
+Ledger 89940, rippled 3.4.0-rc1. The complete original bundle passed --online
+verification: content consistent, both signatures valid, receipt hash chain
+consistent, online receipt authority verified and XRPL validated success. These
+are fresh read-only checks of the original cycle, not funding of a new request.
