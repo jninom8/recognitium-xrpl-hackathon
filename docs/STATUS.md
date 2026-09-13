@@ -585,3 +585,5 @@ Demo presentation defaults: lender public test wallet, 100 XRP and 30 days; borr
 Simplified demo screens: removed generic Details and Ask a question panels from every role. Prefilled forms, explicit approvals, Transactions & evidence, Receipts and Watch the story remain available. Browser-native execution expansion was blocked by automatic approval review without a specific reason; incomplete code was removed and the existing operator boundary retained. Hosted build and browser-model tests passed. The complete fresh browser-to-loan experience remains unfinished.
 
 Removed the Saved rounds selector for the sequential demo. Current request stays selected across roles; Transactions & evidence and Reset remain available. Hosted build passed.
+
+Pitch v5: added eighth closing slide inspired by Kocherlakota, Money is Memory (1996 / JET 1998), verified against the Minneapolis Fed abstract. Distinguishes the model theorem from the application analogy and avoids claims of perfect or unerasable memory. Eight-slide package/layout passed; closing slide visually inspected.
