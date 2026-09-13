@@ -1059,3 +1059,5 @@ Final audit 13 September 2026: npm test 70/70; npm run build:hosted passed; veri
 Automatic local runner implementation: 73 tests pass; build:hosted and customer.js syntax pass. Real network operations not invoked during fixture tests. Durable approval job plus existing transaction journal; unresolved receipt issuance pauses without a blind second charge. Vercel-to-local authenticated execution remains unconnected.
 
 Automatic story replay deployed: read-only /api/story-proof verifies exact agreement and execution receipt hashes. Both authority checks passed online. No new loan or receipt issued by playback. Pitch v7 closing links verified visually; 73 tests pass.
+
+Admin execution button wired to local authenticated request/run endpoint. Public hosting limitation is visible, not simulated success. No fresh ledger execution claimed.

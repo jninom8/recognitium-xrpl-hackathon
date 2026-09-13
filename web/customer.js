@@ -262,6 +262,28 @@ function render() {
   document.querySelector('.conversation-layout').dataset.hasRecord=String(Boolean(id));
 
   mountMarket(role(),state.mode,id,Boolean(r));
+  if(role()==='broker' && state.mode==='live' && (r || selectedIntake?.status==='REVIEWED')) {
+    const ready=r && exactApproval(r,'broker') && exactApproval(r,'borrower');
+    const complete=Boolean(c?.yield);
+    const reason=complete?'This round is complete. Its receipts remain verifiable.':state.hosting?'The public site is not connected to the local execution runner.':!r?'Prepare the exact loan offer first.':!ready?'Borrower and broker must approve the exact loan terms first.':'One click runs the remaining steps for this approved round.';
+    const box=document.createElement('section');box.className='card';
+    box.innerHTML='<h2>Finish this loan</h2><p>'+esc(reason)+'</p><ol>'+[
+      [Boolean(r?.agreementReceipt),'Seal the approved agreement'],
+      [r?.checks.xrplValidation==='validated-success','Sign and confirm borrower funding on XRPL'],
+      [Boolean(r?.executionReceipt),'Seal the funding evidence'],
+      [Boolean(c?.refusal),'Record the native guardrail test'],
+      [c?.steps.repay?.resultCode==='tesSUCCESS'||c?.steps['repay-late']?.resultCode==='tesSUCCESS','Repay on the agreed date'],
+      [complete,'Return capital and realised yield to the lender']
+    ].map(([done,label])=>'<li>'+(done?'✓ ':'○ ')+label+'</li>').join('')+'</ol><button class="primary" id="run-approved-loan" '+(!ready||state.hosting||complete?'disabled':'')+'>Run approved loan</button><p id="run-approved-status" aria-live="polite"></p>'+[r?.agreementReceipt,r?.executionReceipt].filter(Boolean).map(p=>'<p><a target="_blank" rel="noopener" href="https://www.recognitium.com/verify?id='+encodeURIComponent(p.receiptId)+'">Verify receipt '+esc(p.receiptId)+' ↗</a></p>').join('');
+    $('overview-content').append(box);
+    box.querySelector('button').onclick=async()=>{
+      const button=box.querySelector('button'),status=box.querySelector('#run-approved-status');button.disabled=true;
+      try{const response=await fetch('/api/requests/'+encodeURIComponent(id)+'/run',{method:'POST',headers:{'Content-Type':'application/json',...(access.token?{Authorization:'Bearer '+access.token}:{})},body:JSON.stringify({agreementHash:r.agreementHash,transactionDigest:r.transactionDigest}),signal:AbortSignal.timeout(15000)});
+        const result=await response.json();if(!response.ok)throw Error(result.error??'Run not confirmed');
+        status.textContent='Automatic run queued. This page will show confirmed steps and receipts.';
+      }catch(error){status.textContent=error.message+' No completion is assumed.';button.disabled=false;}
+    };
+  }
   if(state.mode==='live')void showNetworkGate();
   if(state.mode==='live' && !state.hosting && id) {
     const automaticNote=document.createElement('p');automaticNote.className='notice';

@@ -133,14 +133,27 @@ const server = createServer(async (req, res) => {
     }
     if (req.method === 'POST') {
       const approval = /^\/api\/requests\/([a-zA-Z0-9_-]+)\/approve\/(broker|borrower)$/.exec(path);
+      const runApproved = /^\/api\/requests\/([a-zA-Z0-9_-]+)\/run$/.exec(path);
       const intakeReview = /^\/api\/intake\/([a-zA-Z0-9_-]+)\/review$/.exec(path);
-      authorize(req, path === '/api/intake' ? 'borrower' : intakeReview ? 'broker' : approval ? approval[2] as Role : 'operator');
+      authorize(req, path === '/api/intake' ? 'borrower' : intakeReview || runApproved ? 'broker' : approval ? approval[2] as Role : 'operator');
       const input = await body(req);
       const release = await processLock(cycle.dataDirectory);
       let result: unknown;
       try {
         if (path === '/api/intake') result = await intake.create(input);
         else if (intakeReview) result = await intake.review(intakeReview[1]!, input);
+        else if (runApproved) {
+          const id=runApproved[1]!;
+          const native=await cycle.cycles.read('native');const r=await cycle.requests.read(id);
+          if(native?.requestId!==id || !r)throw Error('Prepare this exact round first');
+          if(input.agreementHash!==r.agreementHash || input.transactionDigest!==r.transactionDigest)throw Error('Run does not match the approved terms');
+          if(!['broker','borrower'].every(role=>r.approvals.some(a=>a.role===role&&a.agreementHash===r.agreementHash&&a.transactionDigest===r.transactionDigest)))throw Error('Both exact loan approvals required');
+          const prior=await automatic.read(id);
+          if(prior?.status==='PAUSED')throw Error('Round paused; operator must reconcile saved receipt or ledger outcome before continuing');
+          if(!r.signed&&Date.parse(r.agreement.expiresAt)<=Date.now())throw Error('Exact loan approval expired');
+          result=prior??{requestId:id,status:'QUEUED',updatedAt:new Date().toISOString()};
+          if(!prior)await automatic.write(id,result as {requestId:string;status:string;updatedAt:string});
+        }
         else if (approval) {
           if (typeof input.agreementHash !== 'string' || typeof input.transactionDigest !== 'string') throw new Error('Exact hashes required');
           result = await cycle.service.approve(approval[1]!,approval[2] as Role,input.agreementHash,input.transactionDigest);
