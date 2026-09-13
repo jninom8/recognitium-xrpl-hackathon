@@ -579,3 +579,5 @@ Founder explicitly superseded the V1-only application refusal and authorized the
 Pitch revision v3: slide 6 now has three plain-language problem-to-fix lines. Updated notes remove the superseded V1-only refusal. Seven-slide package/layout checks passed and slide 6 was visually checked; standalone Chrome deck refreshed.
 
 Pitch v4: slide 6 now pairs each observed obstacle with a specific organiser-side improvement. Seven-slide package and layout checks passed; slide 6 visually inspected. Expanded speaker notes distinguish observed recovery from proposed organiser changes.
+
+Demo presentation defaults: lender public test wallet, 100 XRP and 30 days; borrower amount defaults to 100. Approval checkbox remains unchecked. Added Watch the story, an eight-stage illustrative playback with explicit separate saved match/native-cycle evidence and no write/signing calls. Hosted build and 21 browser-model tests passed.

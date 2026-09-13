@@ -91,7 +91,7 @@
     </aside>
     <div class="app-shell">
       <p class="track-banner" translate="no">TRACK 1 · OPEN-ENDED · VANILLA <span>XLS-65 Vaults &amp; shares · XLS-66 Loans &amp; interest</span></p>
-      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="lender">Lender</button><button data-intention="borrower">Borrower</button><button data-intention="broker">Admin</button><button data-page="receipts" translate="no">Receipts</button></nav>
+      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="lender">Lender</button><button data-intention="borrower">Borrower</button><button data-intention="broker">Admin</button><button data-page="receipts" translate="no">Receipts</button><button id="demo-story-open">Watch the story</button></nav>
       <p class="story-line">From available capital to an agreed loan: <strong><span translate="no">Recognitium</span> receipts preserve the commitments; XRPL confirms the money movement.</strong></p>
       <header class="topbar">
         <span class="workspace-name" id="workspace-name"
@@ -170,7 +170,7 @@
           <label for="amount">How much do you need?</label>
           <div class="amount-input">
             <input
-              id="amount"
+              id="amount" value="100"
               name="amount"
               type="text"
               inputmode="decimal"
