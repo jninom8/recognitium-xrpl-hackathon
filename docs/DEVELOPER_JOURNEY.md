@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12–13, 2026.
-Latest research/capture checkpoint: **September 13, 10:27 Paris time (UTC+2)**.
+Latest planning/capture checkpoint: **September 13, 10:36 Paris time (UTC+2)**.
 The overview below is current; dated entries preserve earlier observations.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
@@ -20,7 +20,7 @@ The overview below is current; dated entries preserve earlier observations.
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Borrower, reviewer, lender and admin share one six-step narrative; full operation history, separate evidence checks and live borrower balance |
 | Tests | 52 passing local tests; deployed role views, request/review and wallet checks; failures explicitly distinguish simulated external systems |
-| Developer capture | Team **Recognitium**; 628 events accepted at 10:27 Paris on September 13, including three explicit agent reflections; current projectless automatic capture is not proven |
+| Developer capture | Team **Recognitium**; 629 events accepted at 10:36 Paris on September 13, including four explicit agent reflections; current projectless automatic capture is not proven |
 | Last connection checkpoint | Vercel read both borrower accounts at validated event ledger 82625; HTTP 200, 273/267 ms |
 | Still to finish | Resolve the expired unsigned 600-XRP offer, obtain fresh exact approval and complete that connected native run; independent reproduction and participant-written final report |
 
@@ -488,3 +488,15 @@ and [agent authority direction](AGENT_AUTHORITY_DIRECTION.md) retain these limit
 The official hook accepted the actual research reflection at 08:27:21.106 UTC:
 HTTP 200, 628 cumulative, zero buffered. It is agent reflection, not automatic
 capture from this projectless context or the participant-written final report.
+
+## September 13, 10:36 Paris: plan a conversation-led application
+
+The founder requested one interface with Borrow, Provide liquidity and Review
+intentions, using Mistral to ask the right questions. Inspected the actual hosted
+API, intake schema, native bridge and verifier before writing the
+[implementation plan](CONVERSATIONAL_APP_PLAN.md). It preserves typed backend
+state, exact human approval and the local signing boundary. Wallet/identity
+evidence remains synthetic unless genuinely verified; an offline verification
+call requires saved evidence, not only a transaction hash. No AI call or app
+change was made during planning. Official reflection accepted at 08:35:57.011 UTC:
+HTTP 200, 629 cumulative, zero buffered. The manual report remains human-written.

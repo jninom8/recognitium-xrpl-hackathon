@@ -869,3 +869,15 @@ Official submit.mjs reflection followed by hook-status --flush: HTTP 200,
 08:27:21.106 UTC, one accepted, 628 cumulative, zero buffered. Counts are 625
 automatic historical events and three explicit agent reflections. No new capture
 from the projectless host context is claimed. No participant report generated.
+
+## September 13, 08:36 UTC: conversational UI implementation plan
+
+Read src/hosted/api.ts, src/shared/intake.ts, docs/NATIVE_BRIDGE.md and the receipt
+client/verifier. Confirmed hosted nativeActions=false, borrower-only intake and
+separate offline versus online evidence checks. Saved the bounded implementation
+plan in docs/CONVERSATIONAL_APP_PLAN.md, with existing 12:30 freeze constraint.
+Founder confirmed Mistral as provider; no credential was put in project files and
+no provider API request was made. No code change or test rerun needed for planning.
+Official hook reflection accepted HTTP 200 at 08:35:57.011 UTC, one sent,
+629 cumulative (625 historical automatic + four explicit reflections), zero
+buffered. No fresh automatic capture or participant report is claimed.

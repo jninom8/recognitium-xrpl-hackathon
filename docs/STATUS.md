@@ -27,6 +27,11 @@ as proposed work, not implemented capabilities or compliance claims.
 Research follow-up at 10:27 Paris reread the three original slide decks and
 checked the shared-market framing; no code or lending state changed. Hook
 accepted one more explicit reflection with HTTP 200: 628 total, zero buffered.
+At 10:36 Paris, the founder requested a unified conversational app plan and
+confirmed Mistral as the proposed AI provider. See
+[CONVERSATIONAL_APP_PLAN.md](CONVERSATIONAL_APP_PLAN.md). Planning only: no
+application change, provider request or new loan. Hook reflection accepted with
+HTTP 200 at 08:35:57.011 UTC, 629 total, zero buffered.
 Earlier checkpoints below are chronological history and may be superseded.
 
 Updated September 12, 2026, during the Nanterre hackathon. Update this document
