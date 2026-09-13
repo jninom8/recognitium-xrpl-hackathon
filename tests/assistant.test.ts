@@ -1,7 +1,14 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {assistantInput,assist,assistantDraft} from '../src/server/assistant.js';
+import {assistantInput,assist,assistantDraft,explicitDraft} from '../src/server/assistant.js';
 const input=()=>({role:'borrower',sessionId:'12345678-1234-4234-8234-123456789012',messages:['100.000001 test XRP for inventory for 30 days'],draft:{amount:null,days:null,purpose:null}});
+test('literal guard retains explicit terms when model omits fields, and applies explicit corrections',()=>{
+  const i=assistantInput(input());
+  assert.deepEqual(explicitDraft(i,{amount:null,days:null,purpose:null}),{amount:'100.000001',days:30,purpose:'inventory'});
+  i.draft={amount:'100.000001',days:30,purpose:'inventory'};
+  i.messages.push('Change to 150 XRP for 45 days');
+  assert.deepEqual(explicitDraft(i,{amount:null,days:null,purpose:null}),{amount:'150',days:45,purpose:'inventory'});
+});
 test('assistant rejects authority fields, arbitrary roles and out-of-range financial drafts',()=>{
   for(const bad of [{...input(),approve:true},{...input(),role:'operator'},{...input(),messages:['x'.repeat(801)]},{...input(),draft:{amount:'1e3'}},{...input(),draft:{amount:'10000.000001'}},{...input(),draft:{days:0}},{...input(),draft:{purpose:'passport'}}])assert.throws(()=>assistantInput(bad));
   assert.deepEqual(assistantDraft({amount:'100.000001',days:30,purpose:'inventory'}),{amount:'100.000001',days:30,purpose:'inventory'});

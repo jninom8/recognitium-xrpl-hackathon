@@ -212,3 +212,22 @@ not a paid production service or user authentication.
 
 Open Evidence & history to follow all six Track 1 outcomes. The completed example
 contains real test-network results; a new intake never inherits that funding.
+
+### Reproduce the AI-to-XRPL run
+
+The reviewed synthetic `evidence/ai-request-1708833c.json` preserves the NEW
+AI-prepared request, exact accelerated counter-offer, co-signatures, receipts,
+funding, repayment, withdrawal and native refusal. Verify without moving funds:
+
+```sh
+npm ci
+npm run build
+node dist/scripts/verify-bundle.js evidence/ai-request-1708833c.json
+node dist/scripts/verify-bundle.js evidence/ai-request-1708833c.json --online --mentor-confirmed-open-ended
+```
+
+The first checks saved content/signatures/receipt consistency. The second also
+checks online receipt authority and event-ledger history; temporary Devnet history
+may disappear. Open `/borrow?mode=live&request=request-1708833c-9d9e-4a49-9fe2-6b9284842ecc`
+on the demo and use the three intention tabs to follow the same completed loan.
+The local operator executed native actions after explicit founder approvals.

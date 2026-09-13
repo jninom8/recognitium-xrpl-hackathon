@@ -551,3 +551,53 @@ Ledger 89940, rippled 3.4.0-rc1. The complete original bundle passed --online
 verification: content consistent, both signatures valid, receipt hash chain
 consistent, online receipt authority verified and XRPL validated success. These
 are fresh read-only checks of the original cycle, not funding of a new request.
+
+## September 13, 11:09 Paris: AI intake completed the full native cycle
+
+The remaining connection was exercised with a NEW hosted request:
+`request-1708833c-9d9e-4a49-9fe2-6b9284842ecc`. This is distinct from both the
+original example and the expired 600-XRP offer. Mistral drafted 100 test XRP /
+inventory / 30 requested days; the public reviewer completed intake review.
+The founder then explicitly approved both synthetic roles, exact hashes and the
+60-second accelerated counter-offer. No chat text was treated as a signature.
+
+| Gate | Actual evidence |
+| --- | --- |
+| Open-ended vault | tesSUCCESS, ledger 90024 |
+| Lender deposit | 200 XRP, tesSUCCESS, ledger 90026 |
+| Broker and cover | tesSUCCESS, ledgers 90028 and 90030; cover 20 XRP |
+| Co-signed LoanSet | tesSUCCESS, ledger 90068; borrower received 100 XRP |
+| Native refusal | tecINSUFFICIENT_FUNDS before repayment |
+| LoanPay | tesSUCCESS, ledger 90086; scheduled repayment, no late recovery needed |
+| Lender withdrawal | tesSUCCESS, ledger 90092; 200.000020 XRP withdrawn |
+| Realised yield | 20 drops before fees; withdrawal fee 12 drops |
+| Agreement receipt | DG-e2d41354140a451c855050f148b55da1, one metered tick |
+| Execution receipt | DG-67bd66978e854f4e8d79d21862723ee4, one metered tick |
+
+Funding transaction:
+`CABC51612A0478F935D0C82DF3102124FC2DDC7E7CAACD665BCF37FD836F08FD`.
+Initial submit returned validation-unknown. Reconciliation retained the same signed
+transaction and confirmed funding. A later submit after completion retained the
+funded record. A deliberately changed document copy was rejected; the original
+remained valid. Fresh online verification of the NEW bundle passed content,
+both signatures, receipt authority and every saved XRPL transaction check.
+
+The reviewed synthetic bundle is [ai-request-1708833c.json](../evidence/ai-request-1708833c.json).
+Its document contains synthetic intake and the accelerated offer only. It has no
+wallet seeds, identity documents or company secrets. It preserves original bytes.
+The borrower and lender pages were checked in connected Chrome against this
+request: repaid 100 XRP and withdrawn 200.000020 XRP respectively. The reviewer,
+wallet observations, exact terms, receipts and transaction history use the same
+request-matched backend snapshot. This is an operator-assisted real demo, not an
+autonomous credit service. The frontend still cannot sign or make deposits alone.
+
+58 tests pass. Mistral sometimes omitted a plainly stated draft field even after
+prompt correction, so a narrow literal-field guard preserves explicit amounts,
+days and known purposes; human confirmation remains required. Saved-request chat
+now directs people to the existing record instead of suggesting another intake.
+
+Hook accepted the milestone reflection with HTTP 200 at 09:09:27.628 UTC: 631
+cumulative, zero buffered. Its first attempt used invalid taxonomy surface ledger
+and was rejected locally without sending; the corrected tooling event succeeded.
+Automatic capture has not advanced here. The mandatory personal report remains
+participant-written and has not been generated or submitted.

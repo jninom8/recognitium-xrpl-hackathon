@@ -57,7 +57,7 @@ const conversation=createConversation($('assistant-panel'),{
     draft={clientRequestId:'request-'+crypto.randomUUID(),requestedDrops:amountToDrops(fields.amount),requestedDays:fields.days,purpose:fields.purpose,synthetic:true};
     showDraftReview();
   },
-  fallback: context=>{if(context.role==='borrower'&&context.mode==='live')openRequest();else if(context.role==='broker'){const r=activeIntake();if(r)openIntake(r.clientRequestId);else setPage('requests');}else setPage('activity');}
+  fallback: context=>{if(context.role==='borrower'&&context.mode==='live'){if(context.id){if(selected())openLoan();else openIntake(context.id);}else openRequest();}else if(context.role==='broker'){const r=activeIntake();if(r)openIntake(r.clientRequestId);else setPage('requests');}else setPage('activity');}
 });
 try {
   const value = JSON.parse(localStorage.getItem(pendingKey));
@@ -221,7 +221,7 @@ function render() {
   $('activity-content').innerHTML = activity(r,c);
   $('advanced-link').href=relatedUrl('/operator',id);
   document.querySelectorAll('[data-intention]').forEach(b=>{if(b.dataset.intention===role())b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-  $('page-title').textContent=page==='overview'?(borrower?'What would you like to finance?':lender?'Explore providing liquidity.':'Review with the evidence in view.'):$('page-title').textContent;
+  $('page-title').textContent=page==='overview'?(borrower?(r?'Your loan, from agreement to repayment.':selectedIntake?'Follow your funding request.':'What would you like to finance?'):lender?'Explore providing liquidity.':'Review with the evidence in view.'):$('page-title').textContent;
   if(role()==='broker'){
     const identity=document.createElement('section');identity.className='identity-card';
     identity.innerHTML='<h3>Wallet & identity evidence</h3><p><strong>KYC not performed</strong> · Synthetic demo accounts.</p><p class="hash">Wallet: '+esc(r?.agreement.accounts.borrower??'Not prepared for this request')+'</p><p>Wallet control: '+(r?'Backend-managed test account':'Not established')+'</p><p>Identity commitment: not recorded. No identity issuer is connected.</p>'+(r?'<details><summary>Agreement document commitment (not KYC)</summary><p class="hash">'+esc(r.agreement.documentCommitment)+'</p></details>':'');
