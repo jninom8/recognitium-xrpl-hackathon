@@ -619,3 +619,5 @@ Pitch v8 prepends opening slide 0 with founder quote and italic positioning line
 Pitch v9: founder-authorized logo-only reuse from the Recognitium repository. Existing transparent PNG placed on slide 0 without a black background. Original source left unchanged; nine-slide package/layout checks and opening-slide visual inspection passed.
 
 Pitch v10: curved black oval panel behind the opening logo only; green text area preserved. Nine-slide package/layout checks pass, opening slide visually checked.
+
+Live workspace outage: Vercel private Blob store recognitium-xrpl-intake visibly reports Limits Exceeded. Direct Blob read HTTP 403; public state/intake/runner APIs HTTP 503. Devnet and /api/story-proof still HTTP 200. Idle execution worker stopped to prevent continued polling/heartbeat traffic. Browser polling and worker design contribute to quota usage; exact exhausted quota not yet established. No paid upgrade, data deletion or replacement performed. Restart requires checking the worker lock after confirmed process exit.

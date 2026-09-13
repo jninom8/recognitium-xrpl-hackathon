@@ -1067,3 +1067,5 @@ Public-to-local round-trip check passed: /api/runner connected=true; completed l
 14:26-14:27 Paris: fresh synthetic receipt issuance probe through configured RecognitiumClient returned HTTP 403; no confirmed receipt, no blind retry. 73 tests passed. verify-bundle online passed content/both signatures/authority/XRPL. /api/environment network 4001 ledger 94108, /api/story-proof both verified. Unprepared run POST HTTP 409. Current 467AD12F remains REVIEWED without match/offer.
 
 Fresh MCP issuance succeeded for three explicitly retrospective transition manifests at 12:49:38, 12:49:44 and 12:49:49 UTC, costing 3 ticks total. Official authority lookups and chain/content checks passed for each. This proves MCP issuance works; it does not resolve configured REST issuance HTTP 403. Cinematic replay shows both original and retrospective receipt timing distinctly.
+
+Workspace availability check: actual Vercel UI Limits Exceeded on private Blob store. Direct Blob get 403; state/intake/runner 503; environment and story-proof 200. Worker stopped. Our polling/heartbeat architecture contributes to usage; provider limit type not yet determined. Not an XRPL outage.
