@@ -175,8 +175,8 @@ function render() {
   const story = financingJourney(context);
   document.body.dataset.workspace = recorded ? 'example' : role();
   $('role-heading').textContent = recorded ? 'COMPLETED EXAMPLE' : borrower ? 'BORROWER WORKSPACE' : lender ? 'LENDER WORKSPACE' : 'REVIEWER WORKSPACE';
-  $('role-switch').href = relatedUrl(role() === 'broker' ? '/borrow' : '/review',id);
-  $('role-switch').textContent = role() === 'broker' ? 'Open borrower view ↗' : 'Open reviewer view ↗';
+  $('role-switch').href = relatedUrl(recorded ? lender ? '/borrow' : '/lend' : role() === 'broker' ? '/borrow' : '/review',id);
+  $('role-switch').textContent = recorded ? lender ? 'Open borrower example ↗' : 'Open liquidity example ↗' : role() === 'broker' ? 'Open borrower view ↗' : 'Open reviewer view ↗';
   $('profile-label').hidden = !recorded;
   $('profile').querySelector('option[value="broker"]').hidden = recorded;
   $('workspace-name').textContent = recorded ? 'Completed test loan' : lender ? 'Lender · Follow your capital' : borrower ? 'Borrower · Request and track' : 'Reviewer · Review and coordinate';
@@ -202,7 +202,10 @@ function render() {
     $('overview-content').innerHTML = journeyPanel(context,controls) + metrics + walletPanel(r,state.mode,walletReadings) + (r ? '<div class="dashboard-grid">'+loanCard(r,c,loanOutcome(r,c))+journeyCard(r,story)+'</div>'+proofCards(r,state.mode,relatedUrl('/operator',id)+'&tab=evidence') : borrower && !selectedIntake ? borrowerStart() : '') + (!recorded && (!borrower || privateRequests().length) ? '<div class="section-heading"><h2>'+(!borrower?'Review inbox':'Shared requests')+'</h2><button class="text-button" data-open-page="requests">View all →</button></div>'+requestList(true) : '');
   }
   $('requests-content').innerHTML = requestList(false);
-  $('overview-content').insertAdjacentHTML('beforeend',authorizationGuide(role(),Boolean(state.hosting)));
+  const guide=authorizationGuide(role(),Boolean(state.hosting));
+  const currentJourney=$('overview-content').querySelector('.journey-panel');
+  if(currentJourney) currentJourney.insertAdjacentHTML('afterend',guide);
+  else $('overview-content').insertAdjacentHTML('afterbegin',guide);
   if(lender && r) $('overview-content').insertAdjacentHTML('beforeend',proofCards(r,state.mode,relatedUrl('/operator',r.agreement.requestId)+'&tab=evidence'));
   $('activity-content').innerHTML = activity(r,c);
   if (pending && !$('request-dialog').open) notice('A submission still needs confirmation. Open Request funding to recover the same request.',true);

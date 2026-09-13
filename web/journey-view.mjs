@@ -11,7 +11,7 @@ export function authorizationGuide(role = 'borrower', hosted = false) {
     admin: 'Coordinate the approvals, receipt checks and execution without confusing one with another.',
   }[role] ?? 'Follow the same approval and execution rules for every request.';
   return `<section class="authorization-guide" aria-label="How this demo authorises funding">
-    <div class="section-heading"><div><p class="eyebrow">HOW THIS DEMO WORKS</p><h2>People decide. XRPL settles.</h2></div><span class="guide-label">Guided workspace</span></div>
+    <div class="section-heading"><div><p class="eyebrow">HOW THIS DEMO WORKS</p><h2>People approve. XRPL moves funds.</h2></div><span class="guide-label">Guided workspace</span></div>
     <p class="guide-intro">${intro}</p>
     <ol class="authority-flow">
       <li><span aria-hidden="true">1</span><div><h3>People approve</h3><p>Borrower and broker approve the exact agreement and transaction.</p></div></li>
@@ -21,7 +21,8 @@ export function authorizationGuide(role = 'borrower', hosted = false) {
     <details><summary>Who decides, and what is automated?</summary>
       <p>Recognitium records the agreement fingerprint. The broker makes the lending decision. Receipt verification is our broker application's policy; XRPL does not read Recognitium receipts.</p>
       <p>${hosted ? 'This website supports requests and review. The local operator records exact approvals and handles signing and test-money execution.' : 'The local backend holds the demo wallets. Signing requires both exact role approvals and an authority-verified agreement receipt.'}</p>
-      <p>These are guided forms, not an AI chatbot. No wallet MCP is connected. An AI could help prepare a request in a future extension; it would still need the required human approvals. Private-vault credentials and offline ledger proofs are not implemented here.</p>
+      <p>These are guided forms, not an AI chatbot. No wallet MCP is connected. A future agent could prepare requests, coordinate checks and track execution; it would still need the required human approvals.</p>
+      <p>A KYC-to-wallet fingerprint would record a claimed identity link, not permission to borrow or proof that the identity check was correct. This demo uses synthetic accounts and performs no KYC. Private-vault credentials and offline ledger proofs are not implemented here.</p>
     </details>
   </section>`;
 }
