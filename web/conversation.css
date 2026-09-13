@@ -31,3 +31,5 @@ body[data-workspace=lender] .primary{background:#695387;border-color:#695387}
 #matching-workspace[data-has-matches=true][data-has-run=false]~#overview-content>.journey-panel,#matching-workspace[data-has-matches=true][data-has-run=false]~#overview-content>.identity-card{display:none}
 
 .track-banner{color:#53467b;font-size:12px;font-weight:700;letter-spacing:.06em;padding:10px 0;margin:0}.track-banner span{display:block;font-weight:500;letter-spacing:0;margin-top:4px}.section-protocol{font-size:12px;color:#675b87;margin:8px 0}.brik-history li{margin-bottom:16px}.brik-history code{display:block;font-size:11px;overflow-wrap:anywhere}.brik-history p{font-size:13px}
+
+.app-shell>.track-banner{max-width:820px;box-sizing:border-box;margin:auto;padding:12px 32px 0}#matching-workspace[data-has-matches=true]{order:-2;display:flex;flex-direction:column}#matching-workspace .match-card{order:-1}#matching-workspace[data-has-matches=true]>.card:not(.match-card)>h2,#matching-workspace[data-has-matches=true]>.card:not(.match-card)>.eyebrow{display:none}
