@@ -140,7 +140,7 @@ function role() {
 }
 function setPage(value) {
   page = value;
-  if(value==='receipts')void showReceiptRegister();
+  if(value==='receipts')void showReceiptRegister(activeId());
   for (const name of ["overview", "requests", "activity", "receipts"])
     $(name + "-page").hidden = name !== value;
   document.querySelectorAll("[data-page]").forEach((b) => {
@@ -207,7 +207,7 @@ function render() {
   $('new-request').hidden = !borrower || page === 'activity' || page === 'receipts' || recorded;
   $('sync-note').textContent = available ? syncLabel(state) : 'Connection paused · Last recorded facts retained';
   const choices = recorded ? [] : lender ? state.requests.map(q=>({clientRequestId:q.agreement.requestId,requestedDrops:q.agreement.terms.principalDrops})) : privateRequests();
-  $('request-context').innerHTML = '';
+  $('request-context').innerHTML = id?'<span class="current-example">Current example · '+esc(shortId(id))+'</span>':'';
   $('request-context').hidden = page === 'receipts';
   if(id) $('request-context').insertAdjacentHTML('beforeend','<button class="text-button" data-open-page="activity">Transactions &amp; evidence</button>');
   if (!recorded && !lender && hasAccess() && !privateAvailable) $('overview-content').innerHTML = empty(inboxLoaded ? 'Request connection paused.' : 'Opening the shared requests…',inboxLoaded ? 'Your saved requests are retained. Reconnect before making a decision.' : 'Reading the current request and review status.');
@@ -328,7 +328,7 @@ function requestList(compact) {
       "Enter the code given to you by the person hosting the demo.",
       `<button class='primary' data-access>${role() === "broker" ? "Open review inbox" : "Open my requests"} →</button>`,
     );
-  const requests = privateRequests();
+  const requests = privateRequests().filter(r=>r.clientRequestId===activeId());
   if (!privateAvailable)
     return empty(
       inboxLoaded ? "Request inbox unavailable." : "Opening the shared requests…",
