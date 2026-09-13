@@ -581,3 +581,5 @@ Pitch revision v3: slide 6 now has three plain-language problem-to-fix lines. Up
 Pitch v4: slide 6 now pairs each observed obstacle with a specific organiser-side improvement. Seven-slide package and layout checks passed; slide 6 visually inspected. Expanded speaker notes distinguish observed recovery from proposed organiser changes.
 
 Demo presentation defaults: lender public test wallet, 100 XRP and 30 days; borrower amount defaults to 100. Approval checkbox remains unchecked. Added Watch the story, an eight-stage illustrative playback with explicit separate saved match/native-cycle evidence and no write/signing calls. Hosted build and 21 browser-model tests passed.
+
+Simplified demo screens: removed generic Details and Ask a question panels from every role. Prefilled forms, explicit approvals, Transactions & evidence, Receipts and Watch the story remain available. Browser-native execution expansion was blocked by automatic approval review without a specific reason; incomplete code was removed and the existing operator boundary retained. Hosted build and browser-model tests passed. The complete fresh browser-to-loan experience remains unfinished.

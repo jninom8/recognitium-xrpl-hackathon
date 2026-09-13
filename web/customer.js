@@ -238,7 +238,7 @@ function render() {
     const preview=identity.querySelector('#identity-fixture-preview');if(preview)preview.onclick=async()=>{preview.disabled=true;const output=identity.querySelector('#identity-fixture-result');try{const response=await fetch('/api/identity-fixture',{signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();const fixture=await response.json();output.innerHTML='<p><strong>Synthetic preview · not sealed</strong></p><p>Fictional supplier · no KYC provider</p><p class="hash">Example wallet: '+esc(fixture.opening.wallet)+'</p><p class="hash">Request: '+esc(fixture.opening.requestId)+'</p><code class="hash">'+esc(fixture.commitment)+'</code><p>'+esc(fixture.status)+'</p>'; }catch{output.textContent='Could not load the example. Try again.';}finally{preview.disabled=false;}};
   }
   const details=document.createElement('details');details.className='workspace-details';
-  const summary=document.createElement('summary');summary.textContent='Details';details.append(summary);
+  details.hidden=true;
   const moneyCard=$('overview-content').querySelector('.loan-card');if(moneyCard)$('overview-content').querySelector('.journey-panel')?.after(moneyCard);
   for(const node of [...$('overview-content').children]) if(!node.classList.contains('journey-panel')&&!node.classList.contains('loan-card')&&!(role()==='broker'&&node.classList.contains('identity-card')))details.append(node);
   $('overview-content').insertAdjacentHTML('beforeend',simpleProofs(r));
@@ -255,7 +255,8 @@ function render() {
     else if(story.funded)panel.querySelector('h2').textContent='Your money arrived.';
   }
   if(role()==='broker'&&!id){const panel=$('overview-content').querySelector('.journey-panel');if(panel)panel.querySelector('h2').textContent='Choose a request to review.';}
-  $('assistant-wrap').hidden=role()==='broker';
+  $('assistant-wrap').hidden=true;
+
   const chatWrap=$('assistant-wrap'), chatKey=[role(),state.mode,id??'new'].join(':');
   if(chatWrap.dataset.context!==chatKey){chatWrap.dataset.context=chatKey;chatWrap.open=!id;}
   document.querySelector('.conversation-layout').dataset.hasRecord=String(Boolean(id));
