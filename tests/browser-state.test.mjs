@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SnapshotCursor, sameReview, drops } from '../web/state-client.mjs';
+import { freshnessLabel } from '../web/state-client.mjs';
 
 test('UI rejects delayed responses and handles different modes and restarted backends', () => {
   const c=new SnapshotCursor();const first=c.begin('live'),second=c.begin('live');
@@ -26,4 +27,12 @@ test('selected loan never inherits another run cycle',async()=>{
  const state={cycle:a,cyclesByRequest:{A:a,B:b}};
  assert.equal(cycleFor(state,'B'),b);assert.equal(cycleFor(state,'missing'),null);
  assert.equal(cycleFor({cycle:a},'B'),null);assert.equal(cycleFor({cycle:a},'A'),a);
+});
+
+test('publication freshness stays bound to the selected request and distinguishes the saved example',()=>{
+ const state={mode:'live',observedAt:'2026-09-13T10:00:00Z',hosting:{openDemo:true},bridgeByRequest:{A:{publishedAt:'2026-09-12T10:00:00Z'}}};
+ assert.match(freshnessLabel(state,'A'),/Native progress published/);
+ assert.match(freshnessLabel(state,'B'),/No native progress published/);
+ assert.match(freshnessLabel(state,undefined),/No native progress published/);
+ assert.match(freshnessLabel({...state,mode:'recorded'},'A'),/Saved completed example/);
 });

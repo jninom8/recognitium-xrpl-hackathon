@@ -1,0 +1,44 @@
+{
+  "schema": "recognitium.hosted-wallet-checks.v1",
+  "checkedAt": "2026-09-13T02:53:05.297Z",
+  "operator": "author-operated",
+  "scope": "Read-only hosted balance integration. Test network and synthetic accounts. No signing, issuance or transfer.",
+  "base": "https://recognitium-xrpl-hackathon.vercel.app",
+  "checks": [
+    {
+      "mode": "recorded",
+      "httpStatus": 200,
+      "latencyMs": 273,
+      "fundingStatus": "funded",
+      "loanReceivedDrops": "100000000",
+      "observation": {
+        "requestId": "synthetic-supplier-001",
+        "account": "rPutWPDhwyny4ksLNPqT7PXk8Vicrqb9BR",
+        "networkId": 4001,
+        "serverBuild": "3.4.0-rc1",
+        "ledgerIndex": 82625,
+        "ledgerHash": "334407D72050842BB21F2013A1664DBE560DC1107D583F7F4C7ADF640C9FC3A6",
+        "balanceDrops": "999999944",
+        "checkedAt": "2026-09-13T02:53:04.737Z"
+      }
+    },
+    {
+      "mode": "live",
+      "httpStatus": 200,
+      "latencyMs": 267,
+      "fundingStatus": "unfunded",
+      "loanReceivedDrops": null,
+      "observation": {
+        "requestId": "request-e0403f17-c5f4-4af5-a2a6-2b2cd3c57eeb",
+        "account": "rMHEsNryzQj9HxiQijwfdCQR2Mgywf9SK1",
+        "networkId": 4001,
+        "serverBuild": "3.4.0-rc1",
+        "ledgerIndex": 82625,
+        "ledgerHash": "334407D72050842BB21F2013A1664DBE560DC1107D583F7F4C7ADF640C9FC3A6",
+        "balanceDrops": "1000000000",
+        "checkedAt": "2026-09-13T02:53:05.335Z"
+      }
+    }
+  ],
+  "unknownRequestStatus": 404
+}

@@ -1367,3 +1367,14 @@ body[data-workspace="broker"] .primary:hover { background:#4f3b70; }
 body[data-workspace="broker"] .brand-icon { background:#645087; border-color:#645087; }
 #role-heading { font-size:10px; line-height:1.6; font-weight:700; }
 #role-switch { display:inline-block; border:1px solid var(--line); padding:9px 10px; border-radius:10px; background:#ffffff85; }
+
+/* Put the next action within reach before the supporting detail. */
+.app-shell .topbar { height:64px; }
+.app-shell main { padding-top:18px; }
+.app-shell .source-bar { margin-bottom:16px; }
+.app-shell .page-heading { margin-bottom:22px; }
+.app-shell .page-heading h1 { font-size:clamp(27px,2.7vw,36px); }
+.app-shell .context-bar { margin-bottom:18px; }
+.app-shell .journey-panel { padding:24px; }
+.app-shell .lifecycle { margin:22px 0; }
+@media(max-width:650px) { .app-shell .topbar { height:auto; min-height:58px; padding-top:12px; padding-bottom:12px; } .app-shell .workspace-name { display:block; font-size:11px; } .app-shell .journey-panel { padding:20px 18px; } }

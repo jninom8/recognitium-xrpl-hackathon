@@ -1,7 +1,8 @@
 # Recognitium · Developer journey
 
-**The shared reading page for the team.** September 12, 2026.
-Evidence through **22:48 Paris time (UTC+2)**. About eight minutes to read.
+**The shared reading page for the team.** September 12–13, 2026.
+Latest checkpoint: **September 13, 04:53 Paris time (UTC+2)**.
+The overview below is current; dated entries preserve earlier observations.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
 [Proof](#3-check-the-result) · [Hook](#4-the-mandatory-devex-hook) ·
@@ -17,11 +18,11 @@ Evidence through **22:48 Paris time (UTC+2)**. About eight minutes to read.
 | Realised interest | **20 drops before network fees**, not net profit |
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
-| Customer interface | Plain-language task entrance, request form and tracking; separate completed example and team inbox; technical workspace at `/operator` |
-| Tests | 36 passing local tests, including process crashes with simulated external systems, two-client state checks, durable intake and example separation |
-| Developer capture | Team **Recognitium**; 432 events accepted at the last recorded check |
-| Last connection checkpoint | Read-only health reached network 4001, ledger 70504, in 99 ms at 18:46 |
-| Still to finish | Reviewed request to fresh loan, independent reproduction, fresh joint rehearsal and participant-written final report |
+| Customer interface | Borrower, reviewer, lender and admin share one six-step narrative; full operation history, separate evidence checks and live borrower balance |
+| Tests | 51 passing local tests; deployed request/review and wallet checks; failures explicitly distinguish simulated external systems |
+| Developer capture | Team **Recognitium**; 617 events accepted at 04:53 Paris on September 13 |
+| Last connection checkpoint | Vercel read both borrower accounts at validated event ledger 82625; HTTP 200, 273/267 ms |
+| Still to finish | Resolve the expired unsigned 600-XRP offer, obtain fresh exact approval and complete that connected native run; independent reproduction and participant-written final report |
 
 The business request and document are explicitly **synthetic**. The ledger
 transactions and receipt calls are real observations. All XRP is test XRP.
@@ -383,3 +384,37 @@ Read-only hosted check at 23:24 UTC: selected 600-XRP request still AGREEMENT_LO
 ## September 13: contract history and privacy claim review
 
 Compared an external architectural argument against the original synthetic loan and primary sources. Both expected signing addresses and signatures verify. The useful direction is a versioned history with explicit evidence and authority for each event. Corrected stronger claims about off-chain finality, exact timestamps, automatic default handling, cover protection and salt destruction. The reviewed note includes a proposed amendment-history experiment, clearly distinguished from implemented behavior: [CONTRACT_HISTORY_FACT_CHECK.md](CONTRACT_HISTORY_FACT_CHECK.md). No KYC data, new financial transaction or manual participant report was generated. Hook accepted seven actual buffered events with HTTP 200 at 01:45:52 UTC, 547 cumulative and zero remaining.
+
+## September 13, 04:53 Paris: one narrative, traceable balances
+
+The borrower, reviewer, lender and admin now use one six-step model: request,
+review, agree, receive, repay, return. Each view names the next actor. Setup,
+co-signature approvals, receipt recovery, declined transactions and lender yield
+remain inspectable. The full mapping is in [UI_CAPABILITY_AUDIT.md](UI_CAPABILITY_AUDIT.md).
+A saved page refresh is not presented as a fresh authority or ledger check.
+
+Author-operated Chrome testing created a synthetic request for exactly
+123.000002 test XRP and completed its review in the separate reviewer tab. The
+borrower and admin both showed review complete for that same request, without
+claiming a loan existed. The deployed HTTP smoke also checked concurrent retries,
+stale review, changed details and rejected native actions. 51 local tests passed.
+
+The borrower balance card reads a known agreement's account on network 4001 at
+one validated ledger. It separates wallet funds from the amount this loan actually
+credited. Vercel returned 999.999944 test XRP for the completed example's wallet
+and 1,000 test XRP for the newer wallet at ledger 82625. The latter is still
+unfunded; faucet money does not establish loan funding. A failed refresh retains
+its dated observation. Exact evidence and a repeatable read-only command are in
+[evidence/hosted-wallet-checks.json](../evidence/hosted-wallet-checks.json).
+
+The custom explorer displayed the original successful LoanSet. Testing exposed an
+incorrect transaction-link path in the new UI; it now uses the observed
+`/transactions/:hash` route. The original cycle satisfies all six Track 1 slide
+items, including withdrawal with 20 drops of gross realised yield and a native
+liquidity refusal. The separate 600-XRP offer expired unsigned and still requires
+fresh exact approval after renewal is resolved. The UI does not erase that gap.
+
+Hook 2.4.0 accepted 26 actual captured events at 02:53:39 UTC with HTTP 200;
+617 cumulative, zero buffered at that checkpoint. This is implementation evidence,
+not the official participant-written report. No new signing, receipt issuance,
+loan transfer or public signal occurred during this UI milestone.

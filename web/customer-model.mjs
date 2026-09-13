@@ -25,7 +25,7 @@ export const intakeStates = {
   REVIEWED: {
     label: "Review complete",
     description:
-      "Your request has been reviewed. The next step is an offer showing what you receive and what you repay. Preparing that offer is not yet connected in this demo. No loan has been funded from this request.",
+      "Your request has been reviewed. The local operator can prepare an exact offer for both roles to approve. No loan has been funded merely by completing this review.",
     tone: "neutral",
   },
 };
@@ -71,6 +71,8 @@ export function loanOutcome(request, cycle) {
       funded,
       repaid,
     };
+  if (request.phase === 'SIGNED')
+    return { label: 'Signed; funding not confirmed', description: 'Both signatures are stored. The local operator must submit or reconcile the same transaction.', tone: 'amber', funded, repaid };
   if (request.funding.status === "unknown")
     return {
       label: "Confirming funding",

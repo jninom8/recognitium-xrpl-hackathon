@@ -6,6 +6,7 @@
     <meta name="color-scheme" content="light" />
     <title>Recognitium | Your financing</title>
     <link rel="stylesheet" href="/customer.css" />
+    <link rel="stylesheet" href="/journey.css" />
     <script type="module" src="/customer.js"></script>
   </head>
   <body class="welcome">
@@ -53,7 +54,7 @@
           <span aria-hidden="true">→</span></a
         >
         <p class="welcome-disclosure">
-          Try submitting and reviewing a made-up request together. New loans are not issued through this website yet. The completed example shows a real test-money loan.
+          Try a made-up request with a reviewer. A local operator handles exact approvals and test-money execution; progress appears here. Explore the completed example at any time.
         </p>
       </div>
       <footer class="welcome-footer">
@@ -73,7 +74,7 @@
           <span aria-hidden="true">◫</span>Overview</button
         ><button data-page="requests">
           <span aria-hidden="true">▤</span
-          ><span id="requests-label">My requests</span></button
+          ><span id="requests-label">Requests</span></button
         ><button data-page="activity">
           <span aria-hidden="true">↗</span>History & documents
         </button>
@@ -84,7 +85,7 @@
         <p><a id="role-switch" href="/review" target="_blank" rel="noopener">Open reviewer view ↗</a></p>
         <p><a href="/?mode=recorded">Explore an example</a></p>
         <a id="operator-link" href="/operator?mode=recorded"
-          >Operations & system status ↗</a
+          >Admin & system status ↗</a
         >
       </div>
     </aside>
@@ -115,12 +116,13 @@
           </select>
         </div>
         <p id="notice" class="notice" role="status" hidden></p>
+        <div id="request-context" class="context-bar"></div>
         <div class="page-heading">
           <div>
-            <p id="page-eyebrow" class="eyebrow">BORROWER WORKSPACE</p>
-            <h1 id="page-title">A little room to move forward.</h1>
+            <p id="page-eyebrow" class="eyebrow">RECOGNITIUM WORKSPACE</p>
+            <h1 id="page-title">Opening your workspace…</h1>
             <p id="page-subtitle" class="subtitle">
-              Request funding, review the terms and follow your loan.
+              One request. Clear terms. A record of every payment.
             </p>
           </div>
           <button id="new-request" class="primary">

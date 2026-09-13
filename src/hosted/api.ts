@@ -6,6 +6,8 @@ import { readPublicRuns } from './runs.js';
 import { HostedIntake } from './intake.js';
 import { BlobIntakeDatabase } from './blob.js';
 import { checkHostedOrigin } from './security.js';
+import { readBorrowerWallet } from '../server/wallet.js';
+import type { Agreement } from '../shared/contract.js';
 
 const instanceId = 'hosted-' + createHash('sha256').update(process.env.VERCEL_URL ?? 'local-hosted-test').digest('hex').slice(0,24);
 const reply = (res: ServerResponse, status: number, value: unknown) => {
@@ -18,6 +20,19 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     checkHostedOrigin(req.headers.origin, req.headers.host);
     const url = new URL(req.url ?? '/', 'https://hosted.invalid');
     const path = url.pathname;
+    const balanceMatch=/^\/api\/requests\/([a-zA-Z0-9_-]+)\/balance$/.exec(path);
+    if(req.method==='GET' && balanceMatch) {
+      const id=balanceMatch[1]!;
+      let agreement:Agreement|undefined;
+      if(url.searchParams.get('mode')==='recorded') {
+        const bundle=JSON.parse(await readFile(join(process.cwd(),'hosted','bundle.json'),'utf8'));
+        const candidate=JSON.parse(bundle.agreementBytes) as Agreement;
+        if(candidate.requestId===id)agreement=candidate;
+      } else agreement=(await readPublicRuns()).runs.find(r=>r.requestId===id)?.request?.agreement;
+      if(!agreement)return reply(res,404,{error:'No prepared borrower account for this request'});
+      try{return reply(res,200,await readBorrowerWallet(id,agreement.accounts.borrower,agreement.network));}
+      catch{return reply(res,503,{error:'The event ledger balance could not be confirmed. Keep the last observation and try again.'});}
+    }
     if (req.method === 'GET' && path === '/api/state') {
       const mode = url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live';
       const state = JSON.parse(await readFile(join(process.cwd(), 'hosted', mode + '.json'), 'utf8'));

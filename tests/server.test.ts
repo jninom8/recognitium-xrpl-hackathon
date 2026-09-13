@@ -13,6 +13,9 @@ test('local API shows disconnected state and refuses unauthenticated or wrong-ro
     assert.equal(state.contractVersion,'recognitium.lending.v1'); assert.equal(state.connected,false);
     const home=await fetch(base); assert.equal(home.status,200); assert.match(await home.text(),/Request funding/);
     const operatorPage=await fetch(base+'/operator');assert.equal(operatorPage.status,200);assert.match(await operatorPage.text(),/Operator controls/);
+    for(const asset of ['/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs']) {
+      const resource=await fetch(base+asset);assert.equal(resource.status,200);assert.ok((await resource.text()).length>100);
+    }
     for(const [path,token] of [['/api/setup',''],['/api/setup',broker],['/api/requests/x/approve/borrower',broker]]) {
       const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:'{}'});
       assert.equal(response.status,401);

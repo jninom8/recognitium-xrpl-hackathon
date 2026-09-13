@@ -3,6 +3,19 @@
 Start with the [unified developer journey](DEVELOPER_JOURNEY.md) for the shared
 team overview; this file retains implementation gates and outstanding work.
 
+Latest milestone, September 13: the simplified borrower/reviewer/lender/admin
+journeys are deployed. A shared lifecycle model preserves next actions, exact
+approvals, setup, refusal/recovery history and separate proof/freshness states.
+51 tests pass; deployed request/review, wallet reads and online original-bundle checks passed.
+Borrower and admin views now separate a current event-wallet balance from loan
+proceeds, with validated ledger details and working event transaction links.
+Deployment `dpl_5rn6fsLPRJRJTeyNrHhWgpNCaW3f` is READY at the existing Vercel URL.
+Hook checkpoint 02:53:39 UTC: 617 accepted events, zero buffered.
+See [UI_CAPABILITY_AUDIT.md](UI_CAPABILITY_AUDIT.md) for the complete mapping and
+actual evidence. The fresh 600-test-XRP loan remains unfunded with an expired
+unsigned offer; this UI milestone does not complete that remaining native run.
+Earlier checkpoints below are chronological history and may be superseded.
+
 Updated September 12, 2026, during the Nanterre hackathon. Update this document
 when evidence changes. The current time, not the original timetable, governs
 remaining build time. Official event submission is Sunday 13:00, freeze 12:30.

@@ -32,3 +32,10 @@ export function cycleFor(state, requestId) {
  if (state?.cyclesByRequest) return state.cyclesByRequest[requestId] ?? null;
  return state?.cycle?.requestId === requestId ? state.cycle : null;
 }
+
+/** Page refresh time and evidence publication time are different observations. */
+export function freshnessLabel(state, requestId) {
+ const publishedAt = requestId ? state.bridgeByRequest?.[requestId]?.publishedAt : undefined;
+ const context = state.mode === 'recorded' ? 'Saved completed example' : state.hosting ? publishedAt ? 'Native progress published ' + new Date(publishedAt).toLocaleString() : 'No native progress published for this request' : 'See service check times below';
+ return 'Page refreshed ' + new Date(state.observedAt).toLocaleTimeString() + ' · ' + context;
+}

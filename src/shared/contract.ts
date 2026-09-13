@@ -147,3 +147,9 @@ export interface DashboardRequest extends RequestView {
 export interface BridgeProgress {
  requestId:string;stage:string;requestedDrops:string;requestedDays:number;offeredIntervalSeconds:number;publishedAt:string;intakeDigest:string;intakeRevision:number;
 }
+
+/** Read-only wallet observation at one validated event-network ledger. */
+export interface WalletObservation {
+  requestId:string; account:string; networkId:number; serverBuild:string;
+  ledgerIndex:number; ledgerHash:string; balanceDrops:string; checkedAt:string;
+}

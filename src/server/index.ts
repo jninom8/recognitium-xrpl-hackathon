@@ -10,6 +10,7 @@ import { IntakeService } from '../requests/intake.js';
 import type { FinancingRequest } from '../shared/intake.js';
 import { Dashboard, readPublishedBundle, repositoryBundlePath } from './dashboard.js';
 import { HealthMonitor } from './health.js';
+import { readBorrowerWallet } from './wallet.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const adapter = new NativeAdapter(process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1'); adapter.client.on('error', () => {});
@@ -49,12 +50,20 @@ const server = createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
       return res.end(await readFile(path === '/operator' ? 'web/operator.html' : 'web/index.html'));
     }
-    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css'].includes(path)) {
+    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs'].includes(path)) {
       res.writeHead(200, { 'Content-Type': path.endsWith('.css') ? 'text/css' : 'text/javascript', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(await readFile('web' + path));
     }
     if (req.method === 'GET' && path === '/api/state') {
       return respond(res,200,await dashboard.snapshot(url.searchParams.get('mode') === 'recorded' ? 'recorded' : 'live'));
+    }
+    const balanceMatch=/^\/api\/requests\/([a-zA-Z0-9_-]+)\/balance$/.exec(path);
+    if(req.method==='GET' && balanceMatch) {
+      const mode=url.searchParams.get('mode')==='recorded'?'recorded':'live';
+      const request=(await dashboard.snapshot(mode)).requests.find(r=>r.agreement.requestId===balanceMatch[1]);
+      if(!request)return respond(res,404,{error:'No prepared borrower account for this request'});
+      try{return respond(res,200,await readBorrowerWallet(request.agreement.requestId,request.agreement.accounts.borrower,request.agreement.network));}
+      catch{return respond(res,503,{error:'The event ledger balance could not be confirmed. Keep the last observation and try again.'});}
     }
     if (req.method === 'GET' && path === '/api/intake') {
       const role = url.searchParams.get('role');

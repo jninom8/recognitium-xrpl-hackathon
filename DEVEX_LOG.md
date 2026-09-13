@@ -751,3 +751,36 @@ Read-only hosted check at 23:24 UTC: selected 600-XRP request still AGREEMENT_LO
 Read-only public-bundle verification derived the two original signing addresses and returned both-valid. Inspected the existing 32-byte salted document commitment and current receipt-authority boundary; compared XRPL timing, keys, lending and credentials with primary documentation. Checked C-413/23 P and the EDPB final version 2.0 adopted July 7, 2026. Findings and proposed synthetic tests are in [CONTRACT_HISTORY_FACT_CHECK.md](docs/CONTRACT_HISTORY_FACT_CHECK.md); this is agent-assisted research, not the official participant report. No protocol bug is alleged from these conceptual corrections.
 
 `node scripts/hook-status.mjs --flush` completed successfully at 01:45:52 UTC. Hook 2.4.0 accepted seven existing events with HTTP 200; 547 cumulative, zero buffered. No raw logs, invite or identity files were exposed. No new signature, metered receipt, network transaction or public signal was issued.
+
+## September 13, 04:53 Paris: shared UI and live borrower balance
+
+Implemented a shared borrower/reviewer/lender/admin lifecycle with exact request
+selection, next actor, setup and full ledger history, separate content/authority/
+XRPL evidence, recorded publication times and expiry handling. Preserved approvals,
+receipt recovery, native refusals, repayment and lender yield. Added an on-demand
+borrower wallet read tied to the agreement's account and event network 4001.
+`server_info` fixes a validated ledger; `account_info` must match its index/hash,
+account and integer balance. Failed refreshes retain the last observation.
+
+Actual checks: npm test, 51 passed, zero failed (7149.9723 ms); hosted build and
+syntax checks passed. Chrome created/reviewed request-35dd9b3f-5d58-4b09-8067-cfa6dd68efab
+for 123.000002 test XRP/30 days. Borrower and admin followed the same reviewed ID.
+HTTP smoke at 02:37:07 UTC created request-76e71762-9d1e-4e9f-8a61-3331d0c29b87:
+REVIEWED revision 3, duplicate retry one record, stale/change 409, invalid role 401,
+wrong origin/native 403, malformed JSON 400. No new loan was approved or funded.
+
+`node scripts/check-hosted-wallet.mjs`, 02:53 UTC: HTTP 200, 273/267 ms, validated
+ledger 82625. Original wallet 999999944 drops versus historical loan proceeds
+100000000 drops; newer request wallet 1000000000 drops but funding unfunded.
+Unknown request 404. Evidence: evidence/hosted-wallet-checks.json. Chrome's borrower
+button then displayed 1000 test XRP and Not funded, with ledger 82639. Explorer
+search confirmed original LoanSet 54A285546C2F2A4374C698E2EA00CC82778F408163D30C49898A28B8C4FB75FA
+at ledger 66253; corrected new UI links to /transactions/:hash.
+
+Read-only network probe 02:16 UTC: HTTP 571 ms, WebSocket 619 ms, xrpl.js 5.2.0
+SDK 836 ms, network 4001, rippled 3.4.0-rc1, ledger 81898. Online verification of
+the original bundle passed both signatures, receipt authority and saved native
+transactions. No metered receipt issuance. Hook flush 02:53:39.611 UTC: HTTP 200,
+26 accepted, 617 cumulative, zero remaining. No raw logs or identity/invite exposed.
+These are author-operated observations, not independent reproduction or the manual
+participant report. Fresh 600-XRP offer remains expired, unsigned and unfunded.
