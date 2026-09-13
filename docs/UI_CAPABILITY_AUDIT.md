@@ -58,3 +58,32 @@ Optional AI discovery, Credentials, Permissioned Domains, browser-wallet integra
 ## Remaining functional boundary
 
 The original 100-test-XRP native cycle remains the completed, independently inspectable evidence. The separate 600-test-XRP request has validated setup, an expired unsigned offer and no recorded exact approvals or borrower funding. A fresh connected cycle still requires resolving that offer and obtaining fresh exact approval. Automatic offer renewal is not implemented. Current vault cash, production identity controls and unattended public signing are not supplied by this UI update.
+
+## September 13, 09:34 Paris: approval and evidence explanation audit
+
+- Shared `authorizationGuide` on borrower, reviewer, lender and admin separates
+  human approval, application receipt policy and XRPL signature/rule enforcement.
+  The hosted/local execution boundary is explicit. Guided forms are not labelled
+  as an AI chatbot; KYC, wallet MCP, separately sealed human approval, scheduled
+  repayment mandates and delegated autonomy are visibly proposed, not built.
+- Shared `evidenceLimits` separates offline fingerprints, signing-key signatures
+  and receipt-chain consistency from online authority authentication and XRPL
+  inclusion. No offline validator proof archive is claimed.
+- Missing or invalid receipt authority-check timestamps remain pending; a failed
+  receipt check does not erase confirmed funding. A regression test covers this.
+- Lender overview now includes proof cards. Recorded role links preserve the
+  example ID and recorded mode. Current balance remains distinct from proceeds.
+- `npm test`: 52 passed, zero failed, 5,787.1813 ms. Hosted build and JS syntax
+  checks passed; the final explanatory paragraph was rebuilt successfully.
+- Connected Chrome: borrower and lender guides rendered; lender retained return
+  200.000020 test XRP, 20-drop gross interest and 12-drop withdrawal fee. Clicking
+  its role link opened `/borrow?mode=recorded&request=synthetic-supplier-001`.
+  Admin evidence retained receipt details, download and offline limits. Live
+  reviewer retained the expired 600-test-XRP offer with zero approvals/funding.
+  These were read-only author checks, not independent reproduction or new funding.
+- Existing Vercel Git integration deployed `14230d6`, READY, deployment
+  `3thNG7eFY7woMPxRMWY4HoQVf1Qz`, public alias verified in Chrome. CLI deployment
+  returned Not authorized while whoami succeeded; no auth workaround was needed.
+- Hook explicit reflection accepted at 07:34:14.967 UTC, HTTP 200, 627 cumulative,
+  zero buffered. Active project identity matches Recognitium. Current projectless
+  automatic capture remains unproven; historic registration is not new capture.

@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12–13, 2026.
-Latest research/capture checkpoint: **September 13, 09:09 Paris time (UTC+2)**.
+Latest UI/capture checkpoint: **September 13, 09:34 Paris time (UTC+2)**.
 The overview below is current; dated entries preserve earlier observations.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
@@ -19,8 +19,8 @@ The overview below is current; dated entries preserve earlier observations.
 | Protocol refusals | Insufficient liquidity; normal repayment after its due date |
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Borrower, reviewer, lender and admin share one six-step narrative; full operation history, separate evidence checks and live borrower balance |
-| Tests | 51 passing local tests; deployed request/review and wallet checks; failures explicitly distinguish simulated external systems |
-| Developer capture | Team **Recognitium**; 626 events accepted at 09:09 Paris on September 13, including one explicit agent reflection |
+| Tests | 52 passing local tests; deployed role views, request/review and wallet checks; failures explicitly distinguish simulated external systems |
+| Developer capture | Team **Recognitium**; 627 events accepted at 09:34 Paris on September 13, including two explicit agent reflections; current projectless automatic capture is not proven |
 | Last connection checkpoint | Vercel read both borrower accounts at validated event ledger 82625; HTTP 200, 273/267 ms |
 | Still to finish | Resolve the expired unsigned 600-XRP offer, obtain fresh exact approval and complete that connected native run; independent reproduction and participant-written final report |
 
@@ -432,3 +432,38 @@ This is research and a proposal, not a new implementation or the manual report.
 
 At 07:09:52 UTC the official hook accepted that explicit agent reflection with
 HTTP 200: 626 cumulative events, zero buffered. It does not claim a reset occurred.
+
+## September 13, 09:34 Paris: one explanation across four workspaces
+
+The borrower, reviewer, lender and admin now see the same sequence: people
+approve the exact offer, our broker verifies the agreement receipt, and XRPL
+checks both signatures and lending rules. This is a guided application, not a
+chatbot. The local operator still handles exact approvals and test-wallet signing.
+
+Evidence cards now explain what survives offline and what still requires online
+authority or event-ledger history. A missing or invalid authority-check timestamp
+stays pending, even when funding is confirmed. The lender overview now includes
+these proof cards alongside capital, gross interest and withdrawal fees.
+
+52 tests passed. Chrome checked all four deployed views. The completed example
+retains 200.000020 test XRP returned, 20 drops interest before fees and a separate
+12-drop withdrawal fee. Cross-role navigation retains the same recorded request.
+The live reviewer still shows the 600-test-XRP offer as expired, with no approval
+or funding. No new loan, identity check or metered receipt was made.
+
+Vercel CLI deployment returned Not authorized despite a successful whoami read.
+The existing GitHub integration deployed main successfully; the Vercel dashboard
+showed commit 14230d6 READY and the public site served it. This is deployment
+evidence, not a new XRPL run or an independent teammate reproduction.
+
+The hook's active identity matches Recognitium, but automatic counters did not
+advance from this projectless chat. Official reflection submission and flush
+accepted this genuine UI observation at 07:34:14.967 UTC with HTTP 200:
+627 cumulative events, zero buffered, comprising 625 automatic events and two
+explicit agent reflections. No raw capture or identity files were published.
+
+The founder's proposed agent direction is documented separately in
+[Agent assistance and authority](AGENT_AUTHORITY_DIRECTION.md): a linked approval
+receipt, bounded repayment mandates and revocable permissions remain future work.
+Validator trust, KYC issuer trust and the broker's lending decision stay distinct.
+This journal supports the participants; it is not their official manual report.

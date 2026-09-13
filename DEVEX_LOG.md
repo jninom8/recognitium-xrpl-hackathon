@@ -807,3 +807,45 @@ resolved that validation error. One reflection was buffered and accepted with
 HTTP 200, 626 cumulative, zero remaining. No reset was claimed and no participant
 report generated. This is explicit reflection delivery, not proof of automatic
 runtime capture in the projectless context.
+
+## September 13, 07:34 UTC: unified approval and evidence UI
+
+Added shared approval/broker/XRPL explanations to borrower, reviewer, lender and
+admin. Added offline evidence limits and lender proof cards. Receipt authority
+timestamps must parse as valid dates; missing/invalid timestamps remain pending,
+with a regression test preserving funded state. Recorded role links preserve
+the example request. Existing approvals, wallet data and native operations remain.
+
+`npm test`: 52 passed, zero failed, 5,787.1813 ms. `npm run build:hosted` and JS
+syntax checks passed. Final future-authority explanatory copy also built. The
+first scoped scan before staging checked zero files and was not treated as a
+publication check; the staged scan is the relevant gate.
+
+`npx --yes vercel@59.16.0 deploy --prod --yes` returned Not authorized; whoami
+succeeded. Existing GitHub integration deployed commit 14230d6 automatically.
+Connected Chrome Vercel dashboard showed READY deployment
+3thNG7eFY7woMPxRMWY4HoQVf1Qz at
+https://recognitium-xrpl-hackathon-mbz6hs9i7-joses-projects-fad27925.vercel.app .
+The usual public alias served the new guide. No credentials were exposed.
+
+Chrome checked the deployed borrower, live reviewer, recorded lender and admin
+evidence view. Lender: 200.000020 test XRP returned, 20-drop gross interest and
+12-drop withdrawal fee. Its role link opened the matching recorded borrower
+in a new tab. Admin kept receipt details and bundle download. Reviewer showed
+600-test-XRP expired offer, no role approvals and no funding. No new transaction
+or receipt issuance. Browser auto-translation was active; English source wording
+was adjusted for clearer meaning, not treated as native French localization.
+
+The hook's official identity API confirmed active identity and Recognitium
+team_display/normalized team. An initial check looked for the display name in
+the normalized field and returned false; reading the schema and checking the
+correct fields resolved this diagnostic mistake without changing identity.
+Automatic counters remained unchanged in this projectless context. Submitted
+one actual agent reflection via official submit.mjs and flushed it: HTTP 200,
+07:34:14.967 UTC, one accepted, 627 cumulative, zero buffered. Channels: 625 hook,
+two reflection. No fabricated protocol result or participant report submitted.
+
+Primary-source research on proposed agent authority is recorded in
+docs/AGENT_AUTHORITY_DIRECTION.md. KYC issuer trust is distinct from consensus;
+approval receipts do not prove human presence or AI Act compliance by themselves.
+No credentials, agent autonomy or new lending features were implemented.

@@ -3,17 +3,27 @@
 Start with the [unified developer journey](DEVELOPER_JOURNEY.md) for the shared
 team overview; this file retains implementation gates and outstanding work.
 
-Latest milestone, September 13: the simplified borrower/reviewer/lender/admin
-journeys are deployed. A shared lifecycle model preserves next actions, exact
-approvals, setup, refusal/recovery history and separate proof/freshness states.
-51 tests pass; deployed request/review, wallet reads and online original-bundle checks passed.
-Borrower and admin views now separate a current event-wallet balance from loan
-proceeds, with validated ledger details and working event transaction links.
-Deployment `dpl_5rn6fsLPRJRJTeyNrHhWgpNCaW3f` is READY at the existing Vercel URL.
-Hook checkpoint 02:53:39 UTC: 617 accepted events, zero buffered.
+Latest milestone, September 13, 09:34 Paris: borrower/reviewer/lender/admin
+share a deployed explanation of exact approval, the broker's receipt policy and
+XRPL execution. Evidence cards separate offline consistency from online receipt
+authority and ledger inclusion; missing authority timestamps stay pending.
+52 tests pass. Connected Chrome checked all four deployed workspaces, including
+the lender's return/fees, admin evidence export and the live expired offer.
+Borrower and admin views retain separate current wallet balance and loan proceeds.
+GitHub deployment of `14230d6` is READY at the existing Vercel URL; Vercel's
+project page identified deployment `3thNG7eFY7woMPxRMWY4HoQVf1Qz`. Git deployment
+worked after the CLI returned Not authorized. Later documentation-only commits
+may supersede this deployment without changing the checked behavior.
+Hook checkpoint 07:34:14.967 UTC: HTTP 200 accepted one explicit reflection,
+627 cumulative, zero buffered. Identity is active under Recognitium. Automatic
+capture has not advanced in the current projectless chat context; explicit
+reflection delivery is not evidence of automatic runtime capture here.
 See [UI_CAPABILITY_AUDIT.md](UI_CAPABILITY_AUDIT.md) for the complete mapping and
 actual evidence. The fresh 600-test-XRP loan remains unfunded with an expired
 unsigned offer; this UI milestone does not complete that remaining native run.
+The [agent authority direction](AGENT_AUTHORITY_DIRECTION.md) keeps separate
+approval receipts, repayment mandates, identity issuers and revocable autonomy
+as proposed work, not implemented capabilities or compliance claims.
 Earlier checkpoints below are chronological history and may be superseded.
 
 Updated September 12, 2026, during the Nanterre hackathon. Update this document

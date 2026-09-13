@@ -22,6 +22,7 @@ export function authorizationGuide(role = 'borrower', hosted = false) {
       <p>Recognitium records the agreement fingerprint. The broker makes the lending decision. Receipt verification is our broker application's policy; XRPL does not read Recognitium receipts.</p>
       <p>${hosted ? 'This website supports requests and review. The local operator records exact approvals and handles signing and test-money execution.' : 'The local backend holds the demo wallets. Signing requires both exact role approvals and an authority-verified agreement receipt.'}</p>
       <p>These are guided forms, not an AI chatbot. No wallet MCP is connected. A future agent could prepare requests, coordinate checks and track execution; it would still need the required human approvals.</p>
+      <p>Proposed next step: give authenticated human approval its own linked receipt. Scheduled repayments would need an explicit payment mandate. Any future autonomy limit would be granted and revocable, not earned automatically from past repayments. These capabilities are not implemented.</p>
       <p>A KYC-to-wallet fingerprint would record a claimed identity link, not permission to borrow or proof that the identity check was correct. This demo uses synthetic accounts and performs no KYC. Private-vault credentials and offline ledger proofs are not implemented here.</p>
     </details>
   </section>`;
