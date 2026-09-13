@@ -799,3 +799,11 @@ Privacy-filtered hook status at 07:06:07.258 UTC: version 2.4.0, registered,
 HTTP delivery was needed). Last lifecycle delivery remained 02:58:15.849 UTC,
 eight accepted. This checkpoint does not prove new capture from the current
 projectless working context. The participant report remains unwritten by the agent.
+
+Capture follow-up at 07:09:52.181 UTC: used the official submit.mjs reflection
+channel for the actual offline-verifier result and the researched XPOP boundary.
+The first local validation rejected a summary over 140 characters; shortening it
+resolved that validation error. One reflection was buffered and accepted with
+HTTP 200, 626 cumulative, zero remaining. No reset was claimed and no participant
+report generated. This is explicit reflection delivery, not proof of automatic
+runtime capture in the projectless context.

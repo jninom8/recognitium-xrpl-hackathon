@@ -1,7 +1,7 @@
 # Recognitium · Developer journey
 
 **The shared reading page for the team.** September 12–13, 2026.
-Latest checkpoint: **September 13, 04:53 Paris time (UTC+2)**.
+Latest research/capture checkpoint: **September 13, 09:09 Paris time (UTC+2)**.
 The overview below is current; dated entries preserve earlier observations.
 
 [Timeline](#1-the-timeline) · [Problems and fixes](#2-what-we-learned) ·
@@ -20,7 +20,7 @@ The overview below is current; dated entries preserve earlier observations.
 | Recognitium receipts | Real agreement and execution receipts verified |
 | Customer interface | Borrower, reviewer, lender and admin share one six-step narrative; full operation history, separate evidence checks and live borrower balance |
 | Tests | 51 passing local tests; deployed request/review and wallet checks; failures explicitly distinguish simulated external systems |
-| Developer capture | Team **Recognitium**; 617 events accepted at 04:53 Paris on September 13 |
+| Developer capture | Team **Recognitium**; 626 events accepted at 09:09 Paris on September 13, including one explicit agent reflection |
 | Last connection checkpoint | Vercel read both borrower accounts at validated event ledger 82625; HTTP 200, 273/267 ms |
 | Still to finish | Resolve the expired unsigned 600-XRP offer, obtain fresh exact approval and complete that connected native run; independent reproduction and participant-written final report |
 
@@ -429,3 +429,6 @@ saved JSON currently supplies. Also corrected the proposed private-vault credent
 gate: depositor access does not automatically enforce an exact sealed borrower
 agreement. See [DEVNET_EVIDENCE_RETENTION.md](DEVNET_EVIDENCE_RETENTION.md).
 This is research and a proposal, not a new implementation or the manual report.
+
+At 07:09:52 UTC the official hook accepted that explicit agent reflection with
+HTTP 200: 626 cumulative events, zero buffered. It does not claim a reset occurred.
