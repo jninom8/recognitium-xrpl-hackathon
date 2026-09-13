@@ -28,7 +28,7 @@ Open https://recognitium-xrpl-hackathon.vercel.app/borrow?mode=live&request=requ
 
 Say: This is a completed development-network run, not a new transfer happening as I click. Show Transactions & evidence: vault 90024, deposit 90026, broker 90028, cover 90030, funding 90068, repayment 90086 and withdrawal 90092. Then show the native refusal and the agreement and execution receipts. The lender deposited 200 XRP, withdrew 200.000020 XRP and paid a 12-drop withdrawal fee. Twenty drops is gross yield, not net profit after all setup and network fees.
 
-For the off-chain match receipt, open Receipts and round 131184CE. That match expired before native execution. Identity preview is synthetic and unsealed. The founder has re-enabled mentor-endpoint demo attempts on network 4001 with V1.1 disclosed. A fresh loan still requires exact human approvals and local operator signing; do not present a preflight pass as a completed new loan.
+For the off-chain match receipt, open Receipts and round 131184CE. That match expired before native execution. Identity preview is synthetic and unsealed. Mentor-endpoint demo attempts are now enabled on network 4001 with V1.1 disclosed. Exact approvals and local signing remain required; a preflight pass is not a new completed loan.
 
 Funding hash: CABC51612A0478F935D0C82DF3102124FC2DDC7E7CAACD665BCF37FD836F08FD
 Agreement receipt: DG-e2d41354140a451c855050f148b55da1
@@ -49,7 +49,7 @@ Our limited tests did not identify a break in XRPL cryptography. We did not cond
 
 First, the event endpoint ports repeatedly timed out while ordinary HTTPS worked. A phone hotspot restored access. That isolates a network-path difference, not a proven diagnosis of congestion or firewall policy. Proposal: provide an HTTP/WebSocket connectivity probe and known-good expected response before faucet setup.
 
-Second, the advertised Track 1 endpoint reported LendingProtocolV1_1 enabled, while the closed-ended guide restricts new lending. Earlier mentor-guided open-ended cycles succeeded. We preserve those observations. The founder has now authorized event-specific attempts on the mentor endpoint, while retaining exact approval and native ledger validation. Proposal: publish a versioned endpoint, enabled amendment list and compatible SDK matrix with the event track.
+Second, the advertised Track 1 endpoint reported LendingProtocolV1_1 enabled, while the closed-ended guide restricts new lending. Earlier mentor-guided open-ended cycles succeeded. The founder has re-enabled event-specific demo attempts on the mentor endpoint. We disclose V1.1 and let XRPL validate each transaction. Proposal: publish a versioned endpoint, enabled amendment list and compatible SDK matrix with the event track.
 
 Third, our Vercel build succeeded but API startup failed with ERR_REQUIRE_ESM involving @xrplf/isomorphic and @noble/hashes. We removed unnecessary XRPL SDK imports from hosted receipt/address code and added a startup regression check. This was our integration failure, not a protocol bug. Proposal: include a serverless smoke test and minimal SDK-free hashing example.
 
@@ -59,7 +59,7 @@ Project hook delivery includes historical automatic events and explicitly submit
 
 We want every XLS-65/66 builder to be able to connect a private commitment to a native loan without rebuilding the evidence and recovery layer. Our public repository contains the adapter and repeatable verification examples. This is our proposed missing developer tool, not a claim that no other evidence system exists.
 
-The next proof is a fresh availability-matched loan with exact approvals, funding, repayment and return, once the environment issue is resolved. The longer-term direction is an agent-friendly interface with authenticated approval and a sealed record for every meaningful agreement transition. Today those are boundaries and next steps, not completed features.
+The next proof is a fresh availability-matched loan with exact approvals, funding, repayment and return, with fresh exact approvals and local signing. The longer-term direction is an agent-friendly interface with authenticated approval and a sealed record for every meaningful agreement transition. Today those are boundaries and next steps, not completed features.
 
 Sources: https://github.com/jninom8/recognitium-xrpl-hackathon/blob/main/src/requests/service.ts , https://github.com/jninom8/recognitium-xrpl-hackathon/blob/main/scripts/verify-bundle.ts , https://github.com/jninom8/recognitium-xrpl-hackathon/blob/main/docs/NATIVE_BRIDGE.md
 
