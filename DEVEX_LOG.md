@@ -1063,3 +1063,5 @@ Automatic story replay deployed: read-only /api/story-proof verifies exact agree
 Admin execution button wired to local authenticated request/run endpoint. Public hosting limitation is visible, not simulated success. No fresh ledger execution claimed.
 
 Public-to-local round-trip check passed: /api/runner connected=true; completed loan 1708833C queued through public API, consumed locally, status complete. Chrome confirms runner connection. No new loan or receipt issued. 73 tests/build pass. Outbound queue keeps signing seeds off Vercel.
+
+14:26-14:27 Paris: fresh synthetic receipt issuance probe through configured RecognitiumClient returned HTTP 403; no confirmed receipt, no blind retry. 73 tests passed. verify-bundle online passed content/both signatures/authority/XRPL. /api/environment network 4001 ledger 94108, /api/story-proof both verified. Unprepared run POST HTTP 409. Current 467AD12F remains REVIEWED without match/offer.

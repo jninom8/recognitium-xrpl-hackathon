@@ -24,3 +24,7 @@ The deck has eight slides. The participant-dictated report is one page, within t
 Final factual tooling reflection submitted through the installed hook. Status increased from 637 to 638 sent events, including 13 reflections, with zero buffered. Historical automatic events: 625. Continuous automatic capture in this projectless chat is not established; no setup or identity replacement was performed.
 
 Deployment: main-site verification links published successfully, Vercel dpl_AcEAm5qr5iJ9FazstBdw3sRQXdXd READY. Binary Git attributes preserve PDF and PowerPoint bytes across Windows clones.
+
+## Requalification at 14:27 Paris
+73 tests passed. Saved 1708833C bundle again passed both signatures, receipt authority and XRPL validated-success checks. Devnet 4001 was live at ledger 94108. Both saved story receipts verified at 12:27:25 UTC. Public runner heartbeat was connected; malformed/unprepared run request returned HTTP 409. Chrome confirmed current 467AD12F has no sealed match, no prepared wallet/offer and a disabled Run approved loan button.
+A fresh, explicitly synthetic receipt issuance test using the automatic REST client returned HTTP 403. No fresh receipt was confirmed; issuance intent retained privately and not blindly retried. This is an unresolved receipt-access blocker, not a broken XRPL cryptographic guarantee. Fresh fully automatic browser lending remains unproven.
