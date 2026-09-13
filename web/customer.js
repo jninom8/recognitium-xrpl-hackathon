@@ -263,6 +263,16 @@ function render() {
 
   mountMarket(role(),state.mode,id,Boolean(r));
   if(state.mode==='live')void showNetworkGate();
+  if(state.mode==='live' && !state.hosting && id) {
+    const automaticNote=document.createElement('p');automaticNote.className='notice';
+    automaticNote.textContent='After both exact approvals, the local runner handles receipts, funding, repayment and withdrawal.';
+    $('overview-content').prepend(automaticNote);
+    void fetch('/api/automatic').then(r=>r.ok?r.json():null).then(job=>{
+      if(!automaticNote.isConnected || job?.requestId!==id)return;
+      const labels={COMPLETE:'Complete: repayment and lender withdrawal confirmed.',PAUSED:'Automatic run paused. Saved funds and receipts are retained; the operator must resolve the pending step.',WAITING_FOR_APPROVALS:'Waiting for both exact loan approvals.',WAITING_FOR_REPAYMENT_DATE:'Funded. Waiting for the agreed repayment date.',AGREEMENT_RECEIPTED:'Agreement receipt verified. Preparing the signed loan.',EXECUTION_RECEIPTED:'Funding confirmed and execution receipt verified.',CHECKING_FUNDING:'Checking the loan transaction on XRPL.'};
+      automaticNote.textContent=labels[job.status]??'Automatic test round in progress. No further input needed.';
+    }).catch(()=>{});
+  }
   if(page==='receipts'){$('page-title').textContent='Recognitium receipts · by round';$('section-protocol').textContent='Recognitium · commitments & verification';}
   conversation.update({role:role(),mode:state.mode,id,revision:selectedIntake?.revision,instanceId:state.instanceId});
   if (pending && !$('request-dialog').open) notice('A submission still needs confirmation. Open Request funding to recover the same request.',true);

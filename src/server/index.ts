@@ -14,12 +14,35 @@ import { Dashboard, readPublishedBundle, repositoryBundlePath } from './dashboar
 import { HealthMonitor } from './health.js';
 import { readBorrowerWallet } from './wallet.js';
 import { assist, assistantInput } from './assistant.js';
+import { advanceAutomaticRound } from '../xrpl/automatic-round.js';
 
 const port = Number(process.env.PORT ?? 3000);
 let assistantCalls=0;
 const adapter = new NativeAdapter(process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1'); adapter.client.on('error', () => {});
 const cycle = new Cycle(adapter, process.env.RECOGNITIUM_DATA_DIR ?? 'data', process.env.RECOGNITIUM_WALLET_DIR ?? 'wallets');
 const intake = new IntakeService(new Store<FinancingRequest>(join(cycle.dataDirectory, 'intake')));
+const automatic = new Store<{requestId:string;status:string;updatedAt:string}>(join(cycle.dataDirectory,'automatic'));
+let automaticBusy = false;
+async function automaticTick() {
+  if (automaticBusy) return;
+  automaticBusy = true;
+  let release: (() => Promise<void>) | undefined;
+  try {
+    release = await processLock(cycle.dataDirectory);
+    const native = await cycle.cycles.read('native');
+    if (!native?.requestId) return;
+    const job = await automatic.read(native.requestId);
+    if (!job || ['COMPLETE','PAUSED','REJECTED','EXPIRED_UNRESOLVED','YIELD_CHECK_FAILED'].includes(job.status)) return;
+    try {
+      if (!adapter.client.isConnected()) await adapter.connect();
+      job.status = await advanceAutomaticRound(cycle);
+    } catch {
+      // Preserve unknown receipt/transaction outcomes. Never blindly reissue.
+      job.status = 'PAUSED';
+    }
+    job.updatedAt = new Date().toISOString(); await automatic.write(job.requestId,job);
+  } finally { if(release)await release(); automaticBusy = false; }
+}
 const health = new HealthMonitor(adapter, cycle.receipts, process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1');
 const dashboard = new Dashboard({ records: async () => ({ cycle: await cycle.cycles.read('native') ?? null, requests: await cycle.requests.all() }),
   health: () => health.snapshot(), connected: () => adapter.client.isConnected(), published: readPublishedBundle });
@@ -50,6 +73,17 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
+    if(req.method==='GET' && path==='/api/automatic') {
+      const native=await cycle.cycles.read('native');
+      return respond(res,200,native?.requestId ? await automatic.read(native.requestId) ?? {status:'WAITING_FOR_APPROVALS'} : {status:'WAITING_FOR_OFFER'});
+    }
+    if(req.method==='GET' && path==='/api/receipts') {
+      const receipts=[];
+      for(const r of await cycle.requests.all()) for(const [kind,proof] of [['Agreement',r.agreementReceipt],['XRPL execution',r.executionReceipt]] as const) {
+        if(proof) receipts.push({round:r.agreement.requestId,kind,receiptId:proof.receiptId,commitmentHash:proof.commitmentHash,authorityCheckedAt:proof.authorityCheckedAt,source:'Local native round'});
+      }
+      return respond(res,200,{observedAt:new Date().toISOString(),receipts});
+    }
     if(req.method==='GET'&&path==='/api/identity-fixture')return respond(res,200,previewIdentityFixture());
     if(req.method==='GET'&&path==='/api/environment'){try{return respond(res,200,await readTrackEnvironment());}catch{return respond(res,503,{canOriginate:false,reason:'Event configuration unavailable; new loans stay blocked'});}}
 
@@ -108,6 +142,7 @@ const server = createServer(async (req, res) => {
         else if (approval) {
           if (typeof input.agreementHash !== 'string' || typeof input.transactionDigest !== 'string') throw new Error('Exact hashes required');
           result = await cycle.service.approve(approval[1]!,approval[2] as Role,input.agreementHash,input.transactionDigest);
+          await automatic.write(approval[1]!,{requestId:approval[1]!,status:'WAITING_FOR_APPROVALS',updatedAt:new Date().toISOString()});
         } else {
           // Receipt recovery/verification does not require ledger connectivity.
           const needsLedger = ['/api/connect','/api/setup','/api/prepare','/api/refusal','/api/repay','/api/withdraw'].includes(path) || /\/(sign|submit)$/.test(path);
@@ -151,5 +186,6 @@ const server = createServer(async (req, res) => {
 });
 server.listen(port,'127.0.0.1',() => console.log(`Recognitium local development app: http://127.0.0.1:${port}`));
 const healthTimer = setInterval(() => { if (process.env.DASHBOARD_LIVE_CHECKS === '1') void health.check(); }, 30000); healthTimer.unref();
+const automaticTimer = setInterval(() => { void automaticTick().catch(()=>{}); }, 5000); automaticTimer.unref();
 if (process.env.DASHBOARD_LIVE_CHECKS === '1') void health.check();
-for (const signal of ['SIGINT','SIGTERM'] as const) process.on(signal, () => { clearInterval(healthTimer); server.close(); if (adapter.client.isConnected()) void adapter.disconnect(); });
+for (const signal of ['SIGINT','SIGTERM'] as const) process.on(signal, () => { clearInterval(automaticTimer); clearInterval(healthTimer); server.close(); if (adapter.client.isConnected()) void adapter.disconnect(); });
