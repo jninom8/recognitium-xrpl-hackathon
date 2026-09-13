@@ -881,3 +881,39 @@ no provider API request was made. No code change or test rerun needed for planni
 Official hook reflection accepted HTTP 200 at 08:35:57.011 UTC, one sent,
 629 cumulative (625 historical automatic + four explicit reflections), zero
 buffered. No fresh automatic capture or participant report is claimed.
+
+## September 13, 10:57 Paris: conversational application validation
+
+Implemented one customer shell with Borrow, Provide liquidity and Review intentions,
+Mistral draft assistance and a simple-form fallback. Secrets remain server-side.
+The default model is ministral-3b-latest: actual inference HTTP 200, including
+structured amount/purpose/duration output. mistral-small-latest previously returned
+HTTP 429 on three bounded attempts; the valid API key alone did not prove inference
+capacity. No alternate provider or paid subscription was added.
+
+Connected Chrome exercised AI drafting of 100 test XRP for inventory over 30 days,
+exact intake confirmation, persisted submission and the same request in reviewer
+view: request-1708833c-9d9e-4a49-9fe2-6b9284842ecc. This used the loopback hosted-boundary
+preview with actual shared Blob storage. It created intake only: no loan,
+approval, signature, KYC result or receipt. Chat text has no authority tools.
+A saved request cannot be silently rewritten through the assistant.
+
+57 automated tests passed. New checks cover bounded model output, authority-field
+rejection, persistent AI quota concurrency, corrupt quota data and limits. Existing
+approval, recovery, funding and evidence checks also pass. The presentation test
+checks all six Track 1 outcomes against the real published example and requires
+zero inherited outcomes for a different request. The six-step evidence panel keeps
+vault, deposit, broker/acceptance, funding/repayment, realised yield and native
+refusal visible without crowding the conversational screen. Details, exact terms,
+wallet observations, receipt checks and advanced controls remain accessible.
+
+Official hook accepted an explicit implementation reflection at 08:57:17.313 UTC,
+HTTP 200: 630 cumulative, zero buffered. Automatic runtime capture has not advanced
+in this projectless chat. Explicit delivery is not automatic capture. This record
+is agent-written implementation evidence, not the required participant report.
+
+Deployment verification follows. Remaining boundaries: the fresh 600-XRP offer is
+expired and unfunded; the new AI intake has no prepared offer. Native execution
+requires the local operator, fresh exact role approvals and real receipt recovery.
+No browser wallet or actual KYC issuer was added; lender chat is non-binding and
+cannot make a deposit. The original real 100-XRP test cycle remains distinct.

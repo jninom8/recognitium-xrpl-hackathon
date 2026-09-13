@@ -8,6 +8,8 @@ import { BlobIntakeDatabase } from './blob.js';
 import { checkHostedOrigin } from './security.js';
 import { readBorrowerWallet } from '../server/wallet.js';
 import type { Agreement } from '../shared/contract.js';
+import { assist, assistantInput } from '../server/assistant.js';
+import { reserveAssistantCall } from './assistant-budget.js';
 
 const instanceId = 'hosted-' + createHash('sha256').update(process.env.VERCEL_URL ?? 'local-hosted-test').digest('hex').slice(0,24);
 const reply = (res: ServerResponse, status: number, value: unknown) => {
@@ -20,6 +22,21 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     checkHostedOrigin(req.headers.origin, req.headers.host);
     const url = new URL(req.url ?? '/', 'https://hosted.invalid');
     const path = url.pathname;
+    if(req.method==='POST' && path==='/api/assistant') {
+      if(req.headers['content-type']!=='application/json')return reply(res,400,{error:'application/json required'});
+      let input;
+      try {
+        let raw=req.body;
+        if(raw===undefined){let wire='';for await(const chunk of req){wire+=String(chunk);if(wire.length>12000)throw Error();}raw=JSON.parse(wire);}
+        if(JSON.stringify(raw).length>12000)throw Error();
+        input=assistantInput(raw);
+      } catch {return reply(res,400,{error:'Invalid assistant request'});}
+      try {
+        if(!process.env.MISTRAL_API_KEY)return reply(res,503,{error:'AI is unavailable. Use the guided form.'});
+        if(!await reserveAssistantCall(input.sessionId))return reply(res,429,{error:'Demo AI limit reached. Use the guided form.'});
+        return reply(res,200,await assist(input));
+      } catch {return reply(res,503,{error:'AI is unavailable. Your saved request is unchanged. Use the guided form.'});}
+    }
     const balanceMatch=/^\/api\/requests\/([a-zA-Z0-9_-]+)\/balance$/.exec(path);
     if(req.method==='GET' && balanceMatch) {
       const id=balanceMatch[1]!;

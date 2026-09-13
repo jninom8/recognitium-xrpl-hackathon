@@ -1,5 +1,9 @@
 # Current status
 
+Latest implementation: September 13, 10:57 Paris. Unified conversational UI and
+real ministral-3b-latest drafting work in the hosted-boundary preview. 57 tests pass.
+Deployment verification pending; see the final entry below. New AI intake remains unfunded.
+
 Start with the [unified developer journey](DEVELOPER_JOURNEY.md) for the shared
 team overview; this file retains implementation gates and outstanding work.
 
@@ -347,3 +351,39 @@ Read-only hosted check at 23:24 UTC: selected 600-XRP request still AGREEMENT_LO
 ## September 13: contract-history claims checked
 
 Added [CONTRACT_HISTORY_FACT_CHECK.md](CONTRACT_HISTORY_FACT_CHECK.md). Re-derived both signing addresses and verified both signatures in the original published 100-test-XRP bundle. Reviewed primary XRPL documentation, the C-413/23 P judgment and final July 2026 EDPB blockchain guidance. Preserve the lifecycle idea while separating recorded assertions, key authority, ledger validation, clock accuracy and legal effect. Salt deletion is not an automatic GDPR-erasure guarantee. This is research, not a new KYC feature or participant-written report; no new lending or receipt issuance occurred. Hook status at 01:45:52 UTC: seven existing events accepted, HTTP 200, 547 cumulative, zero buffered.
+
+## September 13, 10:57 Paris: conversational application validation
+
+Implemented one customer shell with Borrow, Provide liquidity and Review intentions,
+Mistral draft assistance and a simple-form fallback. Secrets remain server-side.
+The default model is ministral-3b-latest: actual inference HTTP 200, including
+structured amount/purpose/duration output. mistral-small-latest previously returned
+HTTP 429 on three bounded attempts; the valid API key alone did not prove inference
+capacity. No alternate provider or paid subscription was added.
+
+Connected Chrome exercised AI drafting of 100 test XRP for inventory over 30 days,
+exact intake confirmation, persisted submission and the same request in reviewer
+view: request-1708833c-9d9e-4a49-9fe2-6b9284842ecc. This used the loopback hosted-boundary
+preview with actual shared Blob storage. It created intake only: no loan,
+approval, signature, KYC result or receipt. Chat text has no authority tools.
+A saved request cannot be silently rewritten through the assistant.
+
+57 automated tests passed. New checks cover bounded model output, authority-field
+rejection, persistent AI quota concurrency, corrupt quota data and limits. Existing
+approval, recovery, funding and evidence checks also pass. The presentation test
+checks all six Track 1 outcomes against the real published example and requires
+zero inherited outcomes for a different request. The six-step evidence panel keeps
+vault, deposit, broker/acceptance, funding/repayment, realised yield and native
+refusal visible without crowding the conversational screen. Details, exact terms,
+wallet observations, receipt checks and advanced controls remain accessible.
+
+Official hook accepted an explicit implementation reflection at 08:57:17.313 UTC,
+HTTP 200: 630 cumulative, zero buffered. Automatic runtime capture has not advanced
+in this projectless chat. Explicit delivery is not automatic capture. This record
+is agent-written implementation evidence, not the required participant report.
+
+Deployment verification follows. Remaining boundaries: the fresh 600-XRP offer is
+expired and unfunded; the new AI intake has no prepared offer. Native execution
+requires the local operator, fresh exact role approvals and real receipt recovery.
+No browser wallet or actual KYC issuer was added; lender chat is non-binding and
+cannot make a deposit. The original real 100-XRP test cycle remains distinct.

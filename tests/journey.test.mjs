@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {financingJourney, exactApproval, ledgerHistory} from '../web/journey-model.mjs';
-import {journeyPanel, proofCards, operationHistory} from '../web/journey-view.mjs';
+import {journeyPanel, proofCards, operationHistory, trackOneEvidence} from '../web/journey-view.mjs';
 import {readFile} from 'node:fs/promises';
 // Explicit presentation fixtures. No ledger transaction is created by these tests.
 const now=Date.parse('2026-09-13T10:00:00Z');
@@ -64,6 +64,8 @@ test('real published backend projection passes through the same presentation use
   assert.match(proof,/Offline consistency does not independently prove ledger inclusion/);
   const history=ledgerHistory(r,s.cycle);assert.ok(history.some(e=>e.id==='cover'));assert.ok(history.some(e=>e.id==='refusal'));
   assert.equal(s.cycle.yield.realisedYieldDrops,'20');
+  assert.equal((trackOneEvidence(r,s.cycle).match(/>Recorded</g)||[]).length,6);
+  assert.equal((trackOneEvidence({...r,agreement:{...r.agreement,requestId:'another-request'}},s.cycle).match(/>Recorded</g)||[]).length,0);
   const wire=JSON.stringify(s);for(const privateField of ['"seed"','"documentBase64"','"documentSalt"','"signedBlob"'])assert.equal(wire.includes(privateField),false);
   for(const file of ['journey-model.mjs','journey-view.mjs','journey.css'])assert.match(await readFile('scripts/build-hosted.mjs','utf8'),new RegExp(file.replaceAll('.','\\.')));
 });

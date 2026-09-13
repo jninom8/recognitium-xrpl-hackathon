@@ -7,6 +7,7 @@
     <title>Recognitium | Your financing</title>
     <link rel="stylesheet" href="/customer.css" />
     <link rel="stylesheet" href="/journey.css" />
+    <link rel="stylesheet" href="/conversation.css" />
     <script type="module" src="/customer.js"></script>
   </head>
   <body class="welcome">
@@ -48,6 +49,7 @@
               >Learn how it works <span aria-hidden="true">→</span></span
             >
           </button>
+          <button class="goal-card" data-enter="broker"><span class="goal-icon" aria-hidden="true">✓</span><strong>Review requests</strong><span>Understand the evidence.<br />Make the next decision.</span><span class="goal-action">Open review →</span></button>
         </div>
         <a class="example-link" href="/?mode=recorded"
           >Just looking? Explore a completed example
@@ -90,6 +92,7 @@
       </div>
     </aside>
     <div class="app-shell">
+      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="borrower">Borrow</button><button data-intention="lender">Provide liquidity</button><button data-intention="broker">Review</button></nav>
       <header class="topbar">
         <span class="workspace-name" id="workspace-name"
           >Your funding request</span
@@ -110,7 +113,7 @@
         <div class="source-bar">
           <p id="source-note">Demo · test money</p>
           <label hidden for="source">Data source</label
-          ><select id="source" hidden>
+          ><select id="source" aria-label="Live workspace or completed example">
             <option value="recorded">Completed demo</option>
             <option value="live">Live workspace</option>
           </select>
@@ -130,7 +133,9 @@
           </button>
         </div>
         <section id="overview-page" aria-label="Overview">
+          <div class="conversation-layout"><section id="assistant-panel" class="conversation-card" aria-label="Financing guide"></section>
           <div id="overview-content"></div>
+          </div>
         </section>
         <section id="requests-page" aria-label="Financing requests" hidden>
           <div id="requests-content"></div>
@@ -139,6 +144,7 @@
           <div id="activity-content"></div>
         </section>
         <footer class="footer">
+          <nav class="workspace-toolbar" aria-label="Records and tools"><button class="text-button" data-page="overview">Conversation & summary</button><button class="text-button" data-page="requests">Saved requests</button><button class="text-button" data-page="activity">Evidence & history</button><a href="/operator" id="advanced-link">Advanced tools & health ↗</a></nav>
           <span>Demo · test money · Made-up business details only</span
           ><span id="sync-note" role="status">Connecting…</span>
         </footer>

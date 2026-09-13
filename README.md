@@ -193,3 +193,22 @@ The eventual event submission needs a public-safe application repository,
 reproducible setup, validated transaction links, slides and a participant-authored
 developer report. GitHub publication is authorized; event submission has not
 been made. Teammates can clone the public repository and use feature branches.
+
+### Optional conversational assistant
+
+The same application offers Borrow, Provide liquidity and Review tabs. Set
+`MISTRAL_API_KEY` only in your local environment or the Vercel project's secret
+environment variables, then restart/redeploy. Do not put it in browser code or git.
+`MISTRAL_MODEL` optionally overrides the tested `ministral-3b-latest` default.
+Without a working provider, the simple request form and saved evidence still work.
+
+The assistant extracts synthetic amount, purpose and requested duration. It has
+no signing, receipt, lending or KYC tools. Sending a chat message is not approval.
+Use Review request to confirm intake, then the existing broker/native bridge for
+an exact offer. Native signing continues to require fresh exact role approvals.
+Hosted inference is capped using shared Blob reservations (200/day, 60/hour,
+20/browser session/day). A local process caps calls at 100. These are demo limits,
+not a paid production service or user authentication.
+
+Open Evidence & history to follow all six Track 1 outcomes. The completed example
+contains real test-network results; a new intake never inherits that funding.

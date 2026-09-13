@@ -4,7 +4,7 @@ import { initialHealth } from '../dist/src/server/health.js';
 
 await mkdir('public', { recursive: true });
 await mkdir('hosted', { recursive: true });
-const files = ['index.html','customer.css','customer.js','customer-model.mjs','state-client.mjs','operator.html','app.js','style.css','journey-model.mjs','journey-view.mjs','journey.css','wallet-panel.mjs'];
+const files = ['index.html','customer.css','customer.js','customer-model.mjs','state-client.mjs','operator.html','app.js','style.css','journey-model.mjs','journey-view.mjs','journey.css','wallet-panel.mjs','assistant.js','conversation.css'];
 for (const file of files) await copyFile('web/' + file, 'public/' + file);
 const health = initialHealth();
 health.ledger.message = 'Hosted request review has no signing wallets. Native lending runs on the local operator backend.';

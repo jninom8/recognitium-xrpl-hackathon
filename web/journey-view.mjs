@@ -21,7 +21,7 @@ export function authorizationGuide(role = 'borrower', hosted = false) {
     <details><summary>Who decides, and what is automated?</summary>
       <p>Recognitium records the agreement fingerprint. The broker makes the lending decision. Receipt verification is our broker application's policy; XRPL does not read Recognitium receipts.</p>
       <p>${hosted ? 'This website supports requests and review. The local operator records exact approvals and handles signing and test-money execution.' : 'The local backend holds the demo wallets. Signing requires both exact role approvals and an authority-verified agreement receipt.'}</p>
-      <p>These are guided forms, not an AI chatbot. No wallet MCP is connected. A future agent could prepare requests, coordinate checks and track execution; it would still need the required human approvals.</p>
+      <p>The AI helps draft a request. You review it before submission. If the AI is unavailable, use the simple form. No wallet MCP is connected; chat messages cannot approve, sign or move funds.</p>
       <p>Proposed next step: give authenticated human approval its own linked receipt. Scheduled repayments would need an explicit payment mandate. Any future autonomy limit would be granted and revocable, not earned automatically from past repayments. These capabilities are not implemented.</p>
       <p>A KYC-to-wallet fingerprint would record a claimed identity link, not permission to borrow or proof that the identity check was correct. This demo uses synthetic accounts and performs no KYC. Private-vault credentials and offline ledger proofs are not implemented here.</p>
     </details>
@@ -71,4 +71,19 @@ export function operationHistory(request, cycle, explorer) {
 export function setupSummary(cycle) {
   if (!cycle) return '';
   return `<div class="setup-grid">${[['vault','Vault','Created'],['deposit','Lender deposit',drops(cycle.depositDrops)+' test XRP'],['broker','Loan broker','Configured'],['cover','Broker cover',drops(cycle.coverDrops)+' test XRP']].map(([id,title,value]) => `<div><span>${title}</span><strong>${cycle.steps[id]?.resultCode === 'tesSUCCESS' ? esc(value) : 'Not confirmed'}</strong></div>`).join('')}</div>`;
+}
+
+export function trackOneEvidence(request, cycle) {
+  const c=cycle?.requestId===request?.agreement?.requestId ? cycle : null;
+  const ok=key=>c?.steps?.[key]?.resultCode==='tesSUCCESS';
+  const funded=request?.funding?.status==='funded' && request?.transaction?.resultCode==='tesSUCCESS';
+  const rows=[
+    ['Create the open-ended vault',ok('vault')],
+    ['Deposit lender capital',ok('deposit')],
+    ['Set up the broker and accept the loan',ok('broker')&&funded],
+    ['Fund the borrower and repay',funded&&(ok('repay')||ok('repay-late'))],
+    ['Withdraw capital plus earned interest',ok('withdraw')&&/^\d+$/.test(c?.yield?.realisedYieldDrops??'')&&BigInt(c.yield.realisedYieldDrops)>0n],
+    ['Demonstrate a native refusal',Boolean(c?.refusal?.hash&&c?.refusal?.resultCode?.startsWith('tec'))],
+  ];
+  return '<section class="card track-evidence"><p class="eyebrow">TRACK 1 · VANILLA</p><h2>The six-step lending demonstration</h2><p class="hint">Saved evidence for this loan. New requests do not inherit these results.</p><ol>'+rows.map(([label,done])=>'<li><span>'+label+'</span><strong>'+ (done?'Recorded':'Not confirmed')+'</strong></li>').join('')+'</ol><p class="hint">Interest is before network fees. Transaction details and verification limits follow below.</p></section>';
 }

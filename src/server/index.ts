@@ -11,8 +11,10 @@ import type { FinancingRequest } from '../shared/intake.js';
 import { Dashboard, readPublishedBundle, repositoryBundlePath } from './dashboard.js';
 import { HealthMonitor } from './health.js';
 import { readBorrowerWallet } from './wallet.js';
+import { assist, assistantInput } from './assistant.js';
 
 const port = Number(process.env.PORT ?? 3000);
+let assistantCalls=0;
 const adapter = new NativeAdapter(process.env.TRACK1_MENTOR_OPEN_ENDED_TRIAL === '1'); adapter.client.on('error', () => {});
 const cycle = new Cycle(adapter, process.env.RECOGNITIUM_DATA_DIR ?? 'data', process.env.RECOGNITIUM_WALLET_DIR ?? 'wallets');
 const intake = new IntakeService(new Store<FinancingRequest>(join(cycle.dataDirectory, 'intake')));
@@ -46,11 +48,20 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
+    if(req.method==='POST' && path==='/api/assistant') {
+      checkOrigin(req);
+      try {
+        const input=assistantInput(await body(req));
+        if(assistantCalls>=100)return respond(res,429,{error:'Local demo AI limit reached. Use the guided form.'});
+        assistantCalls++;
+        return respond(res,200,await assist(input));
+      } catch {return respond(res,503,{error:'AI is unavailable. Use the guided form.'});}
+    }
     if (req.method === 'GET' && (['/', '/borrow', '/review', '/lend', '/operator'].includes(path))) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'" });
       return res.end(await readFile(path === '/operator' ? 'web/operator.html' : 'web/index.html'));
     }
-    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs'].includes(path)) {
+    if (req.method === 'GET' && ['/app.js','/state-client.mjs','/style.css','/customer.js','/customer-model.mjs','/customer.css','/journey-model.mjs','/journey-view.mjs','/journey.css','/wallet-panel.mjs','/assistant.js','/conversation.css'].includes(path)) {
       res.writeHead(200, { 'Content-Type': path.endsWith('.css') ? 'text/css' : 'text/javascript', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(await readFile('web' + path));
     }
