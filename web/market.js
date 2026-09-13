@@ -85,6 +85,6 @@ async function refreshStoryProof(){
  try{
   const response=await fetch('/api/story-proof',{signal:AbortSignal.timeout(25000)});if(!response.ok)throw Error();const data=await response.json();
   if(data.round!=='request-1708833c-9d9e-4a49-9fe2-6b9284842ecc')throw Error();
-  host.innerHTML='<p><strong>Real completed loan · live receipt checks</strong></p>'+data.receipts.map(p=>'<p>'+esc(p.kind)+': '+(p.verified?'✓ Verified now':'Live check unavailable')+' · <a target="_blank" rel="noopener" href="https://www.recognitium.com/verify?id='+encodeURIComponent(p.receiptId)+'">Verify on Recognitium ↗</a></p>').join('');
+  host.innerHTML='<p><strong>Real completed loan · live receipt checks</strong></p>'+data.receipts.map(p=>'<p>'+esc(p.kind)+' · <code class="hash">'+esc(p.receiptId)+'</code><br>'+(p.verified?'✓ Verified now':'Live check unavailable')+' · <a target="_blank" rel="noopener" href="https://www.recognitium.com/verify?id='+encodeURIComponent(p.receiptId)+'">Verify on Recognitium ↗</a></p>').join('');
  }catch{host.textContent='Live receipt check unavailable. Saved evidence remains available below.';}
 }
