@@ -2,7 +2,8 @@ import {readBorrowerWallet} from '../server/wallet.js';
 import {TRACK1} from '../shared/contract.js';
 import {RecognitiumClient} from '../recognitium/client.js';
 import {get,put} from '@vercel/blob';
-import { isValidClassicAddress } from 'xrpl';
+// Syntax screening only; account_info must later confirm this exact address on the validated event ledger.
+const classicAddressShape=(value:string)=>/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
 import {propose,decideMatch,type MarketState,type Availability} from '../requests/matching.js';
 import {digest} from '../shared/canonical.js';
 import type {FinancingRequest} from '../shared/intake.js';
@@ -17,7 +18,7 @@ export async function market(command:Record<string,unknown>|undefined, requests:
   const now=Date.now();
   if(command.action==='offer'){
    const {account,amountDrops,maxDays,expiresAt}=command;
-   if(typeof account!=='string'||!isValidClassicAddress(account)||typeof amountDrops!=='string'||!/^\d{1,11}$/.test(amountDrops)||BigInt(amountDrops)<1000000n||BigInt(amountDrops)>10000000000n||!Number.isSafeInteger(maxDays)||Number(maxDays)<1||Number(maxDays)>90||typeof expiresAt!=='string'||!Number.isFinite(Date.parse(expiresAt))||Date.parse(expiresAt)<=now||Date.parse(expiresAt)>now+86400000||command.confirm!==true)throw Error('Confirm a test wallet, 1–10000 XRP, 1–90 days and expiry within 24 hours');
+   if(typeof account!=='string'||!classicAddressShape(account)||typeof amountDrops!=='string'||!/^\d{1,11}$/.test(amountDrops)||BigInt(amountDrops)<1000000n||BigInt(amountDrops)>10000000000n||!Number.isSafeInteger(maxDays)||Number(maxDays)<1||Number(maxDays)>90||typeof expiresAt!=='string'||!Number.isFinite(Date.parse(expiresAt))||Date.parse(expiresAt)<=now||Date.parse(expiresAt)>now+86400000||command.confirm!==true)throw Error('Confirm a test wallet, 1–10000 XRP, 1–90 days and expiry within 24 hours');
    const fields={account,amountDrops,maxDays:Number(maxDays),expiresAt,source:'local-demo' as const,networkId:4001 as const,synthetic:true as const};
    const offer:Availability={...fields,id:digest(fields)};
    if(!state.offers.some(o=>o.id===offer.id)){if(state.offers.some(o=>o.account===offer.account&&Date.parse(o.expiresAt)>now))throw Error('This wallet already has active availability; keep its existing proposal');if(state.offers.length>=100)throw Error('Demo availability limit reached');state.offers.push(offer);}

@@ -8,3 +8,5 @@ test('browser modules parse and their local imports are included in all serving 
   }
  }
 });
+
+test('hosted entry loads without CommonJS require of ESM dependencies',()=>{execFileSync(process.execPath,['--no-experimental-require-module','--input-type=module','-e',"await import('./dist/src/hosted/api.js')"],{stdio:'pipe'});});

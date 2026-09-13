@@ -1,4 +1,4 @@
-import { canonical, sha256 } from '../requests/commitment.js';
+import { canonical, sha256 } from '../shared/canonical.js';
 import type { ReceiptEvidence } from '../shared/contract.js';
 import type { ReceiptPort } from '../requests/service.js';
 
