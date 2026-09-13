@@ -1,12 +1,20 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {financingJourney, exactApproval, ledgerHistory} from '../web/journey-model.mjs';
-import {journeyPanel, proofCards, operationHistory, trackOneEvidence} from '../web/journey-view.mjs';
+import {journeyPanel, proofCards, operationHistory, trackOneEvidence, simpleProofs} from '../web/journey-view.mjs';
 import {readFile} from 'node:fs/promises';
 // Explicit presentation fixtures. No ledger transaction is created by these tests.
 const now=Date.parse('2026-09-13T10:00:00Z');
 const request=()=>({agreement:{requestId:'A',expiresAt:'2026-09-13T11:00:00Z'},agreementHash:'agreement-A',transactionDigest:'tx-A',funding:{status:'unfunded'},phase:'AGREEMENT_LOCKED',approvals:[],checks:{contentHash:'consistent',receiptAuthority:'unchecked'}});
 const success={hash:'A'.repeat(64),resultCode:'tesSUCCESS',ledgerIndex:10};
+test('simple proof cards separate receipt authority from XRPL funding and link only fixed authorities',()=>{
+  const r=request();r.agreementReceipt={receiptId:'DG-'+'a'.repeat(32),authorityCheckedAt:'2026-09-13T09:00:00Z'};
+  let html=simpleProofs(r);assert.match(html,/Agreement receipt checked/);assert.match(html,/Money transfer not confirmed/);
+  assert.match(html,/https:\/\/api.recognitium.com\/v1\/verify\/receipt\/DG-/);
+  r.checks.receiptAuthority='failed';r.funding.status='funded';r.transaction=success;
+  html=simpleProofs(r);assert.match(html,/Receipt check failed/);assert.match(html,/Money transfer confirmed/);
+  r.agreementReceipt.receiptId='javascript:alert(1)';assert.doesNotMatch(simpleProofs(r),/href="javascript/);
+});
 test('same lifecycle facts preserve funded state through expiry and missing receipt, repayment and return',()=>{
   const r={...request(),funding:{status:'funded'},agreement:{...request().agreement,expiresAt:'2020-01-01'}};
   let story=financingJourney({request:r,now});

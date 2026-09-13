@@ -1,5 +1,5 @@
 import { financingJourney, exactApproval, duration } from '/journey-model.mjs';
-import { journeyPanel, proofCards, operationHistory, setupSummary, authorizationGuide, trackOneEvidence } from '/journey-view.mjs';
+import { journeyPanel, proofCards, operationHistory, setupSummary, authorizationGuide, trackOneEvidence, simpleProofs } from '/journey-view.mjs';
 import { WalletReadings, walletPanel } from '/wallet-panel.mjs';
 import { createConversation } from '/assistant.js';
 const walletReadings = new WalletReadings();
@@ -178,7 +178,7 @@ function rowStatus(request) {
 function render() {
   if (!state || state.mode !== $('source').value) return;
   renderedExpiryKey = expiryKey(state);
-  const openDetails = new Set([...document.querySelectorAll('details[open]')].map(d=>d.querySelector('summary')?.textContent));
+  const openDetails = new Set([...document.querySelectorAll('details[open]:not(#assistant-wrap)')].map(d=>d.querySelector('summary')?.textContent));
   const r = selected(), selectedIntake = activeIntake(), id = r?.agreement.requestId ?? activeId();
   const c = id ? cycleFor(state,id) : null, bridge = state.bridgeByRequest?.[id];
   const borrower = role() === 'borrower', lender = role() === 'lender', recorded = state.mode === 'recorded';
@@ -191,7 +191,7 @@ function render() {
   $('profile-label').hidden = !recorded;
   $('profile').querySelector('option[value="broker"]').hidden = recorded;
   $('workspace-name').textContent = recorded ? 'Completed test loan' : lender ? 'Lender · Follow your capital' : borrower ? 'Borrower · Request and track' : 'Reviewer · Review and coordinate';
-  $('source-note').textContent = r?.mode === 'fixture' ? 'Simulated fixture · No live ledger result claimed' : recorded ? 'Recorded example · Real test-network transactions · Read-only' : state.hosting?.openDemo ? 'Shared demo · Everyone sees these synthetic requests · Test XRP only' : 'Local demo · Synthetic requests · Test XRP only';
+  $('source-note').textContent = r?.mode === 'fixture' ? 'Simulated fixture · No live ledger result claimed' : recorded ? 'Recorded example · Real test-network transactions · Read-only' : state.hosting?.openDemo ? 'Shared demo · Test money only' : 'Local demo · Synthetic requests · Test XRP only';
   $('operator-link').href = relatedUrl('/operator',id);
   $('access-button').textContent = hasAccess() ? 'Lock workspace' : role() === 'broker' ? 'Open review inbox' : 'Open my requests';
   $('access-button').hidden = lender || recorded || state.hosting?.openDemo;
@@ -204,6 +204,7 @@ function render() {
   $('sync-note').textContent = available ? syncLabel(state) : 'Connection paused · Last recorded facts retained';
   const choices = recorded ? [] : lender ? state.requests.map(q=>({clientRequestId:q.agreement.requestId,requestedDrops:q.agreement.terms.principalDrops})) : privateRequests();
   $('request-context').innerHTML = choices.length ? '<label>Following request <select id="customer-request-picker" aria-label="Following request">'+(!lender?'<option value="" '+(!id?'selected':'')+'>'+(borrower?'New request':'Choose a request')+'</option>':'')+choices.map(q=>'<option value="'+esc(q.clientRequestId)+'" '+(q.clientRequestId===id?'selected':'')+'>'+esc(shortId(q.clientRequestId))+' · '+esc(amount(q.requestedDrops))+'</option>').join('')+'</select></label><a href="'+esc(relatedUrl('/operator',id))+'">Open this record in admin ↗</a>' : '';
+  if(choices.length)$('request-context').innerHTML='<details><summary>Other requests</summary>'+$('request-context').innerHTML+'</details>';
   if (!recorded && !lender && hasAccess() && !privateAvailable) $('overview-content').innerHTML = empty(inboxLoaded ? 'Request connection paused.' : 'Opening the shared requests…',inboxLoaded ? 'Your saved requests are retained. Reconnect before making a decision.' : 'Reading the current request and review status.');
   else if (lender) { renderLender(r,c); if(r) $('overview-content').insertAdjacentHTML('afterbegin',journeyPanel(context)); }
   else {
@@ -221,20 +222,36 @@ function render() {
   $('activity-content').innerHTML = activity(r,c);
   $('advanced-link').href=relatedUrl('/operator',id);
   document.querySelectorAll('[data-intention]').forEach(b=>{if(b.dataset.intention===role())b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-  $('page-title').textContent=page==='overview'?(borrower?(r?'Your loan, from agreement to repayment.':selectedIntake?'Follow your funding request.':'What would you like to finance?'):lender?'Explore providing liquidity.':'Review with the evidence in view.'):$('page-title').textContent;
+  $('page-title').textContent=page==='overview'?(borrower?(r?'Your loan':selectedIntake?'Your request':'What do you need?'):lender?'Your lending':'Review requests'):$('page-title').textContent;
   if(role()==='broker'){
     const identity=document.createElement('section');identity.className='identity-card';
     identity.innerHTML='<h3>Wallet & identity evidence</h3><p><strong>KYC not performed</strong> · Synthetic demo accounts.</p><p class="hash">Wallet: '+esc(r?.agreement.accounts.borrower??'Not prepared for this request')+'</p><p>Wallet control: '+(r?'Backend-managed test account':'Not established')+'</p><p>Identity commitment: not recorded. No identity issuer is connected.</p>'+(r?'<details><summary>Agreement document commitment (not KYC)</summary><p class="hash">'+esc(r.agreement.documentCommitment)+'</p></details>':'');
     $('overview-content').querySelector('.journey-panel')?.after(identity);
   }
   const details=document.createElement('details');details.className='workspace-details';
-  const summary=document.createElement('summary');summary.textContent='Agreement, wallet and evidence details';details.append(summary);
+  const summary=document.createElement('summary');summary.textContent='Details';details.append(summary);
   const moneyCard=$('overview-content').querySelector('.loan-card');if(moneyCard)$('overview-content').querySelector('.journey-panel')?.after(moneyCard);
-  for(const node of [...$('overview-content').children]) if(!node.classList.contains('journey-panel')&&!node.classList.contains('identity-card')&&!node.classList.contains('loan-card'))details.append(node);
+  for(const node of [...$('overview-content').children]) if(!node.classList.contains('journey-panel')&&!node.classList.contains('loan-card'))details.append(node);
+  $('overview-content').insertAdjacentHTML('beforeend',simpleProofs(r));
   $('overview-content').append(details);
+  const panel=$('overview-content').querySelector('.journey-panel');
+  if(panel){
+    const explanation=panel.querySelector('.journey-lead > div > p:not(.eyebrow)');
+    const progress=panel.querySelector('.lifecycle');
+    const next=panel.querySelector('.next-action > div');
+    for(const node of [explanation,progress,next])if(node)details.append(node);
+    if(r){const action=panel.querySelector('.next-action');if(action)details.append(action);}
+    if(story.withdrawn)panel.querySelector('h2').textContent='All done. Your loan is repaid.';
+    else if(story.repaid)panel.querySelector('h2').textContent='Loan repaid.';
+    else if(story.funded)panel.querySelector('h2').textContent='Your money arrived.';
+  }
+  const chatWrap=$('assistant-wrap'), chatKey=[role(),state.mode,id??'new'].join(':');
+  if(chatWrap.dataset.context!==chatKey){chatWrap.dataset.context=chatKey;chatWrap.open=!id;}
+  document.querySelector('.conversation-layout').dataset.hasRecord=String(Boolean(id));
+
   conversation.update({role:role(),mode:state.mode,id,revision:selectedIntake?.revision,instanceId:state.instanceId});
   if (pending && !$('request-dialog').open) notice('A submission still needs confirmation. Open Request funding to recover the same request.',true);
-  document.querySelectorAll('details').forEach(d=>{if(openDetails.has(d.querySelector('summary')?.textContent))d.open=true;});
+  document.querySelectorAll('details:not(#assistant-wrap)').forEach(d=>{if(openDetails.has(d.querySelector('summary')?.textContent))d.open=true;});
   updateReview();
 }
 

@@ -2,12 +2,12 @@ import { amountToDrops } from './customer-model.mjs';
 const blank=()=>({amount:null,days:null,purpose:null});
 export function createConversation(root, actions) {
   root.innerHTML=`<div class="chat-heading"><div><span class="eyebrow">YOUR FINANCING GUIDE</span><h2 id="chat-title">Let's take the next step.</h2></div><span id="chat-provider" class="guide-label">Ready to help</span></div>
-    <p class="chat-disclosure">Made-up business details only. AI helps prepare; you decide. No documents, personal information or wallet secrets.</p>
+    <p class="chat-disclosure">Test money only. No personal details or passwords.</p>
     <div id="chat-messages" class="chat-messages" role="log" aria-label="Financing conversation" aria-live="polite"></div>
     <div id="chat-chips" class="chat-chips"></div>
-    <form id="chat-form" class="chat-form"><label class="sr-only" for="chat-input">Message to your financing guide</label><textarea id="chat-input" maxlength="800" rows="2" placeholder="Tell me what you have in mind…" required></textarea><button class="primary" id="chat-send" type="submit">Send ↗</button></form>
+    <form id="chat-form" class="chat-form"><label class="sr-only" for="chat-input">Message to your financing guide</label><textarea id="chat-input" maxlength="800" rows="2" placeholder="Type your question…" required></textarea><button class="primary" id="chat-send" type="submit">Send ↗</button></form>
     <p id="chat-status" class="hint" role="status"></p><div id="chat-draft" class="chat-draft" hidden></div>
-    <div class="chat-actions"><button type="button" id="chat-review" class="primary" hidden>Review request →</button><button type="button" id="chat-form-fallback" class="text-button">Use a simple form</button><button type="button" id="chat-reset" class="text-button">Start a new conversation</button></div>`;
+    <div class="chat-actions"><button type="button" id="chat-review" class="primary" hidden>Review request →</button><button type="button" id="chat-form-fallback" class="text-button">Use a simple form</button><button type="button" id="chat-reset" class="text-button">Clear chat</button></div>`;
   const $=id=>root.querySelector('#'+id);
   let key='',version=0,ctx,busy=false,draft=blank(),messages=[],controller;
   let sessionId;try{sessionId=sessionStorage.getItem('recognitium.ai.session');}catch{}
@@ -23,7 +23,7 @@ export function createConversation(root, actions) {
     $('chat-provider').textContent='Ready to help';$('chat-status').textContent='';
     const recorded=ctx.mode==='recorded';
     $('chat-title').textContent=ctx.role==='borrower'?'Your next step, together.':ctx.role==='lender'?'Put your intention into words.':'A clear view before you decide.';
-    add(recorded?'This is the completed test loan. Ask about the process or open its evidence. New requests belong in the live workspace.':ctx.role==='borrower'?(ctx.id?'Your saved request is in the summary. I can explain the next steps. To prepare another request, choose New request first.':'What would you like to finance? Tell me the amount and timing if you know them.'):ctx.role==='lender'?(ctx.id?'Your selected lending record is in the summary. Ask about the process, or open the evidence to follow the deposit and return.':'How much test XRP are you considering providing? We can explore the process. This conversation does not deposit money or reserve a place in a vault.'):'Choose a request in the summary, then open its review. I can explain the checks; your decision stays separate from the conversation.');
+    add(recorded||ctx.id?'Ask me about your loan.':ctx.role==='borrower'?'How much do you need, and what is it for?':ctx.role==='lender'?'How much test XRP would you like to lend? No money moves in this chat.':'Choose a request to review.');
     const chips=recorded||Boolean(ctx.id)?['How does the agreement link to the loan?','What can I verify offline?']:ctx.role==='borrower'?['Inventory: 100 test XRP for 30 days','Waiting for an invoice payment','What happens after I apply?']:ctx.role==='lender'?['I am considering 200 test XRP','How are returns calculated?','Can I withdraw at any time?']:['What should I check before review?','What does a KYC commitment prove?'];
     $('chat-chips').replaceChildren(...chips.map(text=>{const b=document.createElement('button');b.type='button';b.textContent=text;b.addEventListener('click',()=>{$('chat-input').value=text;void send();});return b;}));
     $('chat-form-fallback').textContent=ctx.role==='borrower'&&!recorded?(ctx.id?'View saved request':'Use a simple form'):ctx.role==='broker'?'Open review':'View evidence';
@@ -42,7 +42,7 @@ export function createConversation(root, actions) {
       if(result.draft.amount!==null)amountToDrops(result.draft.amount);
       if(result.draft.days!==null&&(!Number.isInteger(result.draft.days)||result.draft.days<1||result.draft.days>90))throw Error();
       if(result.draft.purpose!==null&&!['inventory','receivables','working-capital'].includes(result.draft.purpose))throw Error();
-      draft=result.draft;add(result.reply);$('chat-provider').textContent='Mistral · AI guidance';$('chat-status').textContent='Suggestions only. Confirm the exact fields before sending a request.';paintDraft();
+      draft=result.draft;add(result.reply);$('chat-provider').textContent='Mistral · AI guidance';$('chat-status').textContent='Check the details before sending.';paintDraft();
     }catch{if(at===version){$('chat-provider').textContent='Guided form available';$('chat-status').textContent='AI is unavailable or its demo limit was reached. Your existing records are unchanged.';add('You can continue with the simple form or review the saved evidence below.');}}
     finally{clearTimeout(timeout);if(at===version)restore();}
   }

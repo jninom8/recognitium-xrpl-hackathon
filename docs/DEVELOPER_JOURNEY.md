@@ -601,3 +601,15 @@ cumulative, zero buffered. Its first attempt used invalid taxonomy surface ledge
 and was rejected locally without sending; the corrected tooling event succeeded.
 Automatic capture has not advanced here. The mandatory personal report remains
 participant-written and has not been generated or submitted.
+
+### September 13: shorter screens with two visible evidence sources
+
+The founder requested a much simpler first screen and explicit proof from both
+systems. The customer views now show a short state, amount, XRPL proof card and
+Recognitium proof card. Chat, request selection and technical explanations are
+collapsed for saved loans. Exact terms, warnings, native history and controls are
+retained. Recognitium links open the real agreement and execution receipt lookup
+endpoints; both returned HTTP 200 during this check. The cards distinguish saved
+XRPL confirmation from receipt authority, including failed and pending states.
+Nine presentation tests passed and the hosted build passed. No loan, signature
+or new receipt was created in this UI change.

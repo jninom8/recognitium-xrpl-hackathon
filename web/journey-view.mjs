@@ -73,6 +73,16 @@ export function setupSummary(cycle) {
   return `<div class="setup-grid">${[['vault','Vault','Created'],['deposit','Lender deposit',drops(cycle.depositDrops)+' test XRP'],['broker','Loan broker','Configured'],['cover','Broker cover',drops(cycle.coverDrops)+' test XRP']].map(([id,title,value]) => `<div><span>${title}</span><strong>${cycle.steps[id]?.resultCode === 'tesSUCCESS' ? esc(value) : 'Not confirmed'}</strong></div>`).join('')}</div>`;
 }
 
+export function simpleProofs(request) {
+  if(!request)return '';
+  const tx=request.transaction,receipt=request.agreementReceipt;
+  const funded=request.funding?.status==='funded'&&tx?.resultCode==='tesSUCCESS';
+  const checked=receipt&&Number.isFinite(Date.parse(receipt.authorityCheckedAt));
+  const failed=request.checks?.receiptAuthority==='failed';
+  const receiptLink=(r,label)=>r&&/^DG-[a-f0-9]{32}$/i.test(r.receiptId)?'<a target="_blank" rel="noopener" href="https://api.recognitium.com/v1/verify/receipt/'+encodeURIComponent(r.receiptId)+'">'+label+' ↗</a>':'';
+  return '<section class="simple-proofs" aria-label="XRPL and Recognitium evidence"><article><h3>XRPL</h3><p>'+ (funded?'Money transfer confirmed':'Money transfer not confirmed')+'</p><details><summary>See proof</summary><p>Saved ledger result'+(tx?.ledgerIndex?' · Ledger '+esc(tx.ledgerIndex):'')+'.</p>'+(funded&&/^[A-F0-9]{64}$/i.test(tx.hash)?'<a target="_blank" rel="noopener" href="https://custom.xrpl.org/lending-hackathon.dev.ripplex.io:51233/transactions/'+tx.hash+'">Open XRPL transaction ↗</a>':'')+'<p>A live check needs the event network.</p></details></article><article><h3>Recognitium</h3><p>'+(request.checks?.contentHash==='mismatch'?'Agreement changed':failed?'Receipt check failed':checked?'Agreement receipt checked':'Agreement receipt pending')+'</p><details><summary>See proof</summary><p>Recognitium records the agreement fingerprint. It does not move the money.</p>'+receiptLink(receipt,'Open agreement receipt')+receiptLink(request.executionReceipt,'Open payment receipt')+'<p>Last agreement check: '+esc(checked?time(receipt.authorityCheckedAt):'Not recorded')+'</p><p class="hash">Agreement: '+esc(request.agreementHash)+'</p></details></article></section>';
+}
+
 export function trackOneEvidence(request, cycle) {
   const c=cycle?.requestId===request?.agreement?.requestId ? cycle : null;
   const ok=key=>c?.steps?.[key]?.resultCode==='tesSUCCESS';

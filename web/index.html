@@ -92,7 +92,7 @@
       </div>
     </aside>
     <div class="app-shell">
-      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="borrower">Borrow</button><button data-intention="lender">Provide liquidity</button><button data-intention="broker">Review</button></nav>
+      <nav class="intention-bar" aria-label="Your intention"><a class="brand" translate="no" href="/">recognitium.</a><button data-intention="borrower">Borrow</button><button data-intention="lender">Lend</button><button data-intention="broker">Review</button></nav>
       <header class="topbar">
         <span class="workspace-name" id="workspace-name"
           >Your funding request</span
@@ -133,7 +133,7 @@
           </button>
         </div>
         <section id="overview-page" aria-label="Overview">
-          <div class="conversation-layout"><section id="assistant-panel" class="conversation-card" aria-label="Financing guide"></section>
+          <div class="conversation-layout"><details id="assistant-wrap" class="assistant-wrap" open><summary>Ask a question</summary><section id="assistant-panel" class="conversation-card" aria-label="Financing guide"></section></details>
           <div id="overview-content"></div>
           </div>
         </section>
@@ -144,7 +144,7 @@
           <div id="activity-content"></div>
         </section>
         <footer class="footer">
-          <nav class="workspace-toolbar" aria-label="Records and tools"><button class="text-button" data-page="overview">Conversation & summary</button><button class="text-button" data-page="requests">Saved requests</button><button class="text-button" data-page="activity">Evidence & history</button><a href="/operator" id="advanced-link">Advanced tools & health ↗</a></nav>
+          <nav class="workspace-toolbar" aria-label="Records and tools"><button class="text-button" data-page="overview">Overview</button><button class="text-button" data-page="requests">Saved requests</button><button class="text-button" data-page="activity">Loan history</button><a href="/operator" id="advanced-link">Advanced tools & health ↗</a></nav>
           <span>Demo · test money · Made-up business details only</span
           ><span id="sync-note" role="status">Connecting…</span>
         </footer>
