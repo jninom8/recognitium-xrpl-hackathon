@@ -1046,3 +1046,7 @@ Fresh external verification: node dist/scripts/verify-bundle.js evidence/ai-requ
 
 ### English-only interface, September 13
 Chrome inspection showed French auto-translations around protected English labels. Both HTML entry points now declare English and disable automatic translation; UI dates use en-GB and the financing assistant is instructed to reply in English. User-entered records remain unchanged. Hosted build and 10 focused assistant/hosted tests passed.
+
+### Deployed online audit, September 13, 13:02 Paris
+All six public receipts returned HTTP 200, verified=true, and content_hash equal to the frontend register commitment. Full online verification of ai-request-1708833c passed both signatures, content, receipt authority and saved native ledger transactions. Public environment ledger 92349 matched a direct validated ledger RPC at hash 51C8BE640C6FC905056F1FDAB536EF887067CAA04D7FE3F7C2F268EF440DE697. V1.1 remains enabled; new V1-only loans remain blocked.
+Chrome exercised live 102.000001-XRP synthetic request DAEF4ACA, submission, admin start-review and decline, borrower synchronization and Reset. No loan signed or funds moved. Fixed historical matches appearing in an unselected new borrower/lender workspace; Admin retains the full match list. All 70 tests and hosted build passed. This is not a fresh matched native cycle or exhaustive testing of every possible action.

@@ -16,7 +16,7 @@ function paint(){
  const role=context.role, now=Date.now();
  const offers=(data?.offers??[]).filter(o=>Date.parse(o.expiresAt)>now);
  const fresh=new URL(location.href).searchParams.get('new')==='1'&&!context.requestId;
- const matches=fresh?[]:(data?.matches??[]).filter(m=>!context.requestId||m.requestId===context.requestId);
+ const matches=fresh?[]:(data?.matches??[]).filter(m=>context.requestId?m.requestId===context.requestId:role==='broker');
  host().hidden=context.hasRun&&!matches.length;host().dataset.hasMatches=String(matches.length>0);host().dataset.hasRun=String(context.hasRun);
  const money=d=>(Number(d)/1000000).toLocaleString('en-GB',{maximumFractionDigits:6})+' test XRP';
  host().innerHTML='<div class="card"><p class="eyebrow">FIND · AGREE · REVIEW</p><h2>'+(role==='lender'?'Offer your availability':role==='borrower'?'Find a lender':'Review proposed matches')+'</h2><p>'+(role==='lender'?'1 · Supply: declare availability before any XLS-65 vault deposit.':role==='borrower'?'2 · Demand: match your request with availability, then both parties approve.':'3 · Review: check the sealed match before preparing an XLS-66 loan.')+'</p>'+
