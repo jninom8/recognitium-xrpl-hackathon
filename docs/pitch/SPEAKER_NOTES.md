@@ -1,6 +1,6 @@
 # Recognitium pitch rehearsal
 
-Seven slides. Five minutes including a 90-second evidence walkthrough.
+Eight slides. Five minutes including a 90-second evidence walkthrough.
 
 ## 1. Opening / 0:00–0:25
 

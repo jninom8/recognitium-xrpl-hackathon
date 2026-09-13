@@ -708,3 +708,6 @@ Chrome exercised live 102.000001-XRP synthetic request DAEF4ACA, submission, adm
 
 ### Mentor endpoint demo re-enabled, September 13
 Founder explicitly superseded the V1-only application refusal and authorized the mentor-provided network for the end-to-end demo. The shared Track 1 manifest now enables an event-specific V1.1 trial. Hosted environment and native adapter agree: network 4001, matching validated ledger/amendments and required vault/lending amendments are still mandatory. V1.1 is disclosed, not relabelled V1. XRPL may reject an ineligible transaction; exact human approvals and receipt integrity checks are unchanged. Live WebSocket connect plus HTTP origination preflight passed on rippled 3.4.0-rc1. All 70 tests and hosted build passed. No new loan signed or submitted in this change; hosted signing remains a local operator step.
+
+### Final verification checkpoint
+The completed native loan remains independently verifiable online. Agreement and execution receipts now open the main Recognitium verifier, where the browser also recomputes the receipt chain tip. Final suite: 70 passing tests. The remaining gap is continuous execution of a fresh matched request through the browser; the selected reviewed request has not been funded. See [final audit](FINAL_DEMO_AUDIT.md). Final hook reflection submitted, with 638 sent and zero buffered events.
