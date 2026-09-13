@@ -15,6 +15,7 @@ import { HealthMonitor } from './health.js';
 import { readBorrowerWallet } from './wallet.js';
 import { assist, assistantInput } from './assistant.js';
 import { advanceAutomaticRound } from '../xrpl/automatic-round.js';
+import { storyProof } from '../hosted/story-proof.js';
 
 const port = Number(process.env.PORT ?? 3000);
 let assistantCalls=0;
@@ -73,6 +74,7 @@ const server = createServer(async (req, res) => {
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return respond(res,403,{ error: 'Local host required' });
     const url = new URL(req.url ?? '/', `http://127.0.0.1:${port}`);
     const path = url.pathname;
+    if(req.method==='GET'&&path==='/api/story-proof')return respond(res,200,await storyProof());
     if(req.method==='GET' && path==='/api/automatic') {
       const native=await cycle.cycles.read('native');
       return respond(res,200,native?.requestId ? await automatic.read(native.requestId) ?? {status:'WAITING_FOR_APPROVALS'} : {status:'WAITING_FOR_OFFER'});

@@ -1057,3 +1057,5 @@ Founder explicitly superseded the V1-only application refusal and authorized the
 Final audit 13 September 2026: npm test 70/70; npm run build:hosted passed; verify-bundle ai-request-1708833c --online --mentor-confirmed-open-ended passed content, both signatures, receipt authority and XRPL validated success. Main-site receipt verification tested in Chrome for agreement and execution. Hook final tooling reflection submitted, 638 cumulative events, zero buffered. Fresh request 467AD12F has no match/funding; no new loan submitted. See docs/FINAL_DEMO_AUDIT.md.
 
 Automatic local runner implementation: 73 tests pass; build:hosted and customer.js syntax pass. Real network operations not invoked during fixture tests. Durable approval job plus existing transaction journal; unresolved receipt issuance pauses without a blind second charge. Vercel-to-local authenticated execution remains unconnected.
+
+Automatic story replay deployed: read-only /api/story-proof verifies exact agreement and execution receipt hashes. Both authority checks passed online. No new loan or receipt issued by playback. Pitch v7 closing links verified visually; 73 tests pass.

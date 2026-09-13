@@ -1,4 +1,5 @@
 import {receiptRegister} from './receipt-register.js';
+import {storyProof} from './story-proof.js';
 import {previewIdentityFixture} from '../shared/identity-fixture.js';
 import {readTrackEnvironment} from '../server/environment.js';
 import {matchChecklist} from '../requests/matching.js';
@@ -27,6 +28,7 @@ return async function handler(req: IncomingMessage & { body?: unknown }, res: Se
     checkHostedOrigin(req.headers.origin, req.headers.host);
     const url = new URL(req.url ?? '/', 'https://hosted.invalid');
     const path = url.pathname;
+    if(req.method==='GET'&&path==='/api/story-proof')return reply(res,200,await storyProof());
     if(req.method==='GET'&&path==='/api/identity-fixture')return reply(res,200,previewIdentityFixture());
     if(req.method==='GET'&&path==='/api/receipts'){try{return reply(res,200,await receiptRegister());}catch{return reply(res,503,{error:'Receipt index unavailable; saved evidence is retained'});}}
 

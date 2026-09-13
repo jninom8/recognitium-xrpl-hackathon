@@ -70,12 +70,21 @@ const storySteps=[
 ];
 let storyIndex=0,storyTimer;
 const storyDialog=document.createElement('dialog');storyDialog.id='demo-story';
-storyDialog.innerHTML='<div class="story-top"><span>GUIDED DEMO · ILLUSTRATION + SAVED EVIDENCE</span><button id="story-close" aria-label="Close story">Close ×</button></div><div class="story-rail"><span>App + AI</span><b>→</b><span>Recognitium</span><b>→</b><span>Broker</span><b>→</b><span>XRPL</span></div><p id="story-stage"></p><h2 id="story-title"></h2><p id="story-body"></p><progress id="story-progress" max="8"></progress><div class="story-controls"><button id="story-back">Back</button><button id="story-play">Play</button><button id="story-next">Next</button></div><p class="story-boundary">Playback does not submit requests, sign loans or issue receipts.</p><a href="/borrow?mode=live&request=request-1708833c-9d9e-4a49-9fe2-6b9284842ecc">Open real completed loan evidence ↗</a>';
+storyDialog.innerHTML='<div class="story-top"><span>GUIDED DEMO · ILLUSTRATION + SAVED EVIDENCE</span><button id="story-close" aria-label="Close story">Close ×</button></div><div class="story-rail"><span>App + AI</span><b>→</b><span>Recognitium</span><b>→</b><span>Broker</span><b>→</b><span>XRPL</span></div><p id="story-stage"></p><h2 id="story-title"></h2><p id="story-body"></p><progress id="story-progress" max="8"></progress><div id="story-proof" aria-live="polite"></div><div class="story-controls"><button id="story-back">Back</button><button id="story-play">Play</button><button id="story-next">Next</button></div><p class="story-boundary">Playback does not submit requests, sign loans or issue receipts.</p><a href="/borrow?mode=live&request=request-1708833c-9d9e-4a49-9fe2-6b9284842ecc">Open real completed loan evidence ↗</a>';
 document.body.append(storyDialog);
 function pauseStory(){clearInterval(storyTimer);storyTimer=undefined;document.getElementById('story-play').textContent='Play';}
 function renderStory(){const [stage,title,body,rail]=storySteps[storyIndex];document.getElementById('story-stage').textContent=(storyIndex+1)+' / 8 · '+stage;document.getElementById('story-title').textContent=title;document.getElementById('story-body').textContent=body;document.getElementById('story-progress').value=storyIndex+1;storyDialog.querySelectorAll('.story-rail span').forEach((el,i)=>el.classList.toggle('active',i===rail));document.getElementById('story-back').disabled=storyIndex===0;document.getElementById('story-next').textContent=storyIndex===7?'Restart':'Next';}
-document.getElementById('demo-story-open').onclick=()=>{pauseStory();storyIndex=0;renderStory();storyDialog.showModal();};
+document.getElementById('demo-story-open').onclick=()=>{pauseStory();storyIndex=0;renderStory();storyDialog.showModal();void refreshStoryProof();document.getElementById('story-play').click();};
 document.getElementById('story-close').onclick=()=>storyDialog.close();storyDialog.addEventListener('close',pauseStory);
 document.getElementById('story-back').onclick=()=>{pauseStory();storyIndex=Math.max(0,storyIndex-1);renderStory();};
 document.getElementById('story-next').onclick=()=>{pauseStory();storyIndex=(storyIndex+1)%8;renderStory();};
 document.getElementById('story-play').onclick=()=>{if(storyTimer){pauseStory();return;}if(storyIndex===7)storyIndex=0;renderStory();document.getElementById('story-play').textContent='Pause';storyTimer=setInterval(()=>{storyIndex++;renderStory();if(storyIndex===7)pauseStory();},9000);};
+
+async function refreshStoryProof(){
+ const host=document.getElementById('story-proof');host.textContent='Checking the completed loan receipts live…';
+ try{
+  const response=await fetch('/api/story-proof',{signal:AbortSignal.timeout(25000)});if(!response.ok)throw Error();const data=await response.json();
+  if(data.round!=='request-1708833c-9d9e-4a49-9fe2-6b9284842ecc')throw Error();
+  host.innerHTML='<p><strong>Real completed loan · live receipt checks</strong></p>'+data.receipts.map(p=>'<p>'+esc(p.kind)+': '+(p.verified?'✓ Verified now':'Live check unavailable')+' · <a target="_blank" rel="noopener" href="https://www.recognitium.com/verify?id='+encodeURIComponent(p.receiptId)+'">Verify on Recognitium ↗</a></p>').join('');
+ }catch{host.textContent='Live receipt check unavailable. Saved evidence remains available below.';}
+}
