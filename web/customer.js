@@ -207,7 +207,7 @@ function render() {
   $('new-request').hidden = !borrower || page === 'activity' || page === 'receipts' || recorded;
   $('sync-note').textContent = available ? syncLabel(state) : 'Connection paused · Last recorded facts retained';
   const choices = recorded ? [] : lender ? state.requests.map(q=>({clientRequestId:q.agreement.requestId,requestedDrops:q.agreement.terms.principalDrops})) : privateRequests();
-  $('request-context').innerHTML = choices.length ? '<label>Saved rounds <select id="customer-request-picker" aria-label="Saved rounds">'+('<option value="" '+(!id?'selected':'')+'>'+(borrower?'New request':lender?'Choose a loan':'Choose a request')+'</option>')+choices.map(q=>'<option value="'+esc(q.clientRequestId)+'" '+(q.clientRequestId===id?'selected':'')+'>'+esc(shortId(q.clientRequestId))+' · '+esc(amount(q.requestedDrops))+'</option>').join('')+'</select></label>' : '';
+  $('request-context').innerHTML = '';
   $('request-context').hidden = page === 'receipts';
   if(id) $('request-context').insertAdjacentHTML('beforeend','<button class="text-button" data-open-page="activity">Transactions &amp; evidence</button>');
   if (!recorded && !lender && hasAccess() && !privateAvailable) $('overview-content').innerHTML = empty(inboxLoaded ? 'Request connection paused.' : 'Opening the shared requests…',inboxLoaded ? 'Your saved requests are retained. Reconnect before making a decision.' : 'Reading the current request and review status.');
@@ -868,7 +868,6 @@ document.addEventListener("click", (e) => {
   if (b.dataset.decision) void applyReview(b.dataset.decision);
   if (b.hasAttribute("data-approve")) void applyReview();
 });
-document.addEventListener('change', e => { if(e.target.id === 'customer-request-picker') chooseRequest(e.target.value); });
 let nextPollAt = 0;
 setInterval(async () => {
   if (document.hidden || pollBusy || Date.now() < nextPollAt) return;
