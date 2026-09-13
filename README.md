@@ -1,6 +1,20 @@
 # Recognitium: XRPL lending hackathon
 
-**Hosted demo:** https://recognitium-xrpl-hackathon.vercel.app/ · [Two-person access and testing](docs/HOSTED_TESTING.md). Shared request review is live; native signing remains local.
+## For mentors · start here
+
+| Order | Open | What you will see |
+| --- | --- | --- |
+| **01** | **[Pitch Deck · Recognitium on XRPL](https://jninom8.github.io/recognitium-xrpl-hackathon/pitch/Recognitium-Pitch.html)** | The product, its purpose, architecture and three developer findings. Nine slides. |
+| **02** | **[Loan Film · From Agreement to Repayment](https://jninom8.github.io/recognitium-xrpl-hackathon/film.html)** | An animated replay of a completed Devnet loan, with actual amounts, transaction hashes and Recognitium receipt links. |
+| **03** | **[Application · Lender, Borrower & Admin](https://jninom8.github.io/recognitium-xrpl-hackathon/lend.html)** | The actual frontend with saved completed-loan data. Start with Lender, then Borrower, Admin and Receipts. |
+| **04** | **[Developer Report · Personal Experience (PDF)](https://jninom8.github.io/recognitium-xrpl-hackathon/report/Recognitium-Personal-Developer-Report.pdf)** | The participant's account of the build and obstacles encountered. One page, within the three-page limit. |
+
+Recognitium receipt IDs shown in this project begin with **DG-**. Open [Recognitium Verify](https://www.recognitium.com/verify) and enter the complete receipt ID. The separate SHA-256 hash identifies the committed content; it is not the receipt ID.
+
+The GitHub-hosted application is read-only; the film replays evidence and creates no new loans or receipts. Its last three receipts seal saved transaction evidence retrospectively, as labelled. New requests, approvals and signing require the local backend described below. The Vercel shared workspace currently has a storage quota outage.
+
+[Download the editable pitch deck](docs/pitch/Recognitium-Pitch-v13.pptx) · [Source code and local setup](#run-the-application)
+
 
 A small application connecting a private request and agreement to an actual XRPL
 loan, repayment and checkable receipt. AI can help discover and prepare a request;
@@ -231,3 +245,4 @@ checks online receipt authority and event-ledger history; temporary Devnet histo
 may disappear. Open `/borrow?mode=live&request=request-1708833c-9d9e-4a49-9fe2-6b9284842ecc`
 on the demo and use the three intention tabs to follow the same completed loan.
 The local operator executed native actions after explicit founder approvals.
+
